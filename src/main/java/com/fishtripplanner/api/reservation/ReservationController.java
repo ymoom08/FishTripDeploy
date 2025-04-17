@@ -8,8 +8,10 @@ import com.fishtripplanner.dto.ReservationPostRequest;
 import com.fishtripplanner.dto.ReservationPostResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -63,5 +65,7 @@ public class ReservationController {
     public ResponseEntity<List<ReservationResponseDto>> getMyRequests(@RequestParam Long userId) {
         return ResponseEntity.ok(reservationService.getRequestsByUser(userId));
     }
+
+
 }
 
