@@ -1,5 +1,4 @@
-
-package com.fishtripplanner.api;
+package com.fishtripplanner.controller.User;
 
 import com.fishtripplanner.domain.User;
 import com.fishtripplanner.dto.user.JoinRequest;
@@ -11,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.Optional;
 
 @Controller

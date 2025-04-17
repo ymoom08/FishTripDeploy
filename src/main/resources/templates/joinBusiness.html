@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>사업자 회원가입</title>
+  <link rel="stylesheet" th:href="@{/css/joinBusiness.css}" />
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+
+</head>
+<body>
+<div class="register-container">
+  <h2>사업자 회원가입</h2>
+  <form action="/register/business" method="post">
+
+    <label for="username">아이디</label>
+    <div class="input-group">
+      <input type="text" id="username" name="username" required />
+      <button type="button" onclick="checkDuplicateId()">중복확인</button>
+    </div>
+
+    <label for="password">비밀번호</label>
+    <input type="password" id="password" name="password" required />
+
+    <label for="name">이름</label>
+    <input type="text" id="name" name="name" required />
+
+    <label for="company">회사명</label>
+    <input type="text" id="company" name="company" required />
+
+    <label for="address">
+      주소
+    <div class="input-group">
+      <input type="text" id="address" name="address" readonly required />
+      <button type="button" onclick="execDaumPostcode()">주소 검색</button>
+    </div>
+    </label>
+
+    <label for="address2">상세주소</label>
+    <input type="text" id="address2" name="address2" required />
+
+
+    <label for="email">이메일</label>
+    <input type="email" id="email" name="email" required />
+
+    <label for="biznum">사업자번호</label>
+    <div class="input-group">
+      <input type="text" id="biznum" name="biznum" required />
+      <button type="button" onclick="verifyBusinessNumber()">인증하기</button>
+    </div>
+
+    <label for="service">서비스 종류</label>
+    <select id="service" name="service">
+      <option value="">선택하세요</option>
+      <option value="선상낚시">선상낚시</option>
+      <option value="갯바위">갯바위</option>
+      <option value="여객선">선외기 대여</option>
+      <option value="여객선">여객선</option>
+    </select>
+
+    <button type="submit">회원가입</button>
+  </form>
+</div>
+
+<script>
+  function checkDuplicateId() {
+    const username = $('#username').val();
+    if (!username) return alert("아이디를 입력하세요.");
+
+    $.get(`/api/user/check-id?username=${username}`, function (response) {
+      if (response.exists) {
+        alert("이미 사용 중인 아이디입니다.");
+      } else {
+        alert("사용 가능한 아이디입니다.");
+      }
+    });
+  }
+
+  function execDaumPostcode() {
+    new daum.Postcode({
+      oncomplete: function(data) {
+        document.getElementById("address").value = data.address;
+      }
+    }).open();
+  }
+
+  function verifyBusinessNumber() {
+    const biznum = $('#biznum').val();
+    if (!biznum) return alert("사업자 번호를 입력하세요.");
+
+    $.post('/api/verify-business', { biznum: biznum }, function(result) {
+      if (result.valid) {
+        alert("인증 완료!");
+      } else {
+        alert("유효하지 않은 사업자번호입니다.");
+      }
+    });
+  }
+</script>
+</body>
+</html>
