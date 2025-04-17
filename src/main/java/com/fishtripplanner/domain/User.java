@@ -34,6 +34,8 @@ public class User {
 
     private LocalDateTime createdAt;
 
+    private boolean BusinessCheck;
+
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private BusinessInfo businessInfo;
 }
