@@ -8,13 +8,14 @@ import com.fishtripplanner.dto.ReservationPostRequest;
 import com.fishtripplanner.dto.ReservationPostResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
 import java.util.List;
 
-@RestController
+@Controller
 @RequestMapping("/api/reservations")
 @RequiredArgsConstructor
 public class ReservationController {
