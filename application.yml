@@ -1,22 +1,23 @@
 spring:
   datasource:
-    url: jdbc:postgresql://ep-solitary-boat-a1gavunr-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require
+    url: jdbc:postgresql://ep-wispy-lab-a1j132ka-pooler.ap-southeast-1.aws.neon.tech/neondb
     username: neondb_owner
     password: npg_y2EBdq5cIfKa
     driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
-      ddl-auto: update  # 엔티티 기반 테이블 자동 생성
+      ddl-auto: update # 또는 create / create-drop (개발 상황에 따라 변경)
+    show-sql: true
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-    show-sql: true     # 콘솔에 SQL 출력
+        format_sql: true
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
 
-  # 로깅 보기 편하게 (선택)
-  output:
-    ansi:
-      enabled: always
+  # 연결 보안을 위해 SSL 사용
+  datasource-properties:
+    sslmode: require
 
-server:
-  port: 8080
+logging:
+  level:
+    org.hibernate.SQL: debug
