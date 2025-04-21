@@ -10,7 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
+
 import java.util.Optional;
 
 @Controller
@@ -36,20 +36,5 @@ public class UserController {
         return "redirect:/";
     }
 
-    @GetMapping("/register")
-    public String registerForm(Model model) {
-        model.addAttribute("joinRequest", new JoinRequest());
-        return "register";
-    }
 
-    @PostMapping("/register")
-    public String register(@ModelAttribute JoinRequest joinRequest) {
-        User user = new User();
-        user.setUsername(joinRequest.getUsername());
-        user.setPassword(joinRequest.getPassword());
-        user.setAddress(joinRequest.getAddress());
-        user.setRole(joinRequest.getRole());
-        userRepository.save(user);
-        return "redirect:/login";
-    }
 }

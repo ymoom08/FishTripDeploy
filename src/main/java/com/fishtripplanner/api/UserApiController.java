@@ -20,7 +20,7 @@ public class UserApiController {
 
     private final UserRepository userRepository;
 
-    //여기부터는 04월 17일부터 작업한 거예요!
+    //여기부터는 04월 17일부터 작업한 거예요! 회원가입 시 아이디 중복확인(json api)
     @ResponseBody // ✅ 이거 꼭 붙이기!
     @GetMapping("/check-id")
     public Map<String, Boolean> checkId(@RequestParam("username") String username) {
