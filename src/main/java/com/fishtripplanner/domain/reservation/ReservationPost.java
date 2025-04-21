@@ -41,6 +41,10 @@ public class ReservationPost {
     private String imageUrl;
 
     private LocalDateTime createdAt;
+
+
 }
 
+
+//fishtype
 

@@ -1,0 +1,142 @@
+body {
+  font-family: sans-serif;
+  padding: 20px;
+  font-size: clamp(15px, 1.4vw, 18px);
+}
+
+h1 {
+  text-align: center;
+  font-size: clamp(24px, 2.5vw, 32px);
+  margin-bottom: 25px;
+}
+
+/* 필터 박스 */
+.filter-container {
+  padding: 25px;
+  margin: 0 auto 30px;
+  font-size: clamp(14px, 1.3vw, 18px);
+  max-width: 1200px;
+}
+
+/* 버튼 세트 상단 */
+.filter-top-group {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 40px;
+  margin-bottom: 25px;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 160px;
+  max-width: 200px;
+  width: clamp(160px, 18vw, 200px);
+  gap: 8px;
+}
+
+.filter-group button {
+  padding: 10px 18px;
+  font-size: clamp(14px, 1vw, 16px);
+  border: 2px solid black;
+  background-color: white;
+  cursor: pointer;
+  width: 100%;
+}
+
+/* 검색창 */
+.search-row {
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.search-input {
+  padding: 10px;
+  font-size: 1em;
+  width: clamp(250px, 30vw, 400px);
+}
+
+.search-button {
+  padding: 10px 20px;
+  font-size: 1em;
+  border: 2px solid black;
+  background: white;
+  cursor: pointer;
+}
+
+/* 현재 선택 정보 */
+.current-selection {
+  margin-top: 25px;
+  font-weight: bold;
+  text-align: center;
+  color: #222;
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+  font-size: clamp(14px, 1.2vw, 16px);
+  line-height: 1.5;
+}
+
+/* 광고 카드 리스트 */
+.ad-card-list {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 40px;
+  margin-top: 40px;
+}
+
+.ad-card {
+  border: 2px solid black;
+  width: 350px;
+  padding: 20px;
+  text-align: center;
+  transition: transform 0.2s ease;
+}
+
+.ad-image {
+  height: 200px;
+  background: #eee;
+  margin-bottom: 12px;
+}
+
+.ad-desc {
+  border-top: 2px solid black;
+  padding-top: 6px;
+  font-weight: bold;
+}
+
+.ad-detail {
+  font-size: 14px;
+  margin-top: 10px;
+  text-align: left;
+}
+
+/* 페이징 */
+.pagination {
+  text-align: center;
+  margin-top: 60px;
+}
+
+.pagination a {
+  margin: 0 10px;
+  text-decoration: none;
+  font-weight: bold;
+  color: black;
+  padding: 6px 10px;
+  transition: all 0.2s ease;
+}
+
+.pagination a:hover {
+  text-decoration: underline;
+}
+
+.pagination a.active-page {
+  color: blue;
+  text-decoration: underline;
+}
