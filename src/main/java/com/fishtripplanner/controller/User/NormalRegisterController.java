@@ -44,6 +44,7 @@ public class NormalRegisterController {
                     .address(address + " " + address2)
                     .role(UserRole.NORMAL) // 예: BUSINESS 또는 OWNER 같은 enum 값
                     .createdAt(now)
+                    .BusinessCheck(false)
                     .build();
 
             // 2. 저장

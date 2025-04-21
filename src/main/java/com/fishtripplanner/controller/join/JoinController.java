@@ -3,6 +3,7 @@ package com.fishtripplanner.controller.join;
 import com.fishtripplanner.domain.User;
 import com.fishtripplanner.dto.user.JoinRequest;
 import com.fishtripplanner.repository.UserRepository;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,4 +29,10 @@ public class JoinController {
         return "joinBusiness"; // 사업자회원 폼
     }
 
+    @GetMapping("/join/oauth")
+    public String registerWithOAuth(HttpSession session, Model model) {
+        model.addAttribute("nickname", session.getAttribute("oauth_nickname"));
+        model.addAttribute("profileImage", session.getAttribute("oauth_profile_image"));
+        return "join/oauthJoinForm"; // 따로 페이지 만들거나 기존 회원가입 폼 재사용
+    }
 }

@@ -21,16 +21,16 @@ public class BusinessRegisterController {
 
     @PostMapping("/register/business")
     public String registerBusinessUser(
-            @RequestParam String username,
-            @RequestParam String password,
-            @RequestParam String email,
-            @RequestParam String name,// name은 BusinessInfo로 넘길 예정
-            @RequestParam String nickname,
-            @RequestParam String company,
-            @RequestParam String address,
-            @RequestParam String address2,
-            @RequestParam String service,
-            @RequestParam Number phonenumber
+            @RequestParam("username") String username,
+            @RequestParam("password") String password,
+            @RequestParam("email") String email,
+            @RequestParam("name") String name,
+            @RequestParam("company") String company,
+            @RequestParam("address") String address,
+            @RequestParam("address2") String address2,
+            @RequestParam("nickname") String nickname,
+            @RequestParam("service") String service,
+            @RequestParam("phonenumber") Number phonenumber
     ) {
         // 가입일시
         LocalDateTime now = LocalDateTime.now();
@@ -46,6 +46,7 @@ public class BusinessRegisterController {
                 .address(address + " " + address2)
                 .role(UserRole.OWNER) // 예: BUSINESS 또는 OWNER 같은 enum 값
                 .createdAt(now)
+                .BusinessCheck(true)
                 .build();
 
         // 2. BusinessInfo 생성 및 연결
