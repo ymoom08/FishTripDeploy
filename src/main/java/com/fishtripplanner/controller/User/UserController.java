@@ -1,5 +1,4 @@
-
-package com.fishtripplanner.api;
+package com.fishtripplanner.controller.User;
 
 import com.fishtripplanner.domain.User;
 import com.fishtripplanner.dto.user.JoinRequest;
@@ -10,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
 
 import java.util.Optional;
 
@@ -36,20 +36,5 @@ public class UserController {
         return "redirect:/";
     }
 
-    @GetMapping("/register")
-    public String registerForm(Model model) {
-        model.addAttribute("joinRequest", new JoinRequest());
-        return "register";
-    }
 
-    @PostMapping("/register")
-    public String register(@ModelAttribute JoinRequest joinRequest) {
-        User user = new User();
-        user.setUsername(joinRequest.getUsername());
-        user.setPassword(joinRequest.getPassword());
-        user.setAddress(joinRequest.getAddress());
-        user.setRole(joinRequest.getRole());
-        userRepository.save(user);
-        return "redirect:/login";
-    }
 }

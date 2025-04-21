@@ -21,6 +21,12 @@ public class User {
     private String username;
 
     @Column(nullable = false)
+    private String name;
+
+    @Column(nullable = false)
+    private String nickname;
+
+    @Column(nullable = false)
     private String password;
 
     @Column(nullable = false, unique = true)
@@ -28,6 +34,9 @@ public class User {
 
     @Column(nullable = false, unique = true)
     private String address;
+
+    @Column(nullable = false)
+    private String phonenumber;
 
     @Enumerated(EnumType.STRING)
     private UserRole role;
