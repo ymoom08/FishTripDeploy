@@ -38,6 +38,18 @@ public class User {
     @Column(nullable = false)
     private String phonenumber;
 
+    @Column(nullable = false)
+    private String gender;
+
+    @Column(nullable = false)
+    private String age;
+
+    @Column(nullable = true)
+    private String birthyear;
+
+    @Column(nullable = true)
+    private String birthday;
+
     @Enumerated(EnumType.STRING)
     private UserRole role;
 

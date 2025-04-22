@@ -31,23 +31,32 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         OAuth2AuthenticationToken token = (OAuth2AuthenticationToken) authentication;
         OAuth2User user = token.getPrincipal();
 
-//        String kakaoId = user.getAttribute("id").toString();
-        String nickname = ((Map<String, Object>) user.getAttribute("properties")).get("nickname").toString();
-        String profileImage = ((Map<String, Object>) user.getAttribute("properties")).get("profile_image").toString();
+        String registrationId = token.getAuthorizedClientRegistrationId();
+        String nickname = null;
+        String profileImage = null;
+
+        if (registrationId.equals("kakao")) {
+            Map<String, Object> properties = (Map<String, Object>) user.getAttributes().get("properties");
+            nickname = (String) properties.get("nickname");
+            profileImage = (String) properties.get("profile_image");
+
+        } else if (registrationId.equals("naver")) {
+            Map<String, Object> responseMap = (Map<String, Object>) user.getAttributes().get("response");
+            nickname = (String) responseMap.get("nickname");
+            profileImage = (String) responseMap.get("profile_image");
+        }
+
+        HttpSession session = request.getSession();
+        session.setAttribute("oauth_nickname", nickname);
+        session.setAttribute("oauth_profile_image", profileImage);
 
         Optional<User> existing = userRepository.findByNickname(nickname);
         if (existing.isPresent()) {
-            // 자동 로그인 처리
+            // 로그인된 상태로 홈으로
             redirectStrategy.sendRedirect(request, response, "/");
         } else {
-            // 회원가입 폼으로 redirect, session에 정보 저장
-            HttpSession session = request.getSession();
-            session.setAttribute("oauth_nickname", nickname);
-            session.setAttribute("oauth_profile_image", profileImage);
-
-
+            // 회원가입 페이지로 이동
             redirectStrategy.sendRedirect(request, response, "/join/oauth");
         }
     }
 }
-

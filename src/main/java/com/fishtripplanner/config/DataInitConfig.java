@@ -29,6 +29,8 @@ public class DataInitConfig {
                         .name("관리자")
                         .nickname("Master")
                         .phonenumber("01099999999")
+                        .age("20")
+                        .gender("male")
                         .build();
                 userRepository.save(admin);
                 System.out.println("✅ 테스트 관리자 계정 추가됨! (admin / 1234)");

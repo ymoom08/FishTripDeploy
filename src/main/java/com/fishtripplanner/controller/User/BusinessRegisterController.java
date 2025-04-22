@@ -30,7 +30,11 @@ public class BusinessRegisterController {
             @RequestParam("address2") String address2,
             @RequestParam("nickname") String nickname,
             @RequestParam("service") String service,
-            @RequestParam("phonenumber") Number phonenumber
+            @RequestParam("phonenumber") Number phonenumber,
+            @RequestParam String birthyear,
+            @RequestParam String birthday,
+            @RequestParam String gender,
+            @RequestParam String age
     ) {
         // 가입일시
         LocalDateTime now = LocalDateTime.now();
@@ -44,6 +48,10 @@ public class BusinessRegisterController {
                 .name(name)
                 .phonenumber(phonenumber.toString())
                 .address(address + " " + address2)
+                .birthyear(birthyear)
+                .birthday(birthday)
+                .age(age)
+                .gender(gender)
                 .role(UserRole.OWNER) // 예: BUSINESS 또는 OWNER 같은 enum 값
                 .createdAt(now)
                 .BusinessCheck(true)
