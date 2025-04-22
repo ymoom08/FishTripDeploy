@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FishTrip</title>
+    <link rel="stylesheet" th:href="@{/css/MainPage.css}">
+    <link rel="stylesheet" th:href="@{/css/LoginModal.css}">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
+    <script th:src="@{/js/common.js}"></script>
+</head>
+<body>
+<div class="container">
+
+    <div th:replace="fragments/header :: headerFragment"></div>
+
+
+    <main class="mainContent">
+        <div class="textBlock">
+            <p class="subText">혼자서도,<br />함께도,<br />낚시 계획의 <br />모든것<br />Finder</p>
+            <button class="button" onclick="navigatePage('/plan/create')">🐟 일정 짜기</button>
+        </div>
+        <div class="imageContainer">
+            <div class="videoSlider">
+                <video class="video" th:src="@{/videos/sea2.mp4}" muted loop autoplay></video>
+                <video class="video" th:src="@{/videos/sea3.mp4}" muted loop autoplay></video>
+                <video class="video" th:src="@{/videos/sea4.mp4}" muted loop autoplay></video>
+            </div>
+        </div>
+    </main>
+A
+
+    <div class="eventSection">
+        <h2 class="sectionTitle">🙋‍♂️ 게시판 인기글 자리!</h2>
+        <ul class="sectionList">
+            <li>🐟 같이 즐길수록 재미는 두 배</li>
+            <li>🎁 어종 크기별 다양한 경품</li>
+            <li>🚤 바다낚시 지금 바로 출항!</li>
+            <li>🎣 이번 주말 놓치면 후회할 조황 정보</li>
+            <li>📢 초보 낚시꾼 필독 가이드</li>
+            <li>🗺️ 숨겨진 낚시 명당 대공개</li>
+            <li>🤝 낚시 친구/동료 구함</li>
+            <li>📸 나의 Best Fishing Moment 자랑하기</li>
+            <li>📜 낚시 관련 법규 및 안전 수칙</li>
+            <li>💡 낚시 장비 관리 및 선택 팁</li>
+            <li>📰 최신 낚시 뉴스 및 트렌드</li>
+            <li>🗣️ 자유롭게 이야기 나누는 잡담 게시판</li>
+        </ul>
+    </div>
+
+
+    <section class="catchLogSection">
+        <div class="catchTextBlock">
+            <h2>🎣 예약하기</h2>
+            <p>언제 어디서든 예약이 가능해요<br/>여러 선택지로 익사이팅한 낚시</p>
+            <button class="button" onclick="navigatePage('/my-catch-log')">예약하러 가기</button>
+        </div>
+        <div class="catchPhoneMockup">
+            <img th:src="@{/image/iphone.png}" alt="낚시 기록 모바일 UI" />
+        </div>
+    </section>
+
+
+    <div th:replace="fragments/footer :: footerFragment"></div>
+</div>
+</body>
+</html>

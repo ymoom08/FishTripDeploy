@@ -1,0 +1,299 @@
+.header {
+  background-color: #ffffff;
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.logoArea {
+  flex: 1;
+  font-size: 1.8rem;
+  color: #009688;
+}
+
+.logoText {
+  font-weight: bold;
+  font-size: 1.7rem;
+}
+
+.searchBoxWrapper {
+  flex: 2;
+  display: flex;
+  align-items: center;
+  background-color: #f1f1f1;
+  border-radius: 2rem;
+  padding: 0.5rem 1rem;
+}
+
+.searchInput {
+  flex: 1;
+  border: none;
+  outline: none;
+  background-color: transparent;
+  font-size: 1rem;
+}
+
+.searchButton {
+  border: none;
+  background-color: transparent;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.rightIcons {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1.2rem;
+}
+
+.iconButton {
+  background: none;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+}
+
+.iconLabel {
+  font-size: 0.7rem;
+  color: #555;
+  margin-top: 0.2rem;
+}
+
+/* ======================= 내비게이션 ======================= */
+.navBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem 2rem;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e0e0e0;
+  position: sticky;
+  top: 64px;
+  z-index: 999;
+}
+
+.navLeft {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.navRight {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.menuIcon {
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.activeMenu {
+  color: #00bfa5;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  border: none;
+  background: none;
+  font-size: 1rem;
+}
+
+.menuList {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.menuItem {
+  position: relative;
+  margin-right: 2rem;
+}
+
+.menuButton {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: #333;
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+.subMenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  padding: 0.8rem 0;
+  min-width: 160px;
+}
+
+.subMenuList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.subMenuItem {
+  padding: 0.6rem 1rem;
+}
+
+.subMenuButton {
+  all: unset;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  display: block;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  font-size: 0.95rem;
+  color: #333;
+  cursor: pointer;
+  text-align: left;
+  background: none;
+  border: none;
+}
+
+.subMenuButton:hover {
+  background-color: #e0f7fa;
+}
+/* ======================= 전체 메뉴 박스 ======================= */
+.fullMenuBox {
+  position: absolute;
+  top: 135px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 2rem 3rem;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+  z-index: 999;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 3rem;
+  max-width: 1200px;
+  width: 95vw;
+  box-sizing: border-box;
+}
+
+/* 왼쪽 아이콘 영역 */
+.menuLeft {
+  display: flex;
+  flex-direction: row;
+  gap: 2.5rem;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+  width: auto;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.navigationItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 80px;
+  font-size: 0.9rem;
+  color: #444;
+}
+.navigationItemIcon {
+  font-size: 1.8rem;
+}
+
+/* 오른쪽 텍스트 메뉴 영역 */
+.menuRight {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3rem;
+  justify-content: flex-start;
+  flex: 1;
+}
+
+/* 개별 섹션 */
+.fullMenuSection {
+  min-width: 140px;
+}
+
+.fullMenuTitle {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: #00796b;
+  margin-bottom: 0.5rem;
+}
+
+.fullMenuList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.fullMenuItem {
+  margin-bottom: 0.3rem;
+}
+
+.fullMenuButton {
+  background: none;
+  border: none;
+  font-size: 0.9rem;
+  color: #555;
+  cursor: pointer;
+  padding: 0;
+  text-align: left;
+}
+/*============================================반응형====================================*/
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1rem;
+  }
+
+  .searchBoxWrapper {
+    width: 100%;
+    margin: 1rem 0;
+  }
+
+  .rightIcons {
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .navBar {
+    flex-direction: column;
+    padding: 1rem;
+  }
+
+  .navLeft, .navRight {
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .menuList {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .menuItem {
+    margin: 0.5rem;
+  }
+}

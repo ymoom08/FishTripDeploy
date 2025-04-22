@@ -63,5 +63,6 @@ public class ReservationController {
     public ResponseEntity<List<ReservationResponseDto>> getMyRequests(@RequestParam Long userId) {
         return ResponseEntity.ok(reservationService.getRequestsByUser(userId));
     }
+
 }
 
