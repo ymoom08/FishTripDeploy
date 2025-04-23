@@ -1,12 +1,78 @@
+/* 🌍 전체 배경을 화면 전체에 적용 */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(to bottom right, #b2ebf2, #e0f7fa);
+  font-family: 'Pretendard', sans-serif;
+  overflow-x: hidden;
+}
+
+/* 🌊 전체 화면 배경 및 중앙 정렬 */
+.koreaMapSection {
+  min-height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  padding: 0;
+  margin: 0;
+}
+
+/* 🗺️ 지도 카드 스타일 제거 */
+.mapCard {
+  position: relative;
+  width: 1000px;
+  max-width: 100%;
+  border: none;
+  box-shadow: none;
+  background: none;
+}
+
+.koreaMapImage {
+  width: 100%;
+  height: auto;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* 🔘 버튼 전체 공통 스타일 */
 .mapOverlay {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  pointer-events: none; /* 마우스 이벤트 방지 */
+  pointer-events: none;
 }
 
 .mapOverlay .mapRegionButton {
-  pointer-events: auto; /* 버튼만 클릭 가능 */
+  pointer-events: auto;
+  position: absolute;
+  background-color: rgba(0, 150, 136, 0.9);
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+  white-space: nowrap;
 }
+
+.mapOverlay .mapRegionButton:hover {
+  background-color: #00796b;
+  transform: scale(1.1);
+}
+
+/* 📍 지도 기반 정확 위치 지정 */
+.region-0 { top: 20%; left: 12%; }   /* 서해북부 */
+.region-1 { top: 37%; left: 11%; }   /* 서해중부 */
+.region-2 { top: 59%; left: 6%; }   /* 서해남부 */
+.region-3 { top: 75%; left: 25%; }   /* 남해서부 */
+.region-4 { top: 90%; left: 25%; }   /* 제주도 */
+.region-5 { top: 68%; left: 75%; }   /* 남해동부 */
+.region-6 { top: 40%; left: 88%; }   /* 동해남부 */
+.region-7 { top: 20%; left: 80%; }   /* 동해중부 */
