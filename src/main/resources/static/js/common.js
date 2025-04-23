@@ -135,7 +135,7 @@ function renderFullMenu() {
     });
 }
 
-// ✅ 페이지 로드 후 실행
+
 document.addEventListener('DOMContentLoaded', () => {
     renderFullMenu();
 
@@ -144,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
         fullMenuBox.style.display = 'none';
     }
 
-    // ✅ 외부 클릭 시 fullMenuBox 닫기
+
     document.addEventListener('click', (event) => {
         const fullMenuBox = document.querySelector('.fullMenuBox');
         const menuIcon = document.querySelector('.menuIcon');
@@ -162,7 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // ✅ 동영상 슬라이더 로직
+
     const videos = document.querySelectorAll('.videoSlider .video');
     let current = 0;
 
@@ -184,7 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// ✅ 해역 버튼 클릭 시 작동할 함수
+
 function selectRegion(regionName) {
     alert(`선택된 해역: ${regionName}`);
     // 향후: window.location.href = `/weather?region=${regionName}`;
