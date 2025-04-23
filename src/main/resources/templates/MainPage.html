@@ -23,13 +23,13 @@
         </div>
         <div class="imageContainer">
             <div class="videoSlider">
-                <video class="video" th:src="@{/videos/sea2.mp4}" muted loop autoplay></video>
-                <video class="video" th:src="@{/videos/sea3.mp4}" muted loop autoplay></video>
-                <video class="video" th:src="@{/videos/sea4.mp4}" muted loop autoplay></video>
+                <video class="video" th:src="@{/videos/sea1.mp4}" type="video/mp4" autoplay muted loop playsinline></video>
+                <video class="video" th:src="@{/videos/sea2.mp4}" type="video/mp4" autoplay muted loop playsinline></video>
+                <video class="video" th:src="@{/videos/sea3.mp4}" type="video/mp4" autoplay muted loop playsinline></video>
+
             </div>
         </div>
     </main>
-A
 
     <div class="eventSection">
         <h2 class="sectionTitle">🙋‍♂️ 게시판 인기글 자리!</h2>
@@ -57,7 +57,7 @@ A
             <button class="button" onclick="navigatePage('/my-catch-log')">예약하러 가기</button>
         </div>
         <div class="catchPhoneMockup">
-            <img th:src="@{/image/iphone.png}" alt="낚시 기록 모바일 UI" />
+            <img th:src="@{/image/phone1.png}" alt="낚시 기록 모바일 UI" />
         </div>
     </section>
 
