@@ -67,7 +67,8 @@
   margin-top: 0.2rem;
 }
 
-/* ======================= 내비게이션 ======================= */
+
+/* ======================= 내비게이션 영역 ======================= */
 .navBar {
   display: flex;
   justify-content: space-between;
@@ -104,7 +105,6 @@
   cursor: pointer;
   padding: 0.3rem 0.6rem;
   border-radius: 6px;
-  border: none;
   background: none;
   font-size: 1rem;
 }
@@ -131,6 +131,8 @@
   font-size: 1rem;
 }
 
+
+/* ======================= 드롭다운 메뉴 ======================= */
 .subMenu {
   position: absolute;
   top: 100%;
@@ -142,6 +144,17 @@
   z-index: 100;
   padding: 0.8rem 0;
   min-width: 160px;
+  opacity: 0;
+  transform: translateY(10px);
+  visibility: hidden;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  overflow: hidden;
+}
+
+.menuItem:hover .subMenu {
+  opacity: 1;
+  transform: translateY(0);
+  visibility: visible;
 }
 
 .subMenuList {
@@ -151,29 +164,30 @@
 }
 
 .subMenuItem {
-  padding: 0.6rem 1rem;
+  padding: 0;
 }
 
 .subMenuButton {
   all: unset;
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
   display: block;
   width: 100%;
-  padding: 0.5rem 1rem;
+  padding: 0.4rem 1rem;
   font-size: 0.95rem;
   color: #333;
   cursor: pointer;
   text-align: left;
   background: none;
   border: none;
+  box-sizing: border-box;
+  white-space: nowrap;
 }
 
 .subMenuButton:hover {
   background-color: #e0f7fa;
 }
-/* ======================= 전체 메뉴 박스 ======================= */
+
+
+/* =======================  전체 메뉴 박스 ======================= */
 .fullMenuBox {
   position: absolute;
   top: 135px;
@@ -193,7 +207,6 @@
   box-sizing: border-box;
 }
 
-/* 왼쪽 아이콘 영역 */
 .menuLeft {
   display: flex;
   flex-direction: row;
@@ -219,7 +232,6 @@
   font-size: 1.8rem;
 }
 
-/* 오른쪽 텍스트 메뉴 영역 */
 .menuRight {
   display: flex;
   flex-wrap: wrap;
@@ -228,7 +240,6 @@
   flex: 1;
 }
 
-/* 개별 섹션 */
 .fullMenuSection {
   min-width: 140px;
 }
@@ -259,7 +270,9 @@
   padding: 0;
   text-align: left;
 }
-/*============================================반응형====================================*/
+
+
+/* =======================  반응형 ======================= */
 @media (max-width: 768px) {
   .header {
     flex-direction: column;
