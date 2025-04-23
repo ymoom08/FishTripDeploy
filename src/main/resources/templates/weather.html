@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <title>대한민국 해역 선택</title>
-  <link rel="stylesheet" href="/css/koreaMap.css">
+  <link rel="stylesheet" href="/css/weather.css">
   <script src="/js/koreaMap.js" defer></script>
 </head>
 <body>
 <div class="koreaMapSection">
   <div class="mapCard">
-    <img src="/image/koreaMap.png" alt="입체 대한민국 지도HTML" class="koreaMapImage" />
+    <img src="/image/koreaMap.png" alt="입체 대한민국 지도" class="koreaMapImage" />
     <div class="mapOverlay">
       <button class="mapRegionButton region-0" onclick="selectRegion('서해북부')">서해북부</button>
       <button class="mapRegionButton region-1" onclick="selectRegion('서해중부')">서해중부</button>
@@ -19,9 +19,24 @@
       <button class="mapRegionButton region-5" onclick="selectRegion('남해동부')">남해동부</button>
       <button class="mapRegionButton region-6" onclick="selectRegion('동해남부')">동해남부</button>
       <button class="mapRegionButton region-7" onclick="selectRegion('동해중부')">동해중부</button>
-      <button class="mapRegionButton region-8" onclick="selectRegion('동해북부')">동해북부</button>
     </div>
   </div>
+</div>
+
+<!-- ✅ 로딩 메시지 박스 -->
+<div id="weatherStatus"
+     style="display: none;
+              position: fixed;
+              top: 20px;
+              left: 50%;
+              transform: translateX(-50%);
+              background-color: rgba(0, 0, 0, 0.85);
+              color: #fff;
+              padding: 10px 20px;
+              border-radius: 10px;
+              font-weight: bold;
+              z-index: 999;">
+  해역 정보를 불러오는 중...
 </div>
 </body>
 </html>
