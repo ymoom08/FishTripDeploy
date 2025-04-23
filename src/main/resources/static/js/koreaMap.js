@@ -9,8 +9,10 @@ function selectRegion(regionName) {
         .then(data => {
             alert(
                 `[${data.region}] 해역 정보\n` +
-                `🌡 수온: ${data.temperature}°C\n` +
+                `🌡 수온: ${data.waterTemp}°C\n` +
+                `🧊 기온: ${data.temperature}°C\n` +
                 `💨 풍속: ${data.windSpeed} m/s\n` +
+                `❌ 돌풍: ${data.windGust} m/s\n` +
                 `🌊 파고: ${data.waveHeight} m`
             );
         })

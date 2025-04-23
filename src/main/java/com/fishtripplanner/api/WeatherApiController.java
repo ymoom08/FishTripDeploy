@@ -21,11 +21,12 @@ public class WeatherApiController {
         result.put("region", region);
 
         try {
-            String tm = LocalDateTime.now().minusMinutes(30).format(DateTimeFormatter.ofPattern("yyyyMMddHHmm"));
+            String tm = LocalDateTime.now().minusMinutes(30)
+                    .format(DateTimeFormatter.ofPattern("yyyyMMddHHmm"));
             int stn = getStationCode(region);
             if (stn == -1) throw new RuntimeException("유효하지 않은 지역입니다.");
 
-            // ❗ URL 직접 구성 (인코딩 금지)
+            // 요청 URL 생성
             String url = "https://apihub.kma.go.kr/api/typ01/url/kma_buoy2.php"
                     + "?tm=" + tm
                     + "&stn=" + stn
@@ -34,6 +35,7 @@ public class WeatherApiController {
 
             System.out.println("[DEBUG] 요청 URL: " + url);
 
+            // 요청 헤더 구성
             HttpHeaders headers = new HttpHeaders();
             headers.set("User-Agent", "Mozilla/5.0");
             headers.set("Accept", "text/plain");
@@ -47,20 +49,21 @@ public class WeatherApiController {
 
             String[] lines = body.split("\n");
             String dataLine = null;
+
             for (String line : lines) {
-                if (line.startsWith("202")) {
+                if (line.matches("^\\d{12},.*")) {
                     dataLine = line;
                 }
             }
 
             if (dataLine != null) {
                 String[] tokens = dataLine.split(",");
-                result.put("WS1", tokens[4]);
-                result.put("WS1_GST", tokens[5]);
-                result.put("WS2", tokens[8]);
-                result.put("WS2_GST", tokens[9]);
-                result.put("TA", tokens[12]);
-                result.put("TW", tokens[13]);
+
+                result.put("windSpeed", tokens[3].trim());      // WS1
+                result.put("windGust", tokens[4].trim());       // WS1_GST
+                result.put("temperature", tokens[10].trim());   // TA
+                result.put("waterTemp", tokens[11].trim());     // TW
+                result.put("waveHeight", tokens[13].trim());    // WH_SIG
             } else {
                 result.put("error", "관측 데이터를 찾을 수 없습니다.");
             }
@@ -88,4 +91,3 @@ public class WeatherApiController {
         };
     }
 }
-
