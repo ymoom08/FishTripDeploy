@@ -1,10 +1,15 @@
 package com.fishtripplanner.api;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
-import java.time.LocalDateTime;
+import java.net.URI;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -12,104 +17,127 @@ import java.util.*;
 @RequestMapping("/api/weather")
 public class WeatherApiController {
 
-    private static final String API_KEY = "mXxsZAN-QMm8bGQDflDJeQ"; // 인코딩된 인증키 그대로!
-    private static final String BASE_URL = "https://apihub.kma.go.kr/api/typ01/url/kma_buoy2.php";
+    // ✅ 인코딩된 인증키 사용!
+    private static final String SERVICE_KEY = "pjCLfIkR3vERzSAJHVhHbkUSfIRyEOyujcJxVvYnoNWPBMgzbzBxFy6tPqJyX2P2jH1n5tYeByaSGQq13oO%2F2w%3D%3D";
+    private static final String BASE_URL = "https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst";
     private final RestTemplate restTemplate = new RestTemplate();
 
-    @GetMapping
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public Map<String, Object> getWeather(@RequestParam("region") String region) {
-        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> result = new LinkedHashMap<>();
         result.put("region", region);
 
-        int stn = getStationCode(region);
-        if (stn == -1) {
-            result.put("error", "유효하지 않은 지역입니다.");
+        GridInfo grid = getGrid(region);
+        if (grid == null) {
+            result.put("error", "해당 지역의 격자 정보가 없습니다.");
             return result;
         }
 
-        String tm = LocalDateTime.now().minusMinutes(30).format(DateTimeFormatter.ofPattern("yyyyMMddHHmm"));
-        String observedAt = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
-        result.put("observedAt", observedAt);
+        String baseDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        String baseTime = getClosestBaseTime();
 
-        String url = String.format("%s?tm=%s&stn=%d&authKey=%s&help=0", BASE_URL, tm, stn, API_KEY);
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Accept", "text/plain");
+        URI uri = UriComponentsBuilder.fromHttpUrl(BASE_URL)
+                .queryParam("serviceKey", SERVICE_KEY)
+                .queryParam("pageNo", 1)
+                .queryParam("numOfRows", 1000)
+                .queryParam("dataType", "JSON")
+                .queryParam("base_date", baseDate)
+                .queryParam("base_time", baseTime)
+                .queryParam("nx", grid.nx)
+                .queryParam("ny", grid.ny)
+                .build(true)
+                .toUri();
 
         try {
-            System.out.println("🌐 요청 URL: " + url);
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
+            headers.set("User-Agent", "Mozilla/5.0");
+            headers.set("Referer", "https://www.data.go.kr/");
             HttpEntity<String> entity = new HttpEntity<>(headers);
-            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
 
-            System.out.println("✅ 응답 상태코드: " + response.getStatusCode());
-            System.out.println("📦 응답 내용:\n" + response.getBody());
-
+            ResponseEntity<String> response = restTemplate.exchange(uri, HttpMethod.GET, entity, String.class);
             String body = response.getBody();
 
-            if (body == null || body.isEmpty()) {
-                result.put("error", "기상청 응답이 없습니다.");
+            if (body == null || body.isBlank() || body.trim().startsWith("<")) {
+                result.put("error", "API 응답이 JSON이 아니라 HTML입니다. 인증키 또는 요청 파라미터를 확인하세요.");
                 return result;
             }
 
-            for (String line : body.split("\\n")) {
-                if (!line.matches("^\\d{12},.*")) continue;
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode items = mapper.readTree(body).path("response").path("body").path("items").path("item");
 
-                String[] tokens = line.split(",");
-                if (tokens.length < 14) {
-                    System.out.println("⚠️ 누락된 데이터 라인 감지: " + line);
-                    continue;
+            if (!items.isArray()) {
+                result.put("error", "예보 데이터가 없습니다.");
+                return result;
+            }
+
+            for (JsonNode item : items) {
+                String category = item.path("category").asText();
+                String value = item.path("fcstValue").asText();
+                switch (category) {
+                    case "TMP" -> result.put("temperature", value);
+                    case "WSD" -> result.put("windSpeed", value);
+                    case "SKY" -> result.put("sky", convertSky(value));
+                    case "PTY" -> result.put("precipType", convertPty(value));
+                    case "PCP" -> result.put("precipitation", value);
+                    case "REH" -> result.put("humidity", value);
                 }
-
-                result.put("windSpeed", getSafeToken(tokens, 3));
-                result.put("windGust", getSafeToken(tokens, 4));
-                result.put("temperature", getSafeToken(tokens, 10));
-                result.put("waterTemp", getSafeToken(tokens, 11));
-                result.put("waveHeight", getSafeToken(tokens, 13));
-
-                // 안전망: 값이 없으면 기본 메시지
-                result.putIfAbsent("windSpeed", "데이터 없음");
-                result.putIfAbsent("windGust", "데이터 없음");
-                result.putIfAbsent("temperature", "데이터 없음");
-                result.putIfAbsent("waterTemp", "데이터 없음");
-                result.putIfAbsent("waveHeight", "데이터 없음");
-
-                return result;
             }
 
-            result.put("error", "관측 데이터를 찾을 수 없습니다.");
+            result.put("observedAt", baseDate + " " + baseTime);
+
         } catch (Exception e) {
-            System.out.println("❗ 예외 발생 요청 URL: " + url);
-            e.printStackTrace();
-            result.put("error", "기상청 API 오류: " + e.getMessage());
+            e.printStackTrace(); // ✅ 예외 콘솔 출력 추가
+            result.put("error", "예외 발생: " + e.getMessage());
         }
 
         return result;
     }
 
-    private int getStationCode(String region) {
-        return switch (region) {
-            case "서해북부" -> 22101;
-            case "서해중부" -> 22102;
-            case "서해남부" -> 22103;
-            case "남해서부" -> 22104;
-            case "제주도"   -> 22105;
-            case "남해동부" -> 22106;
-            case "동해남부" -> 22107;
-            case "동해중부" -> 22108;
-            default -> -1;
+    private String getClosestBaseTime() {
+        int[] possibleTimes = {2300, 2000, 1700, 1400, 1100, 800, 500, 200};
+        int now = LocalTime.now().getHour() * 100 + LocalTime.now().getMinute();
+        for (int time : possibleTimes) {
+            if (now >= time) return String.format("%04d", time);
+        }
+        return "2300";
+    }
+
+    private String convertSky(String code) {
+        return switch (code) {
+            case "1" -> "맑음";
+            case "3" -> "구름많음";
+            case "4" -> "흐림";
+            default -> "-";
         };
     }
 
-    private Object getSafeToken(String[] tokens, int index) {
-        if (index < tokens.length) {
-            try {
-                String raw = tokens[index].trim();
-                if (raw.isEmpty() || raw.equals("-99")) return "데이터 없음";
-                double val = Double.parseDouble(raw);
-                return val;
-            } catch (NumberFormatException ignored) {
-                return "데이터 없음";
-            }
-        }
-        return "데이터 없음";
+    private String convertPty(String code) {
+        return switch (code) {
+            case "0" -> "없음";
+            case "1" -> "비";
+            case "2" -> "비/눈";
+            case "3" -> "눈";
+            case "5" -> "빗방울";
+            default -> "-";
+        };
     }
+
+    // ✅ 누락된 지역까지 보완한 전체 getGrid
+    private GridInfo getGrid(String region) {
+        return switch (region) {
+            case "서해북부" -> new GridInfo(55, 127);
+            case "서해중부" -> new GridInfo(57, 126);
+            case "서해남부" -> new GridInfo(51, 111);
+            case "남해서부" -> new GridInfo(58, 99);
+            case "제주도"   -> new GridInfo(52, 38);
+            case "남해동부" -> new GridInfo(67, 99);
+            case "동해남부" -> new GridInfo(98, 76);
+            case "동해중부" -> new GridInfo(92, 131);
+            case "동해북부" -> new GridInfo(101, 134); // ✅ 추가
+            default -> null;
+        };
+    }
+
+    private record GridInfo(int nx, int ny) {}
 }

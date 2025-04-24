@@ -1,5 +1,3 @@
-// weather.js
-
 let refreshIntervalId = null;
 const weatherCache = {};
 const regionList = [
@@ -19,12 +17,12 @@ function loadWeatherFromLocalStorage() {
     try {
       const parsed = JSON.parse(saved);
       for (const [region, data] of Object.entries(parsed)) {
-        if (data && !data.error && data.observedAt) {
+        if (data && data.observedAt && !data.error) {
           weatherCache[region] = data;
         }
       }
     } catch (e) {
-      console.error("캐시 파싱 실패", e);
+      console.error("❌ 캐시 파싱 실패", e);
     }
   }
 }
@@ -70,40 +68,15 @@ function refreshAllWeather() {
   });
 }
 
-function selectRegion(regionName) {
-  const status = document.getElementById("weatherStatus");
-  status.innerText = `[${regionName}] 해역 정보를 불러오는 중...`;
-  status.style.display = "block";
-
-  fetch(`/api/weather?region=${regionName}`)
-    .then(res => res.json())
-    .then(data => {
-      weatherCache[regionName] = data;
-      saveWeatherToLocalStorage();
-      loadCachedWeather();
-      status.style.display = "none";
-    })
-    .catch(error => {
-      weatherCache[regionName] = { error: error.message };
-      loadCachedWeather();
-      status.style.display = "none";
-      alert(`[${regionName}] 정보 요청 실패: ${error.message}`);
-    });
-
-  if (refreshIntervalId) clearInterval(refreshIntervalId);
-  refreshIntervalId = setInterval(() => {
-    selectRegion(regionName);
-  }, 1200000);
-}
-
 function formatWeatherHTML(data) {
   return `
-    <h3>🌍 지역: ${data.region}</h3>
-    <p>🌡 수온: ${data.waterTemp}°C</p>
-    <p>🧊 기온: ${data.temperature}°C</p>
+    <h3>🌍 ${data.region}</h3>
+    <p>🌡 기온: ${data.temperature}°C</p>
     <p>💨 풍속: ${data.windSpeed} m/s</p>
-    <p>❌ 돌풍: ${data.windGust} m/s</p>
-    <p>🌊 파고: ${data.waveHeight} m</p>
-    <p>🕒 관측시각: ${data.observedAt}</p>
+    <p>☁️ 하늘: ${data.sky}</p>
+    <p>🌧 형태: ${data.precipType}</p>
+    <p>🌧 강수량: ${data.precipitation}</p>
+    <p>💧 습도: ${data.humidity}%</p>
+    <p>🕒 시각: ${data.observedAt}</p>
   `;
 }
