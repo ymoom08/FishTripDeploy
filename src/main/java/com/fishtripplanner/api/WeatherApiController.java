@@ -12,7 +12,7 @@ import java.util.*;
 @RequestMapping("/api/weather")
 public class WeatherApiController {
 
-    private static final String API_KEY = "mXxsZAN-QMm8bGQDflDJeQ";
+    private static final String API_KEY = "mXxsZAN-QMm8bGQDflDJeQ"; // 인코딩된 인증키 그대로!
     private static final String BASE_URL = "https://apihub.kma.go.kr/api/typ01/url/kma_buoy2.php";
     private final RestTemplate restTemplate = new RestTemplate();
 
@@ -31,37 +31,55 @@ public class WeatherApiController {
         String observedAt = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
         result.put("observedAt", observedAt);
 
-        String url = String.format("%s?tm=%s&stn=%d&authKey=%s&help=0", BASE_URL, tm, stn, API_KEY); // 🔄 help=1
+        String url = String.format("%s?tm=%s&stn=%d&authKey=%s&help=0", BASE_URL, tm, stn, API_KEY);
         HttpHeaders headers = new HttpHeaders();
-        //headers.set("User-Agent", "Mozilla/5.0");
         headers.set("Accept", "text/plain");
 
         try {
+            System.out.println("🌐 요청 URL: " + url);
             HttpEntity<String> entity = new HttpEntity<>(headers);
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+
+            System.out.println("✅ 응답 상태코드: " + response.getStatusCode());
+            System.out.println("📦 응답 내용:\n" + response.getBody());
+
             String body = response.getBody();
 
             if (body == null || body.isEmpty()) {
-                result.put("error", "응답 없음 (기상청)");
+                result.put("error", "기상청 응답이 없습니다.");
                 return result;
             }
 
             for (String line : body.split("\\n")) {
-                if (line.matches("^\\d{12},.*")) {
-                    String[] tokens = line.split(",");
-                    result.put("windSpeed", getSafeToken(tokens, 3));
-                    result.put("windGust", getSafeToken(tokens, 4));
-                    result.put("temperature", getSafeToken(tokens, 10));
-                    result.put("waterTemp", getSafeToken(tokens, 11));
-                    result.put("waveHeight", getSafeToken(tokens, 13));
-                    return result;
+                if (!line.matches("^\\d{12},.*")) continue;
+
+                String[] tokens = line.split(",");
+                if (tokens.length < 14) {
+                    System.out.println("⚠️ 누락된 데이터 라인 감지: " + line);
+                    continue;
                 }
+
+                result.put("windSpeed", getSafeToken(tokens, 3));
+                result.put("windGust", getSafeToken(tokens, 4));
+                result.put("temperature", getSafeToken(tokens, 10));
+                result.put("waterTemp", getSafeToken(tokens, 11));
+                result.put("waveHeight", getSafeToken(tokens, 13));
+
+                // 안전망: 값이 없으면 기본 메시지
+                result.putIfAbsent("windSpeed", "데이터 없음");
+                result.putIfAbsent("windGust", "데이터 없음");
+                result.putIfAbsent("temperature", "데이터 없음");
+                result.putIfAbsent("waterTemp", "데이터 없음");
+                result.putIfAbsent("waveHeight", "데이터 없음");
+
+                return result;
             }
 
             result.put("error", "관측 데이터를 찾을 수 없습니다.");
         } catch (Exception e) {
+            System.out.println("❗ 예외 발생 요청 URL: " + url);
             e.printStackTrace();
-            result.put("error", "데이터 요청 오류: " + e.getMessage());
+            result.put("error", "기상청 API 오류: " + e.getMessage());
         }
 
         return result;
@@ -84,8 +102,10 @@ public class WeatherApiController {
     private Object getSafeToken(String[] tokens, int index) {
         if (index < tokens.length) {
             try {
-                double val = Double.parseDouble(tokens[index].trim());
-                return val == -99.0 ? "데이터 없음" : val;
+                String raw = tokens[index].trim();
+                if (raw.isEmpty() || raw.equals("-99")) return "데이터 없음";
+                double val = Double.parseDouble(raw);
+                return val;
             } catch (NumberFormatException ignored) {
                 return "데이터 없음";
             }
