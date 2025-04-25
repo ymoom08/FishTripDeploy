@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>예약 페이지</title>
+  <link rel="stylesheet" th:href="@{/css/css_reservation/reservation.css}">
+</head>
+<body>
+<header>
+  <h1>Header</h1>
+</header>
+
+<main class="reservation-content">
+  <div class="card-grid">
+
+    <a th:href="@{/reservation/boat}" class="card-link">
+      <div class="card" style="cursor: pointer;">
+        <img th:src="@{/images/boat.jpg}" alt="선상낚시 예약" class="card-image" />
+        <div class="card-title">선상낚시</div>
+      </div>
+    </a>
+
+    <a th:href="@{/reservation/rock}" class="card-link">
+      <div class="card" style="cursor: pointer;">
+        <img th:src="@{/images/rock.jpg}" alt="갯바위" class="card-image" />
+        <div class="card-title">갯바위</div>
+      </div>
+    </a>
+
+    <a th:href="@{/reservation/float}" class="card-link">
+      <div class="card" style="cursor: pointer;">
+        <img th:src="@{/images/float.png}" alt="좌대" class="card-image" />
+        <div class="card-title">좌대</div>
+      </div>
+    </a>
+
+    <a th:href="@{/reservation/island}" class="card-link">
+      <div class="card" style="cursor: pointer;">
+        <img th:src="@{/images/island.jpg}" alt="섬" class="card-image" />
+        <div class="card-title">섬</div>
+      </div>
+    </a>
+
+    <a th:href="@{/reservation/stay}" class="card-link">
+      <div class="card" style="cursor: pointer;">
+        <img th:src="@{/images/stay.png}" alt="숙박/민박/캠핑" class="card-image" />
+        <div class="card-title">숙박/민박/캠핑</div>
+      </div>
+    </a>
+
+  </div>
+</main>
+</body>
+</html>
