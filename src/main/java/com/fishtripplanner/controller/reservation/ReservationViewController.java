@@ -59,9 +59,6 @@ public class ReservationViewController {
             allCards.add(ReservationCardDto.from(post));
         }
 
-        // 광고 카드 추가
-        allCards.addAll(Arrays.asList("ad1", "ad2", "ad3", "ad4", "ad5"));
-
         // 페이징 처리
         int pageSize = 4;
         int start = page * pageSize;

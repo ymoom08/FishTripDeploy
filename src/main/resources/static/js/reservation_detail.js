@@ -1,14 +1,19 @@
+// reservation_detail.js (🔥 모달 hidden 처리 + Fade 효과 적용 최종 완성본)
 document.addEventListener("DOMContentLoaded", function () {
   let cachedRegions = null;
-  let selectedRegions = []; // [{ id: 1, name: "속초", parent: "강원" }, ...]
+  let selectedRegions = [];
 
-  document.getElementById("regionBtn").addEventListener("click", () => {
-    const regionModal = document.getElementById("regionModal");
-    const regionList = document.getElementById("regionList");
+  const regionBtn = document.getElementById("regionBtn");
+  const regionModal = document.getElementById("regionModal");
+  const regionList = document.getElementById("regionList");
+  const regionApply = document.getElementById("regionApply");
+  const regionReset = document.getElementById("regionReset");
 
+  regionBtn.addEventListener("click", () => {
     if (!regionModal || !regionList) return;
 
-    regionModal.classList.remove("hidden");
+    regionModal.classList.remove("hidden"); // ✅ hidden 제거
+    regionModal.classList.add("show");       // ✅ Fade In 적용
 
     if (cachedRegions) {
       renderFilteredRegions(cachedRegions, regionList);
@@ -27,12 +32,13 @@ document.addEventListener("DOMContentLoaded", function () {
       });
   });
 
-  document.getElementById("regionApply").addEventListener("click", () => {
-    document.getElementById("regionModal").classList.add("hidden");
+  regionApply.addEventListener("click", () => {
+    regionModal.classList.remove("show");   // ✅ Fade Out
+    regionModal.classList.add("hidden");     // ✅ hidden 다시 추가
     fetchFilteredCards();
   });
 
-  document.getElementById("regionReset").addEventListener("click", () => {
+  regionReset.addEventListener("click", () => {
     selectedRegions = [];
     updateSelectedRegionText();
     document.querySelectorAll(".region-child-btn.selected").forEach(btn => btn.classList.remove("selected"));
@@ -52,51 +58,69 @@ document.addEventListener("DOMContentLoaded", function () {
       const childWrapper = document.createElement('div');
       childWrapper.classList.add('region-children');
 
-      // 전체 버튼
       const allBtn = document.createElement('button');
       allBtn.innerText = '전체';
       allBtn.classList.add('region-child-btn');
 
       allBtn.addEventListener("click", () => {
-        const childBtns = childWrapper.querySelectorAll('.region-child-btn:not(:first-child)');
-        const allSelected = Array.from(childBtns).every(btn => btn.classList.contains('selected'));
+        const childBtnList = Array.from(childWrapper.querySelectorAll('.region-child-btn:not(:first-child)'));
+        const alreadySelected = childBtnList.every(btn => btn.classList.contains("selected"));
 
-        region.children.forEach(child => {
-          const name = child.name;
-          const isSelected = selectedRegions.some(r => r.name === name);
+        if (alreadySelected) {
+          selectedRegions = selectedRegions.filter(r => r.parent !== region.name);
+          allBtn.classList.remove("selected");
+          childBtnList.forEach(btn => btn.classList.remove("selected"));
+        } else {
+          selectedRegions = selectedRegions.filter(r => r.parent !== region.name);
 
-          if (allSelected && isSelected) {
-            selectedRegions = selectedRegions.filter(r => r.name !== name);
-          } else if (!allSelected && !isSelected) {
-            selectedRegions.push({ id: child.id, name, parent: region.name });
-          }
-        });
+          region.children.forEach(child => {
+            selectedRegions.push({ id: child.id, name: child.name, parent: region.name });
+          });
 
-        childBtns.forEach(btn => {
-          btn.classList.toggle("selected", !allSelected);
-        });
+          childBtnList.forEach(btn => btn.classList.add("selected"));
+          allBtn.classList.add("selected");
+        }
 
         updateSelectedRegionText();
       });
 
       childWrapper.appendChild(allBtn);
 
-      // 자식 지역 버튼
       region.children.forEach(child => {
         const btn = document.createElement('button');
-        btn.innerText = child.fullName ?? child.name;
+        btn.innerText = child.name;
         btn.classList.add('region-child-btn');
         btn.dataset.regionId = child.id;
 
         btn.addEventListener("click", () => {
           const id = child.id;
           const existingIndex = selectedRegions.findIndex(r => r.id === id);
+
           btn.classList.toggle("selected");
 
           if (existingIndex !== -1) {
             selectedRegions.splice(existingIndex, 1);
           } else {
             selectedRegions.push({ id, name: child.name, parent: region.name });
+          }
+
+          const totalSelected = region.children.every(c =>
+            selectedRegions.some(r => r.id === c.id)
+          );
+
+          if (totalSelected) {
+            selectedRegions = selectedRegions.filter(r => r.parent !== region.name);
+            region.children.forEach(child => {
+              selectedRegions.push({ id: child.id, name: child.name, parent: region.name });
+            });
+
+            allBtn.classList.add("selected");
+            childWrapper.querySelectorAll('.region-child-btn:not(:first-child)').forEach(b => {
+              b.classList.add("selected");
+            });
+          } else {
+            selectedRegions = selectedRegions.filter(r => !(r.parent === region.name && r.name === "전체"));
+            allBtn.classList.remove("selected");
           }
 
           updateSelectedRegionText();
@@ -111,21 +135,51 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function updateSelectedRegionText() {
-    const text = selectedRegions.length === 0
-      ? "선택된 지역 없음"
-      : selectedRegions.map(r => `(${r.parent}) ${r.name}`).join(", ");
-    document.querySelector(".current-selection").innerText = text;
+    const modalSelectionDiv = document.querySelector("#regionModal .current-selection");
+    const pageSelectionDiv = document.getElementById("selectedInfo");
+
+    if (selectedRegions.length === 0) {
+      modalSelectionDiv.innerText = "선택된 지역 없음";
+      pageSelectionDiv.innerText = "";
+      return;
+    }
+
+    let grouped = {};
+    selectedRegions.forEach(r => {
+      if (!grouped[r.parent]) grouped[r.parent] = [];
+      grouped[r.parent].push(r.name);
+    });
+
+    const regionTexts = Object.entries(grouped).map(([parent, names]) => {
+      const totalChildCount = cachedRegions.find(r => r.name === parent)?.children.length ?? 0;
+      if (names.length === totalChildCount) {
+        return `(${parent}) 전체`;
+      } else {
+        return `(${parent}) ${names.join(', ')}`;
+      }
+    });
+
+    const finalText = `현재 선택 지역: ${regionTexts.join(', ')}`;
+
+    modalSelectionDiv.innerText = finalText;
+    pageSelectionDiv.innerText = finalText;
   }
 
   function fetchFilteredCards() {
     const type = window.location.pathname.split("/")[2];
     const query = new URLSearchParams();
     query.append("type", type);
-    selectedRegions.forEach(region => query.append("regionId", region.id));
+    query.append("page", 0);
+    selectedRegions.forEach(region => {
+      if (region.id) query.append("regionId", region.id);
+    });
 
     fetch(`/api/reservation?${query.toString()}`)
       .then(response => response.json())
-      .then(cards => updateCards(cards));
+      .then(cards => updateCards(cards))
+      .catch(err => {
+        console.error("필터링 데이터 요청 실패:", err);
+      });
   }
 
   function updateCards(cards) {
@@ -135,13 +189,23 @@ document.addEventListener("DOMContentLoaded", function () {
     cards.forEach(card => {
       const div = document.createElement("div");
       div.className = "ad-card";
+
+      let imgSrc = card.imageUrl;
+      if (!imgSrc.startsWith("/images/")) {
+        imgSrc = "/images/boat.jpg";
+      }
+
       div.innerHTML = `
-        <img src="${card.imageUrl}" alt="예약 이미지">
-        <h3>${card.title}</h3>
-        <p>지역: ${card.region ?? "없음"}</p>
-        <p>회사명: ${card.companyName ?? "알 수 없음"}</p>
-        <p>어종: ${card.fishTypes?.join(", ") ?? "정보 없음"}</p>
-        <p>${card.content}</p>
+        <div class="ad-image">
+          <img src="${imgSrc}" alt="예약 이미지" style="width:100%; height:180px; object-fit:cover;">
+        </div>
+        <div class="ad-desc">${card.title}</div>
+        <div class="ad-detail">
+          <p>지역: ${card.region ?? "없음"}</p>
+          <p>회사명: ${card.companyName ?? "알 수 없음"}</p>
+          <p>어종: ${card.fishTypes?.join(", ") ?? "정보 없음"}</p>
+          <p>${card.content}</p>
+        </div>
       `;
       container.appendChild(div);
     });

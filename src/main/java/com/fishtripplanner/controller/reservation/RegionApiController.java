@@ -33,8 +33,8 @@ public class RegionApiController {
     // ✅ 지역 필터링 포함한 예약 카드 조회 API
     @GetMapping("/reservation")
     public List<ReservationCardDto> getFilteredCards(
-            @RequestParam String type,
-            @RequestParam(required = false, name = "regionId") List<Long> regionIds,
+            @RequestParam(name = "type") String type,
+            @RequestParam(name = "regionId", required = false) List<Long> regionIds,
             Pageable pageable
     ) {
         // 예약 타입 enum 처리

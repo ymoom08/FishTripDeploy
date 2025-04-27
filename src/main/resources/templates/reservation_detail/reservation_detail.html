@@ -29,10 +29,10 @@
     <input type="text" placeholder="검색창" class="search-input">
     <button class="search-button">검색하기</button>
   </div>
-</div>
 
-<div class="current-selection">
-  현재 선택 지역  :  **시  /  날짜  :  **월 **일  /  어종  :  **어
+  <!-- ✅ 여기 추가 -->
+  <div id="selectedInfo" class="selected-info"></div>
+
 </div>
 
 <div class="ad-card-list" id="cardContainer">
@@ -41,33 +41,19 @@
     <!-- ✅ 실제 데이터 (ReservationCardDto) -->
     <div th:if="${card instanceof T(com.fishtripplanner.dto.reservation.ReservationCardDto)}">
       <div class="ad-image">
-        <img th:src="${card.imageUrl}" alt="예약 이미지" style="width:100%; height:180px; object-fit:cover;">
+        <img th:src="@{${card.imageUrl}}" alt="예약 이미지" style="width:100%; height:180px; object-fit:cover;">
       </div>
       <div class="ad-desc" th:text="${card.title}">제목</div>
       <div class="ad-detail">
         <p th:text="${card.region != null ? card.region : '없음'}">지역</p>
         <p th:text="'회사명: ' + ${card.companyName}">회사명</p>
-        <p th:if="${card instanceof T(com.fishtripplanner.dto.reservation.ReservationCardDto)}"
-           th:text="'어종: ' + ${#strings.arrayJoin(card.fishTypes.toArray(), ', ')}">어종</p>
+        <p th:text="'어종: ' + ${#strings.arrayJoin(card.fishTypes.toArray(), ', ')}">어종</p>
         <p th:text="${card.content}">내용</p>
-      </div>
-    </div>
-
-    <!-- ✅ 가짜 카드 (문자열 "ad-1" 등) -->
-    <div th:if="${card instanceof T(java.lang.String)}">
-      <div class="ad-image">이미지</div>
-      <div class="ad-desc" th:text="${card}">가라광고</div>
-      <div class="ad-detail">
-        <p>지역</p>
-        <p>회사명</p>
-        <p>어종 : (복수 가능)</p>
-        <p>내용</p>
       </div>
     </div>
 
   </div>
 </div>
-
 
 <div class="pagination">
   <span th:if="${currentPage > 0}">

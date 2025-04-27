@@ -1,6 +1,7 @@
 package com.fishtripplanner.dto.reservation;
 
 import com.fishtripplanner.domain.reservation.ReservationPost;
+import com.fishtripplanner.domain.reservation.ReservationType;
 import com.fishtripplanner.entity.FishTypeEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -32,11 +33,27 @@ public class ReservationCardDto {
             regionText = parent != null ? "(" + parent + ") " + child : child;
         }
 
+        // ✅ 이미지 경로 처리
+        String imageUrl = post.getImageUrl();
+        if (imageUrl == null || imageUrl.isBlank()) {
+            // 타입에 따라 기본 이미지 설정
+            switch (post.getType()) {
+                case BOAT -> imageUrl = "/images/boat.jpg";
+                case FLOAT -> imageUrl = "/images/float.png";
+                case ISLAND -> imageUrl = "/images/island.jpg";
+                case ROCK -> imageUrl = "/images/rock.jpg";
+                case STAY -> imageUrl = "/images/stay.png";
+                default -> imageUrl = "/images/default.jpg";
+            }
+        } else if (!imageUrl.startsWith("/images/")) {
+            imageUrl = "/images/" + imageUrl;
+        }
+
         return new ReservationCardDto(
                 post.getTitle(),
                 post.getContent(),
                 post.getCompanyName(),
-                post.getImageUrl(),
+                imageUrl,
                 regionText,
                 post.getFishTypeEntities().stream()
                         .map(FishTypeEntity::getName)
