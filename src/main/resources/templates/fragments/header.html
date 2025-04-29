@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Header</title>
+</head>
+<body>
+<div th:fragment="headerFragment">
+    <header class="header">
+        <div class="logoArea"><span class="logoText">🎣 FishTrip</span></div>
+        <div class="searchBoxWrapper">
+            <input type="text" placeholder="검색어를 입력하세요..." class="searchInput" />
+            <button class="searchButton">🔍</button>
+        </div>
+        <div class="rightIcons">
+            <button class="iconButton" onclick="navigatePage('/notifications')">
+                <span>🔔</span>
+                <div class="iconLabel">알림</div>
+            </button>
+            <button class="iconButton" onclick="navigatePage('/coupons')">
+                <span>🎟️</span>
+                <div class="iconLabel">쿠폰</div>
+            </button>
+            <button class="iconButton" onclick="navigatePage('/profile')">
+                <span>👤</span>
+                <div class="iconLabel">내정보</div>
+            </button>
+        </div>
+    </header>
+
+    <nav class="navBar">
+        <div class="navLeft">
+            <span class="menuIcon" onclick="toggleMenu()">☰</span>
+            <ul class="menuList">
+                <li class="menuItem" onmouseenter="showSubMenu(0)" onmouseleave="hideSubMenu(0)">
+                    <button class="menuButton">예약하기</button>
+                    <div class="subMenu" id="subMenu0" style="display: none;">
+                        <ul class="subMenuList">
+                            <li class="subMenuItem"><a href="#" class="subMenuButton" onclick="navigatePage('/reservation/1')">예약 1</a></li>
+                            <li class="subMenuItem"><a href="#" class="subMenuButton" onclick="navigatePage('/reservation/2')">예약 2</a></li>
+                            <li class="subMenuItem"><a href="#" class="subMenuButton" onclick="navigatePage('/reservation/3')">예약 3</a></li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="menuItem" onmouseenter="showSubMenu(1)" onmouseleave="hideSubMenu(1)">
+                    <button class="menuButton">낚시파티모집</button>
+                    <div class="subMenu" id="subMenu1" style="display: none;">
+                        <ul class="subMenuList">
+                            <li class="subMenuItem"><a href="#" class="subMenuButton" onclick="navigatePage('/fishing-party/list')">모집 1</a></li>
+                            <li class="subMenuItem"><a href="#" class="subMenuButton" onclick="navigatePage('/fishing-party/create')">모집 2</a></li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="menuItem" onmouseenter="showSubMenu(2)" onmouseleave="hideSubMenu(2)">
+                    <button class="menuButton">지금 모집중!</button>
+                    <div class="subMenu" id="subMenu2" style="display: none;">
+                        <ul class="subMenuList">
+                            <li class="subMenuItem"><a href="#" class="subMenuButton" onclick="navigatePage('/recruiting/ongoing')">모집 1</a></li>
+                            <li class="subMenuItem"><a href="#" class="subMenuButton" onclick="navigatePage('/recruiting/popular')">모집 2</a></li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="menuItem" onmouseenter="showSubMenu(3)" onmouseleave="hideSubMenu(3)">
+                    <button class="menuButton">계획짜기!</button>
+                    <div class="subMenu" id="subMenu3" style="display: none;">
+                        <ul class="subMenuList">
+                            <li class="subMenuItem"><a href="#" class="subMenuButton" onclick="navigatePage('/plan/new')">계획 1</a></li>
+                            <li class="subMenuItem"><a href="#" class="subMenuButton" onclick="navigatePage('/plan/my-plans')">계획 2</a></li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="menuItem" onmouseenter="showSubMenu(4)" onmouseleave="hideSubMenu(4)">
+                    <button class="menuButton">날씨/풍속/조류!</button>
+                    <div class="subMenu" id="subMenu4" style="display: none;">
+                        <ul class="subMenuList">
+                            <li class="subMenuItem"><a href="#" class="subMenuButton" onclick="navigatePage('/weather')">날씨 1</a></li>
+                            <li class="subMenuItem"><a href="#" class="subMenuButton" onclick="navigatePage('/wind')">풍속 1</a></li>
+                            <li class="subMenuItem"><a href="#" class="subMenuButton" onclick="navigatePage('/tide')">조류 1</a></li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="menuItem" onmouseenter="showSubMenu(5)" onmouseleave="hideSubMenu(5)">
+                    <button class="menuButton">커뮤니티</button>
+                    <div class="subMenu" id="subMenu5" style="display: none;">
+                        <ul class="subMenuList">
+                            <li class="subMenuItem"><a href="#" class="subMenuButton" onclick="navigatePage('/community/free')">커뮤니티 1</a></li>
+                            <li class="subMenuItem"><a href="#" class="subMenuButton" onclick="navigatePage('/community/reviews')">커뮤니티 2</a></li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="navRight">
+            <button class="menuButton" onclick="navigatePage('/special-exhibition')">기획전</button>
+            <button class="menuButton" onclick="showLogin()">로그인</button>
+            <button class="menuButton" onclick="navigatePage('/register')">회원가입</button>
+            <button class="menuButton" onclick="navigatePage('/customer-service')">고객센터</button>
+        </div>
+    </nav>
+
+    <div class="fullMenuBox" style="display: none;"></div>
+</div>
+</body>
+</html>
