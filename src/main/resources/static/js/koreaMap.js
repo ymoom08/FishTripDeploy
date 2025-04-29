@@ -10,24 +10,10 @@ const regionList = [
 ];
 
 window.addEventListener("DOMContentLoaded", () => {
-  generateRegionButtons();
   loadWeatherFromLocalStorage();
   loadCachedWeather();
   refreshAllWeather();
 });
-
-function generateRegionButtons() {
-  const buttonGrid = document.querySelector(".buttonGrid");
-  if (!buttonGrid) return;
-
-  regionList.forEach(region => {
-    const button = document.createElement("button");
-    button.className = "mapRegionButton";
-    button.textContent = region;
-    button.onclick = () => refreshSingleWeather(region);
-    buttonGrid.appendChild(button);
-  });
-}
 
 function loadWeatherFromLocalStorage() {
   const saved = localStorage.getItem("weatherCache");
@@ -85,20 +71,6 @@ function refreshAllWeather() {
         loadCachedWeather();
       });
   });
-}
-
-function refreshSingleWeather(region) {
-  fetch(`/api/weather?region=${encodeURIComponent(region)}`)
-    .then(res => res.json())
-    .then(data => {
-      weatherCache[region] = data;
-      saveWeatherToLocalStorage();
-      loadCachedWeather();
-    })
-    .catch(err => {
-      weatherCache[region] = { error: err.message };
-      loadCachedWeather();
-    });
 }
 
 function formatWeatherHTML(region, data) {
