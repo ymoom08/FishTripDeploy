@@ -2,12 +2,18 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title>상세 페이지</title>
-  <link rel="stylesheet" th:href="@{/css/css_reservation/reservation_detail.css}" />
+  <title>예약 페이지</title>
+  <link rel="stylesheet" href="/css/css_reservation/reservation_detail.css"> <!-- 수정 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
+  <script src="/js/reservation_detail.js"></script> <!-- 수정 -->
+</head>
+
+
 </head>
 <body>
-
-<h1 th:text="${title}">제목</h1>
+<h1 th:text="${title}">예약</h1>
 
 <div class="filter-container">
   <div class="filter-top-group">
@@ -37,9 +43,9 @@
   <div class="ad-card" th:each="card : ${cards}">
     <div th:if="${card instanceof T(com.fishtripplanner.dto.reservation.ReservationCardDto)}">
       <div class="ad-image">
-        <img th:src="@{${card.imageUrl}}" alt="예약 이미지" style="width:100%; height:180px; object-fit:cover;">
+        <img th:src="@{${card.imageUrl}}" alt="예약 이미지">
       </div>
-      <div class="ad-desc" th:text="${card.title}">제목</div>
+      <div class="ad-desc" th:text="${card.title}">명목</div>
       <div class="ad-detail">
         <p th:text="${card.region != null ? card.region : '없음'}">지역</p>
         <p th:text="'회사명: ' + ${card.companyName}">회사명</p>
@@ -50,6 +56,7 @@
   </div>
 </div>
 
+<!-- 페이지에서 페이지로 이동하는 페이지로턴 -->
 <div class="pagination">
   <span th:if="${currentPage > 0}">
     <a th:href="@{'/reservation/' + ${type} + '?page=' + (${currentPage - 1})}">이전</a>
@@ -64,7 +71,7 @@
   </span>
 </div>
 
-<!-- 지역 선택 모달 -->
+<!-- 지역 선택 목록 모델 -->
 <div id="regionModal" class="modal hidden">
   <div class="modal-content">
     <h2>지역 선택</h2>
@@ -81,14 +88,19 @@
 <div id="dateModal" class="modal hidden">
   <div class="modal-content">
     <h2>날짜 선택</h2>
-    <input type="date" id="selectedDateInput">
-    <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
+    <!-- 🔄 기존 input 제거하고 div 추가 -->
+    <div id="datePickerContainer"></div>
+
+    <div style="margin-top: 20px; text-align: center;">
       <button id="dateApply">적용</button>
-      <button id="dateReset">초기화</button>
+      <button id="dateCancel">취소</button>
     </div>
   </div>
 </div>
 
+
+<!-- flatpickr JS -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="/js/reservation_detail.js"></script>
 
 </body>

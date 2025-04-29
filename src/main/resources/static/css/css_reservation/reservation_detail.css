@@ -1,22 +1,21 @@
-/* 전체 바디 설정 */
+/* ✅ 기본 바디 스타일 */
 body {
   font-family: sans-serif;
   padding: 20px;
   font-size: clamp(15px, 1.4vw, 18px);
 }
 
-/* 제목(H1) */
+/* ✅ 페이지 제목 */
 h1 {
   text-align: center;
   font-size: clamp(24px, 2.5vw, 32px);
   margin-bottom: 25px;
 }
 
-/* 필터 박스 영역 */
+/* ✅ 필터 컨테이너 */
 .filter-container {
   padding: 25px;
   margin: 0 auto 30px;
-  font-size: clamp(14px, 1.3vw, 18px);
   max-width: 1200px;
 }
 
@@ -29,18 +28,15 @@ h1 {
   margin-bottom: 25px;
 }
 
-/* 필터 버튼 하나하나 */
+/* 필터 버튼 하나 */
 .filter-group {
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-width: 160px;
-  max-width: 200px;
   width: clamp(160px, 18vw, 200px);
   gap: 8px;
 }
 
-/* 필터 버튼 스타일 */
 .filter-group button {
   padding: 10px 18px;
   font-size: clamp(14px, 1vw, 16px);
@@ -50,7 +46,7 @@ h1 {
   width: 100%;
 }
 
-/* 검색창 세트 */
+/* ✅ 검색 입력창/버튼 */
 .search-row {
   margin-top: 30px;
   display: flex;
@@ -59,14 +55,12 @@ h1 {
   flex-wrap: wrap;
 }
 
-/* 검색 입력창 */
 .search-input {
   padding: 10px;
   font-size: 1em;
   width: clamp(250px, 30vw, 400px);
 }
 
-/* 검색 버튼 */
 .search-button {
   padding: 10px 20px;
   font-size: 1em;
@@ -75,7 +69,7 @@ h1 {
   cursor: pointer;
 }
 
-/* ✅ 선택된 지역/날짜 표시하는 영역 */
+/* ✅ 선택된 지역/날짜 표시 */
 .selected-info {
   margin-top: 20px;
   text-align: center;
@@ -85,7 +79,7 @@ h1 {
   white-space: pre-line;
 }
 
-/* 카드 리스트 */
+/* ✅ 광고 카드 리스트 */
 .ad-card-list {
   display: flex;
   justify-content: center;
@@ -94,7 +88,7 @@ h1 {
   margin-top: 40px;
 }
 
-/* 하나하나 카드 */
+/* ✅ 카드 하나 */
 .ad-card {
   border: 2px solid black;
   width: 350px;
@@ -102,28 +96,35 @@ h1 {
   text-align: center;
 }
 
-/* 카드 이미지 */
+/* ✅ 카드 이미지 영역 (비율 유지 및 좌우 꽉 채움) */
 .ad-image {
-  height: 200px;
-  background: #eee;
-  margin-bottom: 12px;
+  width: 100%;
+  aspect-ratio: 16 / 9; /* ✅ 비율 고정 */
+  overflow: hidden;
 }
 
-/* 카드 제목 */
+.ad-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ✅ 카드 제목 */
 .ad-desc {
   border-top: 2px solid black;
   padding-top: 6px;
   font-weight: bold;
 }
 
-/* 카드 상세 설명 */
+/* ✅ 카드 상세 정보 */
 .ad-detail {
   font-size: 14px;
   margin-top: 10px;
   text-align: left;
 }
 
-/* 페이징 네비게이션 */
+/* ✅ 페이징 */
 .pagination {
   text-align: center;
   margin-top: 60px;
@@ -146,7 +147,7 @@ h1 {
   text-decoration: underline;
 }
 
-/* 모달 공통 설정 (지역/날짜 선택 모달 다 포함) */
+/* ✅ 모달 공통 (지역, 날짜 선택) */
 .modal {
   position: fixed;
   top: 0;
@@ -158,19 +159,16 @@ h1 {
   align-items: center;
   justify-content: center;
   z-index: 999;
-  
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.3s ease;
 }
 
-/* 모달 활성화 상태 */
 .modal.show {
   opacity: 1;
   pointer-events: auto;
 }
 
-/* 모달 내부 박스 */
 .modal-content {
   background: white;
   padding: 20px;
@@ -180,23 +178,21 @@ h1 {
   overflow-y: auto;
 }
 
-/* 숨김 처리 */
+/* ✅ 숨김 처리 클래스 */
 .hidden {
   display: none;
 }
 
-/* 지역 그룹 (부모지역 이름 + 자식 버튼) */
+/* ✅ 지역 선택 모달 내부 구조 */
 .region-group {
   margin-bottom: 20px;
 }
 
-/* 부모 지역 이름 스타일 */
 .region-title {
   font-weight: bold;
   margin-bottom: 10px;
 }
 
-/* 자식 버튼 묶음 */
 .region-children {
   display: flex;
   flex-wrap: wrap;
@@ -204,7 +200,6 @@ h1 {
   margin-bottom: 10px;
 }
 
-/* 자식 버튼 스타일 */
 .region-child-btn {
   padding: 6px 10px;
   border: 2px solid #aaa;
@@ -213,12 +208,10 @@ h1 {
   cursor: pointer;
 }
 
-/* 자식 버튼 hover */
 .region-child-btn:hover {
   background-color: #e0e0e0;
 }
 
-/* 선택된 버튼 스타일 */
 .region-child-btn.selected {
   background-color: #007bff;
   color: white;
@@ -234,4 +227,18 @@ h1 {
   border: 1px solid #aaa;
   cursor: pointer;
   border-radius: 4px;
+}
+
+#datePickerContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  min-height: 400px;
+  min-width: 400px; /* 🔥 추가: 가로폭 강제 */
+}
+
+.flatpickr-calendar {
+  font-size: 20px !important;
+  margin: auto; /* 🔥 추가: flatpickr 캘린더 자체 가운데 */
 }
