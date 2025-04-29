@@ -1,16 +1,18 @@
+/* 전체 바디 설정 */
 body {
   font-family: sans-serif;
   padding: 20px;
   font-size: clamp(15px, 1.4vw, 18px);
 }
 
+/* 제목(H1) */
 h1 {
   text-align: center;
   font-size: clamp(24px, 2.5vw, 32px);
   margin-bottom: 25px;
 }
 
-/* 필터 박스 */
+/* 필터 박스 영역 */
 .filter-container {
   padding: 25px;
   margin: 0 auto 30px;
@@ -18,7 +20,7 @@ h1 {
   max-width: 1200px;
 }
 
-/* 버튼 세트 상단 */
+/* 필터 버튼 묶음 */
 .filter-top-group {
   display: flex;
   justify-content: center;
@@ -27,6 +29,7 @@ h1 {
   margin-bottom: 25px;
 }
 
+/* 필터 버튼 하나하나 */
 .filter-group {
   display: flex;
   flex-direction: column;
@@ -37,6 +40,7 @@ h1 {
   gap: 8px;
 }
 
+/* 필터 버튼 스타일 */
 .filter-group button {
   padding: 10px 18px;
   font-size: clamp(14px, 1vw, 16px);
@@ -46,7 +50,7 @@ h1 {
   width: 100%;
 }
 
-/* 검색창 */
+/* 검색창 세트 */
 .search-row {
   margin-top: 30px;
   display: flex;
@@ -55,12 +59,14 @@ h1 {
   flex-wrap: wrap;
 }
 
+/* 검색 입력창 */
 .search-input {
   padding: 10px;
   font-size: 1em;
   width: clamp(250px, 30vw, 400px);
 }
 
+/* 검색 버튼 */
 .search-button {
   padding: 10px 20px;
   font-size: 1em;
@@ -69,7 +75,7 @@ h1 {
   cursor: pointer;
 }
 
-/* ✅ 새로 추가된 선택 정보 표시 */
+/* ✅ 선택된 지역/날짜 표시하는 영역 */
 .selected-info {
   margin-top: 20px;
   text-align: center;
@@ -79,7 +85,7 @@ h1 {
   white-space: pre-line;
 }
 
-/* 광고 카드 리스트 */
+/* 카드 리스트 */
 .ad-card-list {
   display: flex;
   justify-content: center;
@@ -88,6 +94,7 @@ h1 {
   margin-top: 40px;
 }
 
+/* 하나하나 카드 */
 .ad-card {
   border: 2px solid black;
   width: 350px;
@@ -95,25 +102,28 @@ h1 {
   text-align: center;
 }
 
+/* 카드 이미지 */
 .ad-image {
   height: 200px;
   background: #eee;
   margin-bottom: 12px;
 }
 
+/* 카드 제목 */
 .ad-desc {
   border-top: 2px solid black;
   padding-top: 6px;
   font-weight: bold;
 }
 
+/* 카드 상세 설명 */
 .ad-detail {
   font-size: 14px;
   margin-top: 10px;
   text-align: left;
 }
 
-/* 페이징 */
+/* 페이징 네비게이션 */
 .pagination {
   text-align: center;
   margin-top: 60px;
@@ -136,7 +146,7 @@ h1 {
   text-decoration: underline;
 }
 
-/* 모달 */
+/* 모달 공통 설정 (지역/날짜 선택 모달 다 포함) */
 .modal {
   position: fixed;
   top: 0;
@@ -148,18 +158,19 @@ h1 {
   align-items: center;
   justify-content: center;
   z-index: 999;
-
-  /* ✅ Fade In만 허용 */
+  
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.3s ease;
 }
 
+/* 모달 활성화 상태 */
 .modal.show {
   opacity: 1;
   pointer-events: auto;
 }
 
+/* 모달 내부 박스 */
 .modal-content {
   background: white;
   padding: 20px;
@@ -169,20 +180,23 @@ h1 {
   overflow-y: auto;
 }
 
+/* 숨김 처리 */
 .hidden {
   display: none;
 }
 
-/* 지역 버튼 그룹 */
+/* 지역 그룹 (부모지역 이름 + 자식 버튼) */
 .region-group {
   margin-bottom: 20px;
 }
 
+/* 부모 지역 이름 스타일 */
 .region-title {
   font-weight: bold;
   margin-bottom: 10px;
 }
 
+/* 자식 버튼 묶음 */
 .region-children {
   display: flex;
   flex-wrap: wrap;
@@ -190,26 +204,29 @@ h1 {
   margin-bottom: 10px;
 }
 
+/* 자식 버튼 스타일 */
 .region-child-btn {
   padding: 6px 10px;
-  border: 2px solid #aaa; /* ✅ 두께 고정 */
+  border: 2px solid #aaa;
   background-color: #f2f2f2;
   border-radius: 5px;
   cursor: pointer;
 }
 
+/* 자식 버튼 hover */
 .region-child-btn:hover {
   background-color: #e0e0e0;
 }
 
-/* 선택된 상태 */
+/* 선택된 버튼 스타일 */
 .region-child-btn.selected {
   background-color: #007bff;
   color: white;
   font-weight: bold;
-  border: 2px solid #0056b3; /* ✅ 두께 그대로, 색만 변경 */
+  border: 2px solid #0056b3;
 }
 
+/* 초기화 버튼 스타일 */
 #regionReset {
   background: #eee;
   color: #333;

@@ -1,5 +1,9 @@
-// reservation_detail.js (🔥 모달 hidden 처리 + Fade 효과 적용 최종 완성본)
+// reservation_detail.js (🔥 지역 + 날짜 선택 기능 통합 완성본)
+
+// DOMContentLoaded 이벤트: 페이지가 완전히 로드되면 실행
 document.addEventListener("DOMContentLoaded", function () {
+
+  // 🔥 지역 관련 변수
   let cachedRegions = null;
   let selectedRegions = [];
 
@@ -9,11 +13,18 @@ document.addEventListener("DOMContentLoaded", function () {
   const regionApply = document.getElementById("regionApply");
   const regionReset = document.getElementById("regionReset");
 
+  // 🔥 날짜 관련 변수
+  let selectedDate = null;
+  const dateBtn = document.getElementById("dateBtn");
+  const dateModal = document.getElementById("dateModal");
+  const dateApply = document.getElementById("dateApply");
+  const dateReset = document.getElementById("dateReset");
+
+  // 🔥 지역 버튼 클릭 시 모달 열기
   regionBtn.addEventListener("click", () => {
     if (!regionModal || !regionList) return;
-
-    regionModal.classList.remove("hidden"); // ✅ hidden 제거
-    regionModal.classList.add("show");       // ✅ Fade In 적용
+    regionModal.classList.remove("hidden");
+    regionModal.classList.add("show");
 
     if (cachedRegions) {
       renderFilteredRegions(cachedRegions, regionList);
@@ -32,18 +43,46 @@ document.addEventListener("DOMContentLoaded", function () {
       });
   });
 
+  // 🔥 날짜 버튼 클릭 시 모달 열기
+  dateBtn.addEventListener("click", () => {
+    if (!dateModal) return;
+    dateModal.classList.remove("hidden");
+    dateModal.classList.add("show");
+  });
+
+  // 🔥 지역 모달 적용 버튼
   regionApply.addEventListener("click", () => {
-    regionModal.classList.remove("show");   // ✅ Fade Out
-    regionModal.classList.add("hidden");     // ✅ hidden 다시 추가
+    regionModal.classList.remove("show");
+    regionModal.classList.add("hidden");
     fetchFilteredCards();
   });
 
+  // 🔥 지역 모달 초기화 버튼
   regionReset.addEventListener("click", () => {
     selectedRegions = [];
     updateSelectedRegionText();
     document.querySelectorAll(".region-child-btn.selected").forEach(btn => btn.classList.remove("selected"));
   });
 
+  // 🔥 날짜 모달 적용 버튼
+  dateApply.addEventListener("click", () => {
+    const dateInput = document.getElementById("selectedDateInput").value;
+    selectedDate = dateInput || null;
+    dateModal.classList.remove("show");
+    dateModal.classList.add("hidden");
+    fetchFilteredCards();
+  });
+
+  // 🔥 날짜 모달 초기화 버튼
+  dateReset.addEventListener("click", () => {
+    selectedDate = null;
+    document.getElementById("selectedDateInput").value = "";
+    dateModal.classList.remove("show");
+    dateModal.classList.add("hidden");
+    fetchFilteredCards();
+  });
+
+  // 🔥 지역 리스트 렌더링 함수
   function renderFilteredRegions(data, container) {
     container.innerHTML = '';
     data.forEach(region => {
@@ -109,17 +148,9 @@ document.addEventListener("DOMContentLoaded", function () {
           );
 
           if (totalSelected) {
-            selectedRegions = selectedRegions.filter(r => r.parent !== region.name);
-            region.children.forEach(child => {
-              selectedRegions.push({ id: child.id, name: child.name, parent: region.name });
-            });
-
             allBtn.classList.add("selected");
-            childWrapper.querySelectorAll('.region-child-btn:not(:first-child)').forEach(b => {
-              b.classList.add("selected");
-            });
+            childWrapper.querySelectorAll('.region-child-btn:not(:first-child)').forEach(b => b.classList.add("selected"));
           } else {
-            selectedRegions = selectedRegions.filter(r => !(r.parent === region.name && r.name === "전체"));
             allBtn.classList.remove("selected");
           }
 
@@ -134,45 +165,54 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  // 🔥 선택된 지역/날짜를 페이지에 표시
   function updateSelectedRegionText() {
     const modalSelectionDiv = document.querySelector("#regionModal .current-selection");
     const pageSelectionDiv = document.getElementById("selectedInfo");
 
-    if (selectedRegions.length === 0) {
-      modalSelectionDiv.innerText = "선택된 지역 없음";
-      pageSelectionDiv.innerText = "";
-      return;
+    let text = "";
+
+    if (selectedRegions.length > 0) {
+      let grouped = {};
+      selectedRegions.forEach(r => {
+        if (!grouped[r.parent]) grouped[r.parent] = [];
+        grouped[r.parent].push(r.name);
+      });
+
+      const regionTexts = Object.entries(grouped).map(([parent, names]) => {
+        const totalChildCount = cachedRegions.find(r => r.name === parent)?.children.length ?? 0;
+        if (names.length === totalChildCount) {
+          return `(${parent}) 전체`;
+        } else {
+          return `(${parent}) ${names.join(', ')}`;
+        }
+      });
+
+      text += `현재 선택 지역: ${regionTexts.join(', ')}`;
     }
 
-    let grouped = {};
-    selectedRegions.forEach(r => {
-      if (!grouped[r.parent]) grouped[r.parent] = [];
-      grouped[r.parent].push(r.name);
-    });
+    if (selectedDate) {
+      text += `\n선택한 날짜: ${selectedDate}`;
+    }
 
-    const regionTexts = Object.entries(grouped).map(([parent, names]) => {
-      const totalChildCount = cachedRegions.find(r => r.name === parent)?.children.length ?? 0;
-      if (names.length === totalChildCount) {
-        return `(${parent}) 전체`;
-      } else {
-        return `(${parent}) ${names.join(', ')}`;
-      }
-    });
-
-    const finalText = `현재 선택 지역: ${regionTexts.join(', ')}`;
-
-    modalSelectionDiv.innerText = finalText;
-    pageSelectionDiv.innerText = finalText;
+    modalSelectionDiv.innerText = text || "선택된 지역 없음";
+    pageSelectionDiv.innerText = text;
   }
 
+  // 🔥 서버에 필터 조건 넘기고 카드 다시 불러오기
   function fetchFilteredCards() {
     const type = window.location.pathname.split("/")[2];
     const query = new URLSearchParams();
     query.append("type", type);
     query.append("page", 0);
+
     selectedRegions.forEach(region => {
       if (region.id) query.append("regionId", region.id);
     });
+
+    if (selectedDate) {
+      query.append("date", selectedDate);
+    }
 
     fetch(`/api/reservation?${query.toString()}`)
       .then(response => response.json())
@@ -182,6 +222,7 @@ document.addEventListener("DOMContentLoaded", function () {
       });
   }
 
+  // 🔥 카드 목록을 페이지에 그리기
   function updateCards(cards) {
     const container = document.querySelector("#cardContainer");
     container.innerHTML = "";
@@ -210,4 +251,5 @@ document.addEventListener("DOMContentLoaded", function () {
       container.appendChild(div);
     });
   }
+
 });
