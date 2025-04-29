@@ -69,14 +69,23 @@ function refreshAllWeather() {
 }
 
 function formatWeatherHTML(data) {
+  const waterTempHTML =
+    data.waterTemp !== undefined &&
+    data.waterTemp !== "" &&
+    data.waterTemp !== "-" &&
+    data.waterTemp !== "null"
+      ? `<p>🌊 수온: ${data.waterTemp}°C</p>`
+      : "<p>🌊 수온 정보 없음</p>";
+
   return `
     <h3>🌍 ${data.region}</h3>
     <p>🌡 기온: ${data.temperature}°C</p>
     <p>💨 풍속: ${data.windSpeed} m/s</p>
+    <p>💧 습도: ${data.humidity}%</p>
+    ${waterTempHTML}
     <p>☁️ 하늘: ${data.sky}</p>
     <p>🌧 형태: ${data.precipType}</p>
     <p>🌧 강수량: ${data.precipitation}</p>
-    <p>💧 습도: ${data.humidity}%</p>
-    <p>🕒 시각: ${data.observedAt}</p>
+    <p>🕒 관측시각: ${data.observedAt}</p>
   `;
 }
