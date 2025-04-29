@@ -2,30 +2,27 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title>대한민국 해양 관측소 선택</title>
+  <title>대한민국 해역 선택</title>
   <link rel="stylesheet" href="/css/weather.css">
   <script defer src="/js/koreaMap.js"></script>
 </head>
 <body>
 
 <div class="mainWrapper">
-  <!-- 지도와 버튼 -->
+
   <div class="koreaMapSection">
     <div class="mapCard">
-      <img src="/image/koreaMap.png" alt="대한민국 지도" class="koreaMapImage" />
-      <div class="mapOverlay">
-        <div class="buttonGrid">
-          <!-- 버튼이 여기 자동 생성됨 -->
-        </div>
-      </div>
+      <img src="/image/koreaMap.png" alt="입체 대한민국 지도" class="koreaMapImage" />
+
+      <div class="mapOverlay"></div>
     </div>
   </div>
 
-  <!-- 날씨 카드 출력 -->
+
   <div id="allRegionWeather" class="weatherGrid"></div>
 </div>
 
-<!-- 로딩 메시지 -->
+
 <div id="weatherStatus"
      style="display: none;
             position: fixed;
@@ -38,7 +35,6 @@
             border-radius: 10px;
             font-weight: bold;
             z-index: 999;">
-  해양 관측 정보를 불러오는 중...
 </div>
 
 </body>
