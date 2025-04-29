@@ -1,15 +1,33 @@
-let refreshIntervalId = null;
 const weatherCache = {};
 const regionList = [
-  "서해북부", "서해중부", "서해남부", "남해서부",
-  "제주도", "남해동부", "동해남부", "동해중부"
+  "감천항", "경인항", "경포대해수욕장", "고래불해수욕장", "광양항", "군산항",
+  "낙산해수욕장", "남해동부", "대천해수욕장", "대한해협", "마산항", "망상해수욕장",
+  "부산항", "부산항신항", "상왕등도", "생일도", "속초해수욕장", "송정해수욕장",
+  "여수항", "완도항", "우이도", "울릉도북동", "울릉도북서", "인천항", "임랑해수욕장",
+  "제주남부", "제주해협", "중문해수욕장", "태안항", "통영항", "평택당진항",
+  "한수원_고리", "한수원_기장", "한수원_나곡", "한수원_덕천", "한수원_온양", "한수원_진하",
+  "해운대해수욕장"
 ];
 
 window.addEventListener("DOMContentLoaded", () => {
+  generateRegionButtons();
   loadWeatherFromLocalStorage();
   loadCachedWeather();
   refreshAllWeather();
 });
+
+function generateRegionButtons() {
+  const buttonGrid = document.querySelector(".buttonGrid");
+  if (!buttonGrid) return;
+
+  regionList.forEach(region => {
+    const button = document.createElement("button");
+    button.className = "mapRegionButton";
+    button.textContent = region;
+    button.onclick = () => refreshSingleWeather(region);
+    buttonGrid.appendChild(button);
+  });
+}
 
 function loadWeatherFromLocalStorage() {
   const saved = localStorage.getItem("weatherCache");
@@ -17,7 +35,7 @@ function loadWeatherFromLocalStorage() {
     try {
       const parsed = JSON.parse(saved);
       for (const [region, data] of Object.entries(parsed)) {
-        if (data && data.observedAt && !data.error) {
+        if (data && data["관측시간"] && !data.error) {
           weatherCache[region] = data;
         }
       }
@@ -33,6 +51,7 @@ function saveWeatherToLocalStorage() {
 
 function loadCachedWeather() {
   const container = document.getElementById("allRegionWeather");
+  if (!container) return;
   container.innerHTML = "";
 
   regionList.forEach(region => {
@@ -45,7 +64,7 @@ function loadCachedWeather() {
     } else if (data.error) {
       card.innerHTML = `<h3>🌊 ${region}</h3><p>❌ ${data.error}</p>`;
     } else {
-      card.innerHTML = formatWeatherHTML(data);
+      card.innerHTML = formatWeatherHTML(region, data);
     }
 
     container.appendChild(card);
@@ -54,7 +73,7 @@ function loadCachedWeather() {
 
 function refreshAllWeather() {
   regionList.forEach(region => {
-    fetch(`/api/weather?region=${region}`)
+    fetch(`/api/weather?region=${encodeURIComponent(region)}`)
       .then(res => res.json())
       .then(data => {
         weatherCache[region] = data;
@@ -68,24 +87,29 @@ function refreshAllWeather() {
   });
 }
 
-function formatWeatherHTML(data) {
-  const waterTempHTML =
-    data.waterTemp !== undefined &&
-    data.waterTemp !== "" &&
-    data.waterTemp !== "-" &&
-    data.waterTemp !== "null"
-      ? `<p>🌊 수온: ${data.waterTemp}°C</p>`
-      : "<p>🌊 수온 정보 없음</p>";
+function refreshSingleWeather(region) {
+  fetch(`/api/weather?region=${encodeURIComponent(region)}`)
+    .then(res => res.json())
+    .then(data => {
+      weatherCache[region] = data;
+      saveWeatherToLocalStorage();
+      loadCachedWeather();
+    })
+    .catch(err => {
+      weatherCache[region] = { error: err.message };
+      loadCachedWeather();
+    });
+}
 
+function formatWeatherHTML(region, data) {
   return `
-    <h3>🌍 ${data.region}</h3>
-    <p>🌡 기온: ${data.temperature}°C</p>
-    <p>💨 풍속: ${data.windSpeed} m/s</p>
-    <p>💧 습도: ${data.humidity}%</p>
-    ${waterTempHTML}
-    <p>☁️ 하늘: ${data.sky}</p>
-    <p>🌧 형태: ${data.precipType}</p>
-    <p>🌧 강수량: ${data.precipitation}</p>
-    <p>🕒 관측시각: ${data.observedAt}</p>
+    <h3>🌍 ${region}</h3>
+    <p>🕒 관측시각: ${data["관측시간"] || "정보 없음"}</p>
+    <p>🌡 기온: ${data["기온"] || "정보 없음"}</p>
+    <p>💨 풍속: ${data["풍속"] || "정보 없음"}</p>
+    <p>🌊 수온: ${data["수온"] || "정보 없음"}</p>
+    <p>🧂 염분: ${data["염분"] || "정보 없음"}</p>
+    <p>🌊 파고: ${data["파고"] || "정보 없음"}</p>
+    <p>🌫 기압: ${data["기압"] || "정보 없음"}</p>
   `;
 }
