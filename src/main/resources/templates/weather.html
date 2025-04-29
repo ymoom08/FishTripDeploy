@@ -2,7 +2,7 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title>대한민국 해역 선택</title>
+  <title>대한민국 해양 관측소 선택</title>
   <link rel="stylesheet" href="/css/weather.css">
   <script defer src="/js/koreaMap.js"></script>
 </head>
@@ -12,21 +12,16 @@
   <!-- 지도와 버튼 -->
   <div class="koreaMapSection">
     <div class="mapCard">
-      <img src="/image/koreaMap.png" alt="입체 대한민국 지도" class="koreaMapImage" />
+      <img src="/image/koreaMap.png" alt="대한민국 지도" class="koreaMapImage" />
       <div class="mapOverlay">
-        <button class="mapRegionButton region-0" onclick="selectRegion('서해북부')">서해북부</button>
-        <button class="mapRegionButton region-1" onclick="selectRegion('서해중부')">서해중부</button>
-        <button class="mapRegionButton region-2" onclick="selectRegion('서해남부')">서해남부</button>
-        <button class="mapRegionButton region-3" onclick="selectRegion('남해서부')">남해서부</button>
-        <button class="mapRegionButton region-4" onclick="selectRegion('제주도')">제주도</button>
-        <button class="mapRegionButton region-5" onclick="selectRegion('남해동부')">남해동부</button>
-        <button class="mapRegionButton region-6" onclick="selectRegion('동해남부')">동해남부</button>
-        <button class="mapRegionButton region-7" onclick="selectRegion('동해중부')">동해중부</button>
+        <div class="buttonGrid">
+          <!-- 버튼이 여기 자동 생성됨 -->
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- 날씨 카드 출력 영역 -->
+  <!-- 날씨 카드 출력 -->
   <div id="allRegionWeather" class="weatherGrid"></div>
 </div>
 
@@ -43,7 +38,7 @@
             border-radius: 10px;
             font-weight: bold;
             z-index: 999;">
-  해역 정보를 불러오는 중...
+  해양 관측 정보를 불러오는 중...
 </div>
 
 </body>
