@@ -16,7 +16,7 @@ public class PartyController {
 
     @GetMapping("/create")
     public String showCreateForm(Model model) {
-        model.addAttribute("partyForm", new PartyCreateRequest());
+        model.addAttribute("create", new PartyCreateRequest());
         return "party/create";
     }
 
