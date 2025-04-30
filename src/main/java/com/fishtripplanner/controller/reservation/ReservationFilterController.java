@@ -5,14 +5,13 @@ import com.fishtripplanner.domain.reservation.ReservationType;
 import com.fishtripplanner.dto.reservation.RegionDto;
 import com.fishtripplanner.dto.reservation.ReservationCardDto;
 import com.fishtripplanner.repository.RegionRepository;
-import com.fishtripplanner.repository.ReservationPostRepository;
+import com.fishtripplanner.service.ReservationPostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
 import java.util.List;
 
 @RestController
@@ -21,9 +20,13 @@ import java.util.List;
 public class ReservationFilterController {
 
     private final RegionRepository regionRepository;
-    private final ReservationPostRepository reservationPostRepository;
+    private final ReservationPostService reservationPostService;
 
-    // ✅ 지역 계층 구조 반환
+    /**
+     * ✅ 지역 계층 구조 조회
+     * - 부모-자식 관계를 갖는 지역 리스트 반환
+     * - 지역 선택 모달에 사용
+     */
     @GetMapping("/regions/hierarchy")
     public List<RegionDto> getRegionHierarchy() {
         return regionRepository.findAllWithChildrenOnly()
@@ -32,48 +35,44 @@ public class ReservationFilterController {
                 .toList();
     }
 
-    // ✅ 지역, 날짜 필터 포함 예약 카드 조회 API
+    /**
+     * ✅ 등록된 어종 이름 목록 조회
+     * - 어종 선택 모달에 사용
+     */
+    @GetMapping("/fish-types")
+    public List<String> getFishTypes() {
+        return reservationPostService.getFishTypeNames();
+    }
+
+    /**
+     * ✅ 예약글 필터링 API
+     * - type(필수) + regionId/date/fishType(선택)
+     * - 필터 조합에 따라 ReservationPost 목록 반환
+     */
     @GetMapping("/reservation")
     public List<ReservationCardDto> getFilteredCards(
-            @RequestParam(name = "type") String type,
-            @RequestParam(name = "regionId", required = false) List<Long> regionIds,
-            @RequestParam(name = "date", required = false) String date,
+            @RequestParam("type") String type, // 필수
+            @RequestParam(value = "regionId", required = false) List<Long> regionIds,
+            @RequestParam(value = "date", required = false) String dateStr,
+            @RequestParam(value = "fishType", required = false) List<String> fishTypes,
             Pageable pageable
     ) {
-        ReservationType enumType;
-        try {
-            enumType = ReservationType.valueOf(type.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("지원하지 않는 예약 타입입니다: " + type);
-        }
+        // 🔹 문자열 → enum으로 변환
+        ReservationType enumType = ReservationType.valueOf(type.toUpperCase());
 
-        Page<ReservationPost> page;
+        // 🔹 날짜 파싱
+        LocalDate parsedDate = (dateStr != null && !dateStr.isBlank()) ? LocalDate.parse(dateStr) : null;
 
-        if (date != null && !date.isBlank()) {
-            // 🔥 날짜 파라미터를 LocalDate로 변환
-            LocalDate parsedDate;
-            try {
-                parsedDate = LocalDate.parse(date);
-            } catch (DateTimeParseException e) {
-                throw new IllegalArgumentException("날짜 포맷이 올바르지 않습니다. (yyyy-MM-dd 형식이어야 합니다)");
-            }
+        // 🔹 빈 리스트는 null로 처리 (서비스에서 조건 분기 처리)
+        List<Long> validRegionIds = (regionIds == null || regionIds.isEmpty()) ? null : regionIds;
+        List<String> validFishTypes = (fishTypes == null || fishTypes.isEmpty()) ? null : fishTypes;
 
-            // 🔥 날짜 + 지역 + 타입 필터
-            if (regionIds != null && !regionIds.isEmpty()) {
-                page = reservationPostRepository.findByTypeAndRegionIdsAndDate(enumType, regionIds, parsedDate, pageable);
-            } else {
-                page = reservationPostRepository.findByTypeAndDate(enumType, parsedDate, pageable);
-            }
+        // 🔹 서비스 호출
+        Page<ReservationPost> page = reservationPostService.filterPosts(
+                enumType, validRegionIds, parsedDate, validFishTypes, pageable
+        );
 
-        } else {
-            // 🔥 날짜 없이 기존 필터
-            if (regionIds != null && !regionIds.isEmpty()) {
-                page = reservationPostRepository.findByTypeAndRegionIds(enumType, regionIds, pageable);
-            } else {
-                page = reservationPostRepository.findByType(enumType, pageable);
-            }
-        }
-
+        // 🔹 DTO 변환 후 반환
         return page.stream()
                 .map(ReservationCardDto::from)
                 .toList();
