@@ -7,21 +7,15 @@
 <body>
 <div th:fragment="headerFragment">
     <header class="header">
-        <div class="logoArea"><span class="logoText">🎣 FishTrip</span></div>
+        <div class="logoArea">
+            <a href="/" class="logoText">🎣 FishTrip</a>
+        </div>
         <div class="searchBoxWrapper">
             <input type="text" placeholder="검색어를 입력하세요..." class="searchInput" />
             <button class="searchButton">🔍</button>
         </div>
         <div class="rightIcons">
             <button class="iconButton" onclick="navigatePage('/notifications')">
-                <span>🔔</span>
-                <div class="iconLabel">알림</div>
-            </button>
-            <button class="iconButton" onclick="navigatePage('/coupons')">
-                <span>🎟️</span>
-                <div class="iconLabel">쿠폰</div>
-            </button>
-            <button class="iconButton" onclick="navigatePage('/profile')">
                 <span>👤</span>
                 <div class="iconLabel">내정보</div>
             </button>
@@ -36,9 +30,9 @@
                     <button class="menuButton">예약하기</button>
                     <div class="subMenu" id="subMenu0" style="display: none;">
                         <ul class="subMenuList">
-                            <li class="subMenuItem"><a href="#" class="subMenuButton" onclick="navigatePage('/reservation/1')">예약 1</a></li>
-                            <li class="subMenuItem"><a href="#" class="subMenuButton" onclick="navigatePage('/reservation/2')">예약 2</a></li>
-                            <li class="subMenuItem"><a href="#" class="subMenuButton" onclick="navigatePage('/reservation/3')">예약 3</a></li>
+                            <li class="subMenuItem">
+                                <a th:href="@{/reservation}" class="subMenuButton">예약 1</a>
+                            </li>
                         </ul>
                     </div>
                 </li>
@@ -73,9 +67,7 @@
                     <button class="menuButton">날씨/풍속/조류!</button>
                     <div class="subMenu" id="subMenu4" style="display: none;">
                         <ul class="subMenuList">
-                            <li class="subMenuItem"><a href="#" class="subMenuButton" onclick="navigatePage('/weather')">날씨 1</a></li>
-                            <li class="subMenuItem"><a href="#" class="subMenuButton" onclick="navigatePage('/wind')">풍속 1</a></li>
-                            <li class="subMenuItem"><a href="#" class="subMenuButton" onclick="navigatePage('/tide')">조류 1</a></li>
+                            <li class="subMenuItem"><a href="#" class="subMenuButton" onclick="navigatePage('/weather')">해양날씨</a></li>
                         </ul>
                     </div>
                 </li>
@@ -92,8 +84,8 @@
         </div>
         <div class="navRight">
             <button class="menuButton" onclick="navigatePage('/special-exhibition')">기획전</button>
-            <button class="menuButton" onclick="showLogin()">로그인</button>
-            <button class="menuButton" onclick="navigatePage('/register')">회원가입</button>
+            <a th:href="@{/login}" class="menuButton" style="text-decoration: none;">로그인</a>
+            <a th:href="@{/join/oauth}" class="menuButton" style="text-decoration: none;">회원가입</a>
             <button class="menuButton" onclick="navigatePage('/customer-service')">고객센터</button>
         </div>
     </nav>

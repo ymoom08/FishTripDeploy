@@ -87,5 +87,9 @@ public class Party {
     @JoinColumn(name = "reservation_post_id")
     private ReservationPost reservationPost;
 
+    @OneToMany(mappedBy = "party", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Waypoint> waypoints = new ArrayList<>();
+
+
 
 }

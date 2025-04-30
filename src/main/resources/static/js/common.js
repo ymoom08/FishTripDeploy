@@ -187,5 +187,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function selectRegion(regionName) {
     alert(`선택된 해역: ${regionName}`);
-    // 향후: window.location.href = `/weather?region=${regionName}`;
 }

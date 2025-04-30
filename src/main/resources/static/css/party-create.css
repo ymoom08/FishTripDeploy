@@ -1,0 +1,33 @@
+body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+#partyForm {
+    max-width: 600px;
+    margin: auto;
+}
+
+#routeModal {
+    text-align: center;
+}
+
+#routeOptions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+#routeOptions div {
+    width: 200px;
+    border: 1px solid #ccc;
+    margin: 10px;
+    padding: 10px;
+    cursor: pointer;
+    background: #f9f9f9;
+}
