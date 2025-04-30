@@ -233,12 +233,14 @@ h1 {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px;
-  min-height: 400px;
-  min-width: 400px; /* 🔥 추가: 가로폭 강제 */
+  padding: 30px;
+  min-height: 450px;
+  min-width: 450px;
+  position: relative; /* ⚠️ 필수: appendTo 대상은 위치 기준 잡기 위해 relative 필요 */
 }
 
 .flatpickr-calendar {
-  font-size: 20px !important;
-  margin: auto; /* 🔥 추가: flatpickr 캘린더 자체 가운데 */
+  transform: scale(1.5); /* 사이즈 1.5배 확대 */
+  transform-origin: center center; /* 확대 기준점 중앙 */
+  font-size: 18px; /* 날짜 글자도 키움 */
 }

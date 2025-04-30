@@ -32,7 +32,7 @@ public class ReservationFilterController {
                 .toList();
     }
 
-    // ✅ 지역 + 날짜 필터 포함 예약 카드 조회 API
+    // ✅ 지역, 날짜 필터 포함 예약 카드 조회 API
     @GetMapping("/reservation")
     public List<ReservationCardDto> getFilteredCards(
             @RequestParam(name = "type") String type,

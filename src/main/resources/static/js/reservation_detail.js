@@ -15,17 +15,19 @@ const dateModal = document.getElementById("dateModal");
 const dateApply = document.getElementById("dateApply");
 const dateCancel = document.getElementById("dateCancel");
 
-flatpickr.localize(flatpickr.l10ns.ko); // 🔥 강제 한글화
+// ✅ 달력 초기화
+flatpickr.localize(flatpickr.l10ns.ko);
 flatpickr("#datePickerContainer", {
   dateFormat: "Y-m-d",
   inline: true,
   locale: "ko",
   onChange: (selectedDates, dateStr) => {
     selectedDate = dateStr;
-  }
+  },
+  appendTo: document.getElementById("datePickerContainer")
 });
 
-// ✅ 지역 선택 모달 열기
+// ✅ 지역 모달 열기
 regionBtn?.addEventListener("click", () => {
   regionModal.classList.remove("hidden");
   regionModal.classList.add("show");
@@ -47,27 +49,29 @@ regionBtn?.addEventListener("click", () => {
     });
 });
 
-// ✅ 날짜 선택 모달 열기
+// ✅ 날짜 모달 열기
 dateBtn?.addEventListener("click", () => {
   dateModal.classList.remove("hidden");
   dateModal.classList.add("show");
 });
 
-// ✅ 지역 적용/초기화 버튼
+// ✅ 지역 적용 / 초기화
 regionApply?.addEventListener("click", () => {
   regionModal.classList.remove("show", "hidden");
+  updateSelectedRegionTextOnly();
   fetchFilteredCards();
 });
 
 regionReset?.addEventListener("click", () => {
   selectedRegions = [];
   document.querySelectorAll(".region-child-btn.selected").forEach(btn => btn.classList.remove("selected"));
-  updateSelectedRegionText();
+  updateSelectedRegionTextOnly();
 });
 
-// ✅ 날짜 적용/취소 버튼
+// ✅ 날짜 적용 / 취소
 dateApply?.addEventListener("click", () => {
   dateModal.classList.remove("show", "hidden");
+  updateSelectedDateTextOnly();
   fetchFilteredCards();
 });
 
@@ -75,7 +79,7 @@ dateCancel?.addEventListener("click", () => {
   dateModal.classList.remove("show", "hidden");
 });
 
-// ✅ 모달 바깥 클릭 시 닫기
+// ✅ 모달 외부 클릭 시 닫기
 [regionModal, dateModal].forEach(modal => {
   modal?.addEventListener("click", e => {
     if (e.target === modal) {
@@ -99,14 +103,12 @@ function renderFilteredRegions(data, container) {
     const childWrapper = document.createElement('div');
     childWrapper.classList.add('region-children');
 
-    // 전체 버튼
     const allBtn = document.createElement('button');
     allBtn.innerText = '전체';
     allBtn.classList.add('region-child-btn');
     allBtn.addEventListener("click", () => toggleRegionAll(region, childWrapper, allBtn));
     childWrapper.appendChild(allBtn);
 
-    // 자식 지역 버튼
     region.children.forEach(child => {
       const btn = document.createElement('button');
       btn.innerText = child.name;
@@ -121,7 +123,7 @@ function renderFilteredRegions(data, container) {
   });
 }
 
-// ✅ 전체 버튼 토글
+// ✅ 전체 선택 토글
 function toggleRegionAll(region, childWrapper, allBtn) {
   const childBtns = Array.from(childWrapper.querySelectorAll('.region-child-btn:not(:first-child)'));
   const alreadySelected = childBtns.every(btn => btn.classList.contains("selected"));
@@ -139,10 +141,10 @@ function toggleRegionAll(region, childWrapper, allBtn) {
     allBtn.classList.add("selected");
   }
 
-  updateSelectedRegionText();
+  updateSelectedRegionTextOnly();
 }
 
-// ✅ 개별 자식 버튼 토글
+// ✅ 개별 지역 선택 토글
 function toggleRegionChild(child, region, childWrapper, allBtn, btn) {
   const existingIndex = selectedRegions.findIndex(r => r.id === child.id);
   btn.classList.toggle("selected");
@@ -164,11 +166,11 @@ function toggleRegionChild(child, region, childWrapper, allBtn, btn) {
     allBtn.classList.remove("selected");
   }
 
-  updateSelectedRegionText();
+  updateSelectedRegionTextOnly();
 }
 
-// ✅ 선택된 정보 표시 업데이트
-function updateSelectedRegionText() {
+// ✅ 지역 정보만 갱신
+function updateSelectedRegionTextOnly() {
   const modalDiv = document.querySelector("#regionModal .current-selection");
   const pageDiv = document.getElementById("selectedInfo");
 
@@ -185,18 +187,42 @@ function updateSelectedRegionText() {
       return names.length === total ? `(${parent}) 전체` : `(${parent}) ${names.join(", ")}`;
     });
 
-    text += `현재 선택 지역: ${regionTexts.join(", ")}`;
+    text = `현재 선택 지역: ${regionTexts.join(", ")}`;
+  } else {
+    text = "선택된 지역 없음";
   }
 
-  if (selectedDate) {
-    text += `\n선택한 날짜: ${selectedDate}`;
-  }
+  modalDiv.innerText = text;
 
-  modalDiv.innerText = text || "선택된 지역 없음";
-  pageDiv.innerText = text;
+  const dateText = selectedDate ? `선택한 날짜: ${selectedDate}` : "";
+  pageDiv.innerText = [text, dateText].filter(Boolean).join("\n");
 }
 
-// ✅ 필터링된 카드 다시 불러오기
+// ✅ 날짜 정보만 갱신
+function updateSelectedDateTextOnly() {
+  const modalDiv = document.querySelector("#dateModal .current-selection");
+  const pageDiv = document.getElementById("selectedInfo");
+
+  const text = selectedDate ? `선택한 날짜: ${selectedDate}` : "선택된 날짜 없음";
+  modalDiv.innerText = text;
+
+  let regionText = "";
+  if (selectedRegions.length > 0) {
+    const grouped = selectedRegions.reduce((acc, cur) => {
+      (acc[cur.parent] = acc[cur.parent] || []).push(cur.name);
+      return acc;
+    }, {});
+    const regionTexts = Object.entries(grouped).map(([parent, names]) => {
+      const total = cachedRegions.find(r => r.name === parent)?.children.length || 0;
+      return names.length === total ? `(${parent}) 전체` : `(${parent}) ${names.join(", ")}`;
+    });
+    regionText = `현재 선택 지역: ${regionTexts.join(", ")}`;
+  }
+
+  pageDiv.innerText = [regionText, text].filter(Boolean).join("\n");
+}
+
+// ✅ 필터링된 카드 불러오기
 function fetchFilteredCards() {
   const type = location.pathname.split("/").at(-1);
   const query = new URLSearchParams({ type, page: 0 });
@@ -210,7 +236,7 @@ function fetchFilteredCards() {
     .catch(err => console.error("카드 불러오기 실패:", err));
 }
 
-// ✅ 카드 목록 업데이트
+// ✅ 카드 렌더링
 function updateCards(cards) {
   const container = document.getElementById("cardContainer");
   container.innerHTML = cards.length === 0
