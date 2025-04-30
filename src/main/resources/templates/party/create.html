@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -5,32 +6,171 @@
   <title>파티 생성</title>
   <link rel="stylesheet" href="/css/party-create.css">
   <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=0b84a2179b2534016530526202844771&libraries=services"></script>
-  <script src="/js/party-create.js" defer></script>
 </head>
 <body>
 <h1>파티 생성</h1>
-
 <form id="partyForm" method="post" th:action="@{/party/save}">
   <label>제목:</label>
   <input type="text" name="title" required><br>
 
   <label>출발지:</label>
-  <input type="text" id="departurePoint" name="departurePoint" readonly required><br>
+  <input type="text" id="departurePoint" name="departurePoint" readonly><br>
 
   <label>목적지:</label>
-  <input type="text" id="destination" name="destination" readonly required><br>
+  <input type="text" id="destination" name="destination" readonly><br>
 
-  <div id="map" style="width:100%; height:400px; margin-top:10px;"></div><br>
+  <div id="map" style="width:100%;height:400px;margin-top:10px;"></div><br>
 
   <button type="button" id="openRouteSelect">경로 선택</button>
   <button type="submit">등록하기</button>
 </form>
 
 <!-- 루트 선택 모달 -->
-<div id="routeModal" style="display:none; position:fixed; top:10%; left:10%; width:80%; height:70%; background:white; overflow:auto; border:1px solid gray; padding:20px;">
+<div id="routeModal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); width:80%; max-width:600px; height:auto; background:white; overflow:auto; border:1px solid gray; padding:20px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
   <h2>경로 선택</h2>
   <div id="routeOptions"></div>
   <button id="closeRouteModal">닫기</button>
 </div>
+
+<script>
+  const map = new kakao.maps.Map(document.getElementById('map'), {
+      center: new kakao.maps.LatLng(37.5665, 126.9780),
+      level: 5
+  });
+
+  const geocoder = new kakao.maps.services.Geocoder();
+  let markers = [];
+  let waypointCoords = [];
+  let departureMarker = null;
+  let destinationMarker = null;
+  let polyline = null;
+
+  kakao.maps.event.addListener(map, 'rightclick', function(mouseEvent) {
+      const latlng = mouseEvent.latLng;
+      const menu = document.createElement('div');
+      menu.style.position = 'absolute';
+      menu.style.left = mouseEvent.point.x + 'px';
+      menu.style.top = mouseEvent.point.y + 'px';
+      menu.style.zIndex = '10';
+      menu.style.background = 'white';
+      menu.style.border = '1px solid black';
+      menu.innerHTML = `
+        <button onclick="selectPoint('departure', ${latlng.getLat()}, ${latlng.getLng()})">출발지</button>
+        <button onclick="selectPoint('waypoint', ${latlng.getLat()}, ${latlng.getLng()})">경유지</button>
+        <button onclick="selectPoint('destination', ${latlng.getLat()}, ${latlng.getLng()})">목적지</button>
+      `;
+      document.body.appendChild(menu);
+      setTimeout(() => document.body.removeChild(menu), 3000);
+  });
+
+  window.selectPoint = function(type, lat, lng) {
+      const position = new kakao.maps.LatLng(lat, lng);
+
+      if (type === 'departure') {
+          if (departureMarker) departureMarker.setMap(null);
+          departureMarker = new kakao.maps.Marker({ position, map });
+          geocoder.coord2Address(lng, lat, function(result, status) {
+              if (status === kakao.maps.services.Status.OK) {
+                  document.getElementById('departurePoint').value = result[0].address.address_name;
+              }
+          });
+      } else if (type === 'destination') {
+          if (destinationMarker) destinationMarker.setMap(null);
+          destinationMarker = new kakao.maps.Marker({ position, map });
+          geocoder.coord2Address(lng, lat, function(result, status) {
+              if (status === kakao.maps.services.Status.OK) {
+                  document.getElementById('destination').value = result[0].address.address_name;
+              }
+          });
+      } else if (type === 'waypoint') {
+          if (markers.length >= 5) {
+              alert('경유지는 최대 5개까지 가능합니다.');
+              return;
+          }
+          const marker = new kakao.maps.Marker({ position, map });
+          markers.push(marker);
+          waypointCoords.push({ lat, lng });
+      }
+  };
+
+  // 모달 열기/닫기
+  const openBtn = document.getElementById('openRouteSelect');
+  const closeBtn = document.getElementById('closeRouteModal');
+  const routeModal = document.getElementById('routeModal');
+  const routeOptions = document.getElementById('routeOptions');
+
+  openBtn.addEventListener('click', function() {
+      routeModal.style.display = 'block';
+      requestActualRoute();
+  });
+  closeBtn.addEventListener('click', function() {
+      routeModal.style.display = 'none';
+  });
+
+  function requestActualRoute() {
+      if (!departureMarker || !destinationMarker) {
+          alert('출발지와 목적지를 먼저 선택해주세요.');
+          return;
+      }
+
+      const waypointsParam = waypointCoords.map(wp => `${wp.lng},${wp.lat}`).join('|');
+      const origin = `${departureMarker.getPosition().getLng()},${departureMarker.getPosition().getLat()}`;
+      const destination = `${destinationMarker.getPosition().getLng()},${destinationMarker.getPosition().getLat()}`;
+
+      fetch(`https://apis-navi.kakaomobility.com/v1/directions?origin=${origin}&destination=${destination}&waypoints=${waypointsParam}`, {
+          method: 'GET',
+          headers: {
+              'Authorization': 'KakaoAK 2aed1eb5d8cab77b823ded86af7bc51d'
+          }
+      })
+      .then(response => response.json())
+      .then(data => {
+          routeOptions.innerHTML = '';
+          const summary = data.routes[0].summary;
+          const option = {
+              title: '추천 경로',
+              cost: `${summary.fare.toll}원`,
+              time: `${Math.round(summary.duration / 60)}분`,
+              path: data.routes[0].sections.flatMap(section =>
+                  section.roads.flatMap(road => road.vertexes)
+              )
+          };
+
+          const card = document.createElement('div');
+          card.style.border = '1px solid gray';
+          card.style.margin = '10px';
+          card.style.padding = '10px';
+          card.style.cursor = 'pointer';
+          card.innerHTML = `
+            <h3>${option.title}</h3>
+            <p>예상 비용: ${option.cost}</p>
+            <p>예상 시간: ${option.time}</p>
+          `;
+          card.onclick = () => {
+              if (polyline) polyline.setMap(null);
+              const latlngs = [];
+              for (let i = 0; i < option.path.length; i += 2) {
+                  latlngs.push(new kakao.maps.LatLng(option.path[i + 1], option.path[i]));
+              }
+              polyline = new kakao.maps.Polyline({
+                  path: latlngs,
+                  strokeWeight: 5,
+                  strokeColor: '#007BFF',
+                  strokeOpacity: 0.8,
+                  strokeStyle: 'solid'
+              });
+              polyline.setMap(map);
+              routeModal.style.display = 'none';
+          };
+
+          routeOptions.appendChild(card);
+      })
+      .catch(error => {
+          console.error('경로 요청 실패:', error);
+          alert('경로 정보를 불러오는 데 실패했습니다.');
+      });
+  }
+</script>
+
 </body>
 </html>
