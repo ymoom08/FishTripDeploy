@@ -43,6 +43,6 @@ public class JoinController {
 
 
 
-        return "join/oauthJoinForm"; // 따로 페이지 만들거나 기존 회원가입 폼 재사용
+        return "join/oauthJoinForm";
     }
 }

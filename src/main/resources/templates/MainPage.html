@@ -12,9 +12,7 @@
 </head>
 <body>
 <div class="container">
-
     <div th:replace="fragments/header :: headerFragment"></div>
-
 
     <main class="mainContent">
         <div class="textBlock">
@@ -26,7 +24,6 @@
                 <video class="video" th:src="@{/videos/sea1.mp4}" type="video/mp4" autoplay muted loop playsinline></video>
                 <video class="video" th:src="@{/videos/sea2.mp4}" type="video/mp4" autoplay muted loop playsinline></video>
                 <video class="video" th:src="@{/videos/sea3.mp4}" type="video/mp4" autoplay muted loop playsinline></video>
-
             </div>
         </div>
     </main>
@@ -49,7 +46,6 @@
         </ul>
     </div>
 
-
     <section class="catchLogSection">
         <div class="catchTextBlock">
             <h2>🎣 예약하기</h2>
@@ -57,10 +53,11 @@
             <button class="button" onclick="navigatePage('/my-catch-log')">예약하러 가기</button>
         </div>
         <div class="catchPhoneMockup">
-            <img th:src="@{/image/phone1.png}" alt="낚시 기록 모바일 UI" />
+            <div class="deviceContainer">
+                <img th:src="@{/image/com.png}" alt="낚시 기록 모바일 UI" class="mockup phone">
+            </div>
         </div>
     </section>
-
 
     <div th:replace="fragments/footer :: footerFragment"></div>
 </div>

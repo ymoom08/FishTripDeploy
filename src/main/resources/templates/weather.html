@@ -4,25 +4,22 @@
   <meta charset="UTF-8">
   <title>대한민국 해역 선택</title>
   <link rel="stylesheet" href="/css/weather.css">
+  <link rel="stylesheet" th:href="@{/css/Header.css}">
   <script defer src="/js/koreaMap.js"></script>
+  <script th:src="@{/js/common.js}" defer></script>
 </head>
 <body>
-
+<div th:replace="fragments/header :: headerFragment"></div>
 <div class="mainWrapper">
-
   <div class="koreaMapSection">
     <div class="mapCard">
       <img src="/image/koreaMap.png" alt="입체 대한민국 지도" class="koreaMapImage" />
-
       <div class="mapOverlay"></div>
     </div>
   </div>
 
-
   <div id="allRegionWeather" class="weatherGrid"></div>
 </div>
-
-
 <div id="weatherStatus"
      style="display: none;
             position: fixed;

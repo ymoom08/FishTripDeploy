@@ -7,7 +7,7 @@ body, html {
 
 .container {
   font-family: 'Pretendard', sans-serif;
-  background: linear-gradient(to bottom right, #b2ebf2, #e0f7fa);
+  background-color: #b2ebf2;
   min-height: 100vh;
   width: 100%;
   overflow-y: auto;
@@ -23,8 +23,6 @@ body, html {
   scroll-snap-align: start;
 }
 
-
-/* ======================= 페이지 1 ======================= */
 .mainContent {
   min-height: 100vh;
   display: flex;
@@ -111,10 +109,8 @@ body, html {
   z-index: 1;
 }
 
-
-/* ======================= 페이지 2 ======================= */
 .eventSection {
-  background: linear-gradient(to bottom right, #b2ebf2, #e0f7fa);
+  background-color: #b2ebf2;
   border-radius: 16px;
   padding: 1rem 1rem;
   margin: 0 auto;
@@ -160,10 +156,9 @@ body, html {
   background-color: #e0f7fa;
 }
 
-/* ======================= 페이지 3 ======================= */
 .catchLogSection {
   min-height: 100vh;
-  background: linear-gradient(to bottom right, #b2ebf2, #e0f7fa);
+  background-color: #b2ebf2;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -221,10 +216,39 @@ body, html {
   max-height: 750px;
   width: auto;
   margin-top: -30px;
+  background: none;
+  box-shadow: none;
+  border: none;
 }
 
+.deviceContainer {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
 
-/* =======================  애니메이션 정의 ======================= */
+.mockup {
+  border-radius: 1.5rem;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background: none;
+}
+
+.mockup:hover {
+  transform: scale(1.03);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
+}
+
+.mockup.phone {
+  height: 500px;
+}
+
+.mockup.pc {
+  height: 300px;
+}
+
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -256,8 +280,6 @@ body, html {
   }
 }
 
-
-/* =======================  반응형 디자인 ======================= */
 @media (max-width: 768px) {
   .mainContent {
     flex-direction: column;
@@ -287,5 +309,13 @@ body, html {
 
   .catchPhoneMockup img {
     height: 350px;
+  }
+
+  .mockup.phone {
+    height: 300px;
+  }
+
+  .mockup.pc {
+    height: 200px;
   }
 }
