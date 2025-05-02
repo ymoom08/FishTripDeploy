@@ -1,4 +1,3 @@
-// ✅ ReservationPostService.java (서비스 계층 - 예약글 필터 비즈니스 로직 담당)
 package com.fishtripplanner.service;
 
 import com.fishtripplanner.domain.reservation.ReservationPost;
@@ -24,40 +23,26 @@ public class ReservationPostService {
      * 가장 적절한 Repository 메서드를 선택하여 조회 수행.
      */
     public Page<ReservationPost> filterPosts(
-            ReservationType type,             // 예약 타입 (boat, rock 등)
-            List<Long> regionIds,             // 지역 ID 리스트
-            LocalDate date,                   // 예약 가능한 날짜
-            List<String> fishTypes,           // 어종 이름 리스트
-            Pageable pageable                 // 페이지네이션 객체
+            ReservationType type,
+            List<Long> regionIds,
+            LocalDate date,
+            List<String> fishTypes,
+            Pageable pageable
     ) {
         boolean hasRegion = regionIds != null && !regionIds.isEmpty();
         boolean hasDate = date != null;
         boolean hasFish = fishTypes != null && !fishTypes.isEmpty();
 
-        // ✅ [1] 모든 필터 조건이 있는 경우
-        if (hasRegion && hasDate && hasFish) {
-            return reservationPostRepository.findByFilters(type, regionIds, date, fishTypes, pageable);
-
-            // ✅ [2] 지역 + 날짜만 있는 경우
-        } else if (hasRegion && hasDate) {
-            return reservationPostRepository.findByTypeAndRegionIdsAndDate(type, regionIds, date, pageable);
-
-            // ✅ [3] 날짜 + 어종만 있는 경우 (지역은 제외)
-        } else if (!hasRegion && hasDate && hasFish) {
-            return reservationPostRepository.findByDateAndFishTypes(type, date, fishTypes, pageable);
-
-            // ✅ [4] 날짜만 있는 경우
-        } else if (hasDate) {
-            return reservationPostRepository.findByTypeAndDate(type, date, pageable);
-
-            // ✅ [5] 지역만 있는 경우
-        } else if (hasRegion) {
-            return reservationPostRepository.findByTypeAndRegionIds(type, regionIds, pageable);
-
-            // ✅ [6] 아무 조건도 없을 경우 (기본 조회)
-        } else {
-            return reservationPostRepository.findByType(type, pageable);
-        }
+        // ✅ 필터 조합 문자열 기반으로 switch-case 분기
+        return switch (String.format("%s-%s-%s", hasRegion, hasDate, hasFish)) {
+            case "true-true-true"   -> reservationPostRepository.findByFilters(type, regionIds, date, fishTypes, pageable);
+            case "true-true-false"  -> reservationPostRepository.findByTypeAndRegionIdsAndDate(type, regionIds, date, pageable);
+            case "false-true-true"  -> reservationPostRepository.findByDateAndFishTypes(type, date, fishTypes, pageable);
+            case "false-false-true" -> reservationPostRepository.findByFishTypes(type, fishTypes, pageable); // ✅ 이 줄 추가
+            case "false-true-false" -> reservationPostRepository.findByTypeAndDate(type, date, pageable);
+            case "true-false-false" -> reservationPostRepository.findByTypeAndRegionIds(type, regionIds, pageable);
+            default                 -> reservationPostRepository.findByType(type, pageable);
+        };
     }
 
     /**

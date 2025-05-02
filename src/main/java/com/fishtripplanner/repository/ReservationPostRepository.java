@@ -51,6 +51,39 @@ public interface ReservationPostRepository extends JpaRepository<ReservationPost
             Pageable pageable
     );
 
+    // ✅ 타입 + 어종 기준 조회 (지역, 날짜 제외)
+    @Query("""
+        SELECT DISTINCT r
+        FROM ReservationPost r
+        JOIN r.fishTypeEntities f
+        WHERE r.type = :type
+          AND f.name IN :fishTypes
+    """)
+    Page<ReservationPost> findByFishTypes(
+            @Param("type") ReservationType type,
+            @Param("fishTypes") List<String> fishTypes,
+            Pageable pageable
+    );
+
+    // ✅ 타입 + 날짜 + 어종 기준 조회 (지역 제외)
+    @Query("""
+        SELECT DISTINCT r
+        FROM ReservationPost r
+        WHERE r.type = :type
+          AND :date IN elements(r.availableDates)
+          AND EXISTS (
+            SELECT 1
+            FROM r.fishTypeEntities f
+            WHERE f.name IN :fishTypes
+          )
+    """)
+    Page<ReservationPost> findByDateAndFishTypes(
+            @Param("type") ReservationType type,
+            @Param("date") LocalDate date,
+            @Param("fishTypes") List<String> fishTypes,
+            Pageable pageable
+    );
+
     // ✅ 타입 + 지역 + 날짜 기준 예약글 조회
     @Query("""
         SELECT DISTINCT r
@@ -66,31 +99,20 @@ public interface ReservationPostRepository extends JpaRepository<ReservationPost
             Pageable pageable
     );
 
-    // ✅ 타입 + 날짜 + 어종 기준 조회 (지역은 제외)
+    // ✅ 통합 필터 (type + regionIds + date + fishTypes 조합)
     @Query("""
         SELECT DISTINCT r
         FROM ReservationPost r
-        JOIN r.fishTypeEntities f
-        WHERE r.type = :type
-          AND :date IN elements(r.availableDates)
-          AND f.name IN :fishTypes
-    """)
-    Page<ReservationPost> findByDateAndFishTypes(
-            @Param("type") ReservationType type,
-            @Param("date") LocalDate date,
-            @Param("fishTypes") List<String> fishTypes,
-            Pageable pageable
-    );
-
-    // ✅ 통합 필터 (타입 + 지역 + 날짜 + 어종)
-    @Query("""
-        SELECT DISTINCT r
-        FROM ReservationPost r
-        JOIN r.fishTypeEntities f
         WHERE r.type = :type
           AND (:regionIds IS NULL OR r.region.id IN :regionIds)
           AND (:date IS NULL OR :date IN elements(r.availableDates))
-          AND (:fishTypes IS NULL OR f.name IN :fishTypes)
+          AND (
+            :fishTypes IS NULL OR EXISTS (
+              SELECT 1
+              FROM r.fishTypeEntities f
+              WHERE f.name IN :fishTypes
+            )
+          )
     """)
     Page<ReservationPost> findByFilters(
             @Param("type") ReservationType type,
@@ -100,7 +122,7 @@ public interface ReservationPostRepository extends JpaRepository<ReservationPost
             Pageable pageable
     );
 
-    // ✅ 등록된 모든 어종 이름 반환 (모달에서 체크박스용)
+    // ✅ 등록된 모든 어종 이름 반환 (모달 체크박스용)
     @Query("SELECT DISTINCT f.name FROM FishTypeEntity f")
     List<String> findAllFishTypeNames();
 }

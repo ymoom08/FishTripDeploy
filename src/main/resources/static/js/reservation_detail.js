@@ -19,6 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const dateModal = document.getElementById("dateModal");
   const dateApply = document.getElementById("dateApply");
   const dateCancel = document.getElementById("dateCancel");
+  const dateReset = document.getElementById("dateReset");
 
   const fishBtn = document.getElementById("fishBtn");
   const fishModal = document.getElementById("fishModal");
@@ -38,7 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
     appendTo: document.getElementById("datePickerContainer")
   });
 
-  // ✅ 한글 초성 추출 함수
+  // ✅ 한글 초성 추출 함수 (어종 그룹핑용)
   function getInitialConsonant(kor) {
     const initialTable = ["ㄱ","ㄲ","ㄴ","ㄷ","ㄸ","ㄹ","ㅁ","ㅂ","ㅃ","ㅅ","ㅆ","ㅇ","ㅈ","ㅉ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
     const uni = kor.charCodeAt(0) - 44032;
@@ -144,9 +145,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   regionApply?.addEventListener("click", () => {
-
-  console.log("✅ 선택된 어종:", selectedFishTypes);
-
     regionModal.classList.remove("show", "hidden");
     updateSelectedRegionTextOnly();
     fetchFilteredCards();
@@ -161,7 +159,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateSelectedRegionTextOnly() {
     const modalDiv = document.querySelector("#regionModal .current-selection");
     const pageDiv = document.getElementById("selectedInfo");
-    let text = "";
+    let text = "선택된 지역 없음";
 
     if (selectedRegions.length > 0) {
       const grouped = selectedRegions.reduce((acc, cur) => {
@@ -173,8 +171,6 @@ document.addEventListener("DOMContentLoaded", () => {
         return names.length === total ? `(${parent}) 전체` : `(${parent}) ${names.join(", ")}`;
       });
       text = `현재 선택 지역: ${regionTexts.join(", ")}`;
-    } else {
-      text = "선택된 지역 없음";
     }
 
     modalDiv.innerText = text;
@@ -198,49 +194,22 @@ document.addEventListener("DOMContentLoaded", () => {
     dateModal.classList.remove("show", "hidden");
   });
 
+  dateReset?.addEventListener("click", () => {
+    selectedDate = null;
+    updateSelectedDateTextOnly();
+  });
+
   function updateSelectedDateTextOnly() {
     const modalDiv = document.querySelector("#dateModal .current-selection");
     const pageDiv = document.getElementById("selectedInfo");
     const text = selectedDate ? `선택한 날짜: ${selectedDate}` : "선택된 날짜 없음";
     modalDiv.innerText = text;
 
-    let regionText = "";
-    if (selectedRegions.length > 0) {
-      const grouped = selectedRegions.reduce((acc, cur) => {
-        (acc[cur.parent] = acc[cur.parent] || []).push(cur.name);
-        return acc;
-      }, {});
-      const regionTexts = Object.entries(grouped).map(([parent, names]) => {
-        const total = cachedRegions.find(r => r.name === parent)?.children.length || 0;
-        return names.length === total ? `(${parent}) 전체` : `(${parent}) ${names.join(", ")}`;
-      });
-      regionText = `현재 선택 지역: ${regionTexts.join(", ")}`;
-    }
-
+    const regionText = selectedRegions.length > 0 ? `현재 선택 지역: ${selectedRegions.map(r => r.name).join(", ")}` : "";
     pageDiv.innerText = [regionText, text].filter(Boolean).join("\n");
   }
 
-const dateReset = document.getElementById("dateReset");
-
-dateReset?.addEventListener("click", () => {
-  selectedDate = null;
-
-  const calendarInstance = flatpickr("#datePickerContainer", {
-    dateFormat: "Y-m-d",
-    inline: true,
-    locale: "ko",
-    onChange: (selectedDates, dateStr) => {
-      selectedDate = dateStr;
-    },
-    appendTo: document.getElementById("datePickerContainer")
-  });
-
-  calendarInstance.clear(); // ✅ 달력에서 선택된 날짜 제거
-  updateSelectedDateTextOnly();
-});
-
-
-  // ✅ 어종 모달 열기 및 그룹 렌더링
+  // ✅ 어종 모달 열기 및 렌더링
   fishBtn?.addEventListener("click", () => {
     fishModal.classList.remove("hidden");
     fishModal.classList.add("show");
@@ -291,7 +260,6 @@ dateReset?.addEventListener("click", () => {
   function updateSelectedFishText() {
     const modalDiv = document.querySelector("#fishModal .current-selection");
     const pageDiv = document.getElementById("selectedInfo");
-
     const fishText = selectedFishTypes.length > 0 ? `선택한 어종: ${selectedFishTypes.join(", ")}` : "선택된 어종 없음";
     modalDiv.innerText = fishText;
 
@@ -316,6 +284,8 @@ dateReset?.addEventListener("click", () => {
     selectedRegions.forEach(r => query.append("regionId", r.id));
     if (selectedDate) query.append("date", selectedDate);
     selectedFishTypes.forEach(fish => query.append("fishType", fish));
+
+    console.log("🔥 API 호출 URL:", `/api/reservation?${query.toString()}`);
 
     fetch(`/api/reservation?${query.toString()}`)
       .then(res => {
