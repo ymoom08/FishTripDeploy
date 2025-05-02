@@ -77,4 +77,10 @@ public class ReservationFilterController {
                 .map(ReservationCardDto::from)
                 .toList();
     }
+
+    // ✅ ReservationFilterController.java
+    @GetMapping("/regions/names") // 혹은 "/regions/used"
+    public List<String> getUsedRegionNames() {
+        return reservationPostService.getUsedRegionNames();  // 서비스로 위임
+    }
 }

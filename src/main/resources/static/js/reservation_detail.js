@@ -1,5 +1,4 @@
 // ✅ DOMContentLoaded: 모든 DOM 요소가 준비된 후 실행되도록 보장
-
 document.addEventListener("DOMContentLoaded", () => {
 
   // ✅ 전역 변수 선언
@@ -26,6 +25,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const fishList = document.getElementById("fishList");
   const fishApply = document.getElementById("fishApply");
   const fishReset = document.getElementById("fishReset");
+
+  // ✅ 공통 모달 닫기 함수
+  function closeModal(modal) {
+    modal.classList.remove("show");
+    modal.classList.add("hidden");
+  }
 
   // ✅ 달력 초기화
   flatpickr.localize(flatpickr.l10ns.ko);
@@ -145,7 +150,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   regionApply?.addEventListener("click", () => {
-    regionModal.classList.remove("show", "hidden");
+    closeModal(regionModal);
     updateSelectedRegionTextOnly();
     fetchFilteredCards();
   });
@@ -185,13 +190,13 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   dateApply?.addEventListener("click", () => {
-    dateModal.classList.remove("show", "hidden");
+    closeModal(dateModal);
     updateSelectedDateTextOnly();
     fetchFilteredCards();
   });
 
   dateCancel?.addEventListener("click", () => {
-    dateModal.classList.remove("show", "hidden");
+    closeModal(dateModal);
   });
 
   dateReset?.addEventListener("click", () => {
@@ -246,7 +251,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   fishApply?.addEventListener("click", () => {
-    fishModal.classList.remove("show", "hidden");
+    closeModal(fishModal);
     updateSelectedFishText();
     fetchFilteredCards();
   });
@@ -271,8 +276,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // ✅ 모달 외부 클릭 시 닫기
   [regionModal, dateModal, fishModal].forEach(modal => {
     modal?.addEventListener("click", e => {
-      if (e.target === modal) {
-        modal.classList.remove("show", "hidden");
+      if (e.target.classList.contains("modal")) {
+        closeModal(modal);
       }
     });
   });
