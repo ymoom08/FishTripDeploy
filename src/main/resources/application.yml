@@ -13,6 +13,11 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
 
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+
   security:
     oauth2:
       client:
@@ -21,7 +26,7 @@ spring:
             client-id: 2aed1eb5d8cab77b823ded86af7bc51d
             client-authentication-method: client_secret_post
             authorization-grant-type: authorization_code
-            redirect-uri: "http://192.168.0.108:8090/login/oauth2/code/kakao"
+            redirect-uri: "http://192.168.0.80:8090/login/oauth2/code/kakao"
             scope: profile_nickname, profile_image
             client-name: Kakao
           naver:
@@ -29,7 +34,7 @@ spring:
             client-secret: 3Wwm2XJQkJ
             client-authentication-method: client_secret_post
             authorization-grant-type: authorization_code
-            redirect-uri: "http://192.168.0.108:8090/login/oauth2/code/naver"
+            redirect-uri: "http://192.168.0.80:8090/login/oauth2/code/naver"
             scope:
               - name
               - email

@@ -50,11 +50,13 @@
         <div class="catchTextBlock">
             <h2>🎣 예약하기</h2>
             <p>언제 어디서든 예약이 가능해요<br/>여러 선택지로 익사이팅한 낚시</p>
-            <button class="button" onclick="navigatePage('/my-catch-log')">예약하러 가기</button>
+            <!-- ✅ 수정된 부분: 버튼 -> <a> 태그 -->
+            <a th:href="@{/reservation}" class="button">예약하러 가기</a>
         </div>
         <div class="catchPhoneMockup">
             <div class="deviceContainer">
-                <img th:src="@{/image/com.png}" alt="낚시 기록 모바일 UI" class="mockup phone">
+                <!-- ✅ 이미지 경로 수정 -->
+                <img th:src="@{/images/com.png}" alt="낚시 기록 모바일 UI" class="mockup phone">
             </div>
         </div>
     </section>

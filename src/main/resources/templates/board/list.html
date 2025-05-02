@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>게시판 목록</title>
+  <style>
+    body {
+      background-color: #b2ebf2;
+      font-family: 'Pretendard', sans-serif;
+      margin: 0;
+      padding: 2rem;
+    }
+    .board-container {
+      background: white;
+      max-width: 700px;
+      margin: auto;
+      border-radius: 10px;
+      padding: 2rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      color: #00796b;
+      margin-bottom: 1rem;
+    }
+    .post-list {
+      list-style: none;
+      padding: 0;
+    }
+    .post-item {
+      background-color: #e0f7fa;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+      transition: 0.2s ease;
+    }
+    .post-item:hover {
+      background-color: #b2ebf2;
+      transform: scale(1.02);
+    }
+    .post-icon {
+      font-size: 1.5rem;
+      margin-right: 1rem;
+    }
+    .post-link {
+      text-decoration: none;
+      color: #333;
+      font-weight: bold;
+    }
+    .write-btn {
+      display: block;
+      margin: 2rem auto 0;
+      padding: 0.6rem 1.5rem;
+      background-color: #00796b;
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+    }
+    .write-btn:hover {
+      background-color: #004d40;
+    }
+  </style>
+</head>
+<body>
+<div class="board-container">
+  <h2>📣 게시판 인기글 자리!</h2>
+  <ul class="post-list">
+    <li class="post-item"><span class="post-icon">🐟</span><a href="#" class="post-link">같이 즐길수록 재미는 두 배</a></li>
+    <li class="post-item"><span class="post-icon">🎁</span><a href="#" class="post-link">어종 크기별 다양한 경품</a></li>
+    <li class="post-item"><span class="post-icon">⛵</span><a href="#" class="post-link">바다낚시 지금 바로 출항!</a></li>
+    <li class="post-item"><span class="post-icon">🧭</span><a href="#" class="post-link">이번 주말 놓치면 후회할 조황 정보</a></li>
+    <li class="post-item"><span class="post-icon">📢</span><a href="#" class="post-link">초보 낚시꾼 필독 가이드</a></li>
+    <li class="post-item"><span class="post-icon">📚</span><a href="#" class="post-link">숨겨진 낚시 명당 대공개</a></li>
+    <li class="post-item"><span class="post-icon">💛</span><a href="#" class="post-link">낚시 친구/동료 구함</a></li>
+    <li class="post-item"><span class="post-icon">📸</span><a href="#" class="post-link">나의 Best Fishing Moment 자랑하기</a></li>
+    <li class="post-item"><span class="post-icon">📝</span><a href="#" class="post-link">낚시 관련 법규 및 안전 수칙</a></li>
+    <li class="post-item"><span class="post-icon">💡</span><a href="#" class="post-link">낚시 장비 관리 및 선택 팁</a></li>
+    <li class="post-item"><span class="post-icon">📰</span><a href="#" class="post-link">최신 낚시 뉴스 및 트렌드</a></li>
+    <li class="post-item"><span class="post-icon">💬</span><a href="#" class="post-link">자유롭게 이야기 나누는 잡담 게시판</a></li>
+  </ul>
+  <a th:href="@{/posts/new}"><button class="write-btn">글 작성</button></a>
+</div>
+</body>
+</html>

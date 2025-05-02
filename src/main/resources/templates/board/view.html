@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>게시글 보기</title>
+</head>
+<body>
+<h1 th:text="${post.title}"></h1>
+<p><strong>작성자:</strong> <span th:text="${post.writer}"></span></p>
+<p><strong>내용:</strong></p>
+<p th:text="${post.content}"></p>
+
+<div>
+  <p th:if="${post.profileImagePath != null}">
+    <img th:src="@{${post.profileImagePath}}" alt="프리폴 사진" style="width:100px;">
+  </p>
+  <p th:if="${post.imagePath != null}">
+    <img th:src="@{${post.imagePath}}" alt="사진" style="max-width:400px;">
+  </p>
+  <p th:if="${post.videoPath != null}">
+    <video th:src="@{${post.videoPath}}" controls style="max-width:500px;"></video>
+  </p>
+</div>
+
+<a th:href="@{'/posts/edit/' + ${post.id}}">수정</a> |
+<a th:href="@{'/posts/delete/' + ${post.id}}">삭제</a> |
+<a th:href="@{/posts}">목록</a>
+</body>
+</html>

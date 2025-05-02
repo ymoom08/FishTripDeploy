@@ -16,6 +16,7 @@ body, html {
   scroll-padding-top: 120px;
 }
 
+/* 스크롤 스냅 구간 */
 .mainContent,
 .eventSection,
 .additionalContent,
@@ -23,6 +24,7 @@ body, html {
   scroll-snap-align: start;
 }
 
+/* 메인 콘텐츠 */
 .mainContent {
   min-height: 100vh;
   display: flex;
@@ -42,34 +44,36 @@ body, html {
 }
 
 .subText {
-  font-size: 3rem;
+  font-size: clamp(1.8rem, 5vw, 3rem);
   color: #004d40;
-  line-height: 1.8;
+  line-height: 1.6;
   font-weight: bold;
   text-align: center;
 }
 
+/* 버튼 공통 */
 .button {
   margin: 2rem auto;
-  padding: 0.8rem 5rem;
+  padding: 0.8rem 3rem;
   border-radius: 30px;
-  background-color: #00acc1;
+  background: linear-gradient(135deg, #00acc1, #00796b);
   color: #fff;
   font-size: 1rem;
   font-weight: 600;
   border: none;
   cursor: pointer;
-  transition: background-color 0.3s ease;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
   display: block;
-  min-width: 120px;
   width: fit-content;
+  min-width: 140px;
 }
+
 .button:hover {
-  background-color: #0097a7;
+  background: linear-gradient(135deg, #0097a7, #004d40);
   transform: scale(1.05);
 }
 
+/* 이미지/비디오 */
 .imageContainer {
   flex: 1.5;
   display: flex;
@@ -78,8 +82,8 @@ body, html {
   margin-left: 2rem;
   position: relative;
   width: 100%;
-  height: 70vh;
-  max-height: 100vh;
+  height: 60vh;
+  max-height: 90vh;
   overflow: hidden;
   border-radius: 20px;
 }
@@ -91,6 +95,7 @@ body, html {
   height: 100%;
   overflow: hidden;
   border-radius: 20px;
+  position: relative;
 }
 
 .videoSlider .video {
@@ -104,15 +109,36 @@ body, html {
   transition: opacity 1s ease-in-out;
   z-index: 0;
 }
+
 .videoSlider .video.active {
   opacity: 1;
   z-index: 1;
 }
 
+/* 🐟 헤엄치는 물고기 */
+.fish {
+  position: fixed;
+  width: 100px;
+  height: auto;
+  bottom: 20px;
+  left: 20px;
+  z-index: 1000;
+  animation: swim 20s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes swim {
+  0%   { transform: translateX(0) translateY(0) rotateY(0deg); }
+  50%  { transform: translateX(100vw) translateY(-20px) rotateY(0deg); }
+  51%  { transform: translateX(100vw) translateY(-20px) rotateY(180deg); }
+  100% { transform: translateX(0) translateY(0) rotateY(180deg); }
+}
+
+/* 이벤트 섹션 */
 .eventSection {
   background-color: #b2ebf2;
   border-radius: 16px;
-  padding: 1rem 1rem;
+  padding: 1rem;
   margin: 0 auto;
   max-width: 1000px;
   height: 100vh;
@@ -122,6 +148,7 @@ body, html {
   animation: fadeInUp 1.3s ease;
   transition: transform 0.3s ease;
 }
+
 .eventSection:hover {
   transform: translateY(-5px);
 }
@@ -152,10 +179,12 @@ body, html {
   box-shadow: 0 4px 8px rgba(0, 172, 193, 0.1);
   transition: background-color 0.2s ease;
 }
+
 .eventSection .sectionList li:hover {
   background-color: #e0f7fa;
 }
 
+/* 예약 섹션 */
 .catchLogSection {
   min-height: 100vh;
   background-color: #b2ebf2;
@@ -173,12 +202,14 @@ body, html {
   text-align: center;
   animation: fadeInUp 1s ease;
 }
+
 .catchTextBlock h2 {
   font-size: 3rem;
   color: #00796b;
   margin-bottom: 1.5rem;
   text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
 }
+
 .catchTextBlock p {
   font-size: 1.4rem;
   color: #444;
@@ -199,11 +230,13 @@ body, html {
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
   transition: all 0.3s ease;
 }
+
 .catchTextBlock .reserveBtn:hover {
   background-color: #00acc1;
   transform: scale(1.05);
 }
 
+/* 기기 목업 */
 .catchPhoneMockup {
   flex: 1 1 300px;
   display: flex;
@@ -249,6 +282,7 @@ body, html {
   height: 300px;
 }
 
+/* 애니메이션 키프레임 */
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -280,6 +314,7 @@ body, html {
   }
 }
 
+/* 반응형 - 태블릿 이하 */
 @media (max-width: 768px) {
   .mainContent {
     flex-direction: column;
@@ -317,5 +352,29 @@ body, html {
 
   .mockup.pc {
     height: 200px;
+  }
+}
+
+/* 반응형 - 모바일 */
+@media (max-width: 480px) {
+  .subText {
+    font-size: 1.5rem;
+  }
+
+  .button {
+    padding: 0.6rem 2rem;
+    font-size: 0.95rem;
+  }
+
+  .catchTextBlock h2 {
+    font-size: 2rem;
+  }
+
+  .catchTextBlock p {
+    font-size: 1.1rem;
+  }
+
+  .catchPhoneMockup img {
+    height: 280px;
   }
 }
