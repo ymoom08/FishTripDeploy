@@ -22,12 +22,19 @@
     </div>
     <div class="filter-group">
       <button id="sortBtn">정렬기준</button>
+
+      <!-- 🔽 정렬 옵션 버튼 목록 -->
+      <div id="sortOptions" class="sort-options hidden">
+        <button data-sort="latest">최신순</button>
+        <button data-sort="priceAsc">가격 낮은순</button>
+        <button data-sort="priceDesc">가격 높은순</button>
+      </div>
     </div>
   </div>
 
   <div class="search-row">
-    <input type="text" placeholder="검색창" class="search-input">
-    <button class="search-button">검색하기</button>
+    <input type="text" id="searchInput" placeholder="검색창" class="search-input">
+    <button id="searchButton" class="search-button">검색하기</button>
   </div>
 
   <div id="selectedInfo" class="selected-info"></div>
@@ -39,7 +46,7 @@
       <div class="ad-image">
         <img th:src="@{${card.imageUrl}}" alt="예약 이미지">
       </div>
-      <div class="ad-desc" th:text="${card.title}">명목</div>
+      <div class="ad-desc" th:text="${card.title}">제목</div>
       <div class="ad-detail">
         <p th:text="${card.region != null ? card.region : '없음'}">지역</p>
         <p th:text="'회사명: ' + ${card.companyName}">회사명</p>

@@ -132,20 +132,33 @@ public interface ReservationPostRepository extends JpaRepository<ReservationPost
 
     // ✅ 통합 필터 — 모든 조건 NULL 가능 (fallback용 느슨한 쿼리)
     @Query("""
-        SELECT DISTINCT r
-        FROM ReservationPost r
-        LEFT JOIN r.availableDates d
-        LEFT JOIN r.fishTypeEntities f
-        WHERE r.type = :type
-          AND (:regionIds IS NULL OR r.region.id IN :regionIds)
-          AND (:date IS NULL OR d = :date)
-          AND (:fishTypes IS NULL OR f.name IN :fishTypes)
-    """)
+    SELECT DISTINCT r
+    FROM ReservationPost r
+    LEFT JOIN r.availableDates d
+    LEFT JOIN r.fishTypeEntities f
+    WHERE r.type = :type
+      AND (:regionIds IS NULL OR r.region.id IN :regionIds)
+      AND (:date IS NULL OR d = :date)
+      AND (:fishTypes IS NULL OR f.name IN :fishTypes)
+      AND (
+          :keyword IS NULL
+           OR LOWER(r.title) LIKE LOWER(CONCAT('%', :keyword, '%'))
+           OR LOWER(r.companyName) LIKE LOWER(CONCAT('%', :keyword, '%'))
+           OR LOWER(r.content) LIKE LOWER(CONCAT('%', :keyword, '%'))
+           OR EXISTS (
+               SELECT 1
+               FROM r.fishTypeEntities f2
+               WHERE LOWER(f2.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+           )
+           OR LOWER(r.region.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+      )
+""")
     Page<ReservationPost> findByFilters(
             @Param("type") ReservationType type,
             @Param("regionIds") List<Long> regionIds,
             @Param("date") LocalDate date,
             @Param("fishTypes") List<String> fishTypes,
+            @Param("keyword") String keyword,  // ✅ 추가
             Pageable pageable
     );
 

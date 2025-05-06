@@ -26,6 +26,7 @@ public class ReservationPostService {
             List<Long> regionIds,
             LocalDate date,
             List<String> fishTypes,
+            String keyword,
             String sortKey,
             Pageable pageable
     ) {
@@ -33,7 +34,6 @@ public class ReservationPostService {
         Sort sort = switch (sortKey) {
             case "priceAsc"  -> Sort.by("price").ascending();
             case "priceDesc" -> Sort.by("price").descending();
-            case "popular"   -> Sort.by("likes").descending(); // likes 필드 있다고 가정
             case "latest"    -> Sort.by("createdAt").descending();
             default          -> Sort.by("createdAt").descending();
         };
@@ -44,14 +44,22 @@ public class ReservationPostService {
         boolean hasFish = fishTypes != null && !fishTypes.isEmpty();
 
         return switch (String.format("%s-%s-%s", hasRegion, hasDate, hasFish)) {
-            case "true-true-true"   -> reservationPostRepository.findByFiltersStrict(type, regionIds, date, fishTypes, sortedPageable);
-            case "true-true-false"  -> reservationPostRepository.findByTypeAndRegionIdsAndDate(type, regionIds, date, sortedPageable);
-            case "false-true-true"  -> reservationPostRepository.findByDateAndFishTypes(type, date, fishTypes, sortedPageable);
-            case "true-false-true"  -> reservationPostRepository.findByRegionIdsAndFishTypes(type, regionIds, fishTypes, sortedPageable);
-            case "false-false-true" -> reservationPostRepository.findByFishTypes(type, fishTypes, sortedPageable);
-            case "false-true-false" -> reservationPostRepository.findByTypeAndDate(type, date, sortedPageable);
-            case "true-false-false" -> reservationPostRepository.findByTypeAndRegionIds(type, regionIds, sortedPageable);
-            default                 -> reservationPostRepository.findByType(type, sortedPageable);
+            case "true-true-true"   -> reservationPostRepository.findByFiltersStrict(
+                    type, regionIds, date, fishTypes, sortedPageable);
+            case "true-true-false"  -> reservationPostRepository.findByTypeAndRegionIdsAndDate(
+                    type, regionIds, date, sortedPageable);
+            case "false-true-true"  -> reservationPostRepository.findByDateAndFishTypes(
+                    type, date, fishTypes, sortedPageable);
+            case "true-false-true"  -> reservationPostRepository.findByRegionIdsAndFishTypes(
+                    type, regionIds, fishTypes, sortedPageable);
+            case "false-false-true" -> reservationPostRepository.findByFishTypes(
+                    type, fishTypes, sortedPageable);
+            case "false-true-false" -> reservationPostRepository.findByTypeAndDate(
+                    type, date, sortedPageable);
+            case "true-false-false" -> reservationPostRepository.findByTypeAndRegionIds(
+                    type, regionIds, sortedPageable);
+            default                 -> reservationPostRepository.findByFilters(
+                    type, regionIds, date, fishTypes, keyword, sortedPageable);
         };
     }
 

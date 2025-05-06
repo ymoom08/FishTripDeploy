@@ -35,6 +35,7 @@ h1 {
   align-items: center;
   width: clamp(160px, 18vw, 200px);
   gap: 8px;
+    position: relative; /* 🔥 정렬 드롭다운 기준 잡기용 */
 }
 
 .filter-group button {
@@ -288,4 +289,38 @@ h1 {
 .fish-modal-body {
   display: block;      /* ✅ 기존 flex 제거 → 그룹마다 줄바꿈됨 */
   padding: 10px;
+}
+
+/* ✅ 정렬 옵션 드롭다운 */
+.sort-options {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  padding: 10px;
+  z-index: 100;
+  position: absolute;
+  width: 100%;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
+}
+
+.sort-options button {
+  padding: 8px;
+  font-size: 14px;
+  background: white;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  text-align: center;
+}
+
+.sort-options button:hover {
+  background-color: #f2f2f2;
+}
+
+/* 숨김 처리 */
+.hidden {
+  display: none;
 }
