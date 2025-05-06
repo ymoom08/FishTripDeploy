@@ -55,6 +55,7 @@ public class ReservationFilterController {
             @RequestParam(value = "regionId", required = false) List<Long> regionIds,
             @RequestParam(value = "date", required = false) String dateStr,
             @RequestParam(value = "fishType", required = false) List<String> fishTypes,
+            @RequestParam(value = "sort", defaultValue = "latest") String sortKey, // ✅ 정렬 파라미터
             Pageable pageable
     ) {
         // 🔹 문자열 → enum으로 변환
@@ -67,9 +68,11 @@ public class ReservationFilterController {
         List<Long> validRegionIds = (regionIds == null || regionIds.isEmpty()) ? null : regionIds;
         List<String> validFishTypes = (fishTypes == null || fishTypes.isEmpty()) ? null : fishTypes;
 
+
+
         // 🔹 서비스 호출
         Page<ReservationPost> page = reservationPostService.filterPosts(
-                enumType, validRegionIds, parsedDate, validFishTypes, pageable
+                enumType, validRegionIds, parsedDate, validFishTypes, sortKey, pageable
         );
 
         // 🔹 DTO 변환 후 반환
