@@ -86,7 +86,7 @@ public class ReservationViewController {
 
         @GetMapping("/regions")
         public List<String> getRegions() {
-            return repo.findAllRegions(); // 지역 이름 목록만 반환
+            return repo.findAllRegionNames();  // ✅ 올바른 메서드 이름
         }
     }
 }
