@@ -56,6 +56,11 @@ public class ReservationPost {
     )
     private List<FishTypeEntity> fishTypeEntities;
 
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
+
 
 }
 

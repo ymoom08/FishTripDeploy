@@ -51,10 +51,12 @@ public class ReservationFilterController {
      */
     @GetMapping("/reservation")
     public List<ReservationCardDto> getFilteredCards(
-            @RequestParam("type") String type, // 필수
+            @RequestParam("type") String type,
             @RequestParam(value = "regionId", required = false) List<Long> regionIds,
             @RequestParam(value = "date", required = false) String dateStr,
             @RequestParam(value = "fishType", required = false) List<String> fishTypes,
+            @RequestParam(value = "keyword", required = false) String keyword, // ✅ 이 줄 추가
+            @RequestParam(value = "sort", defaultValue = "latest") String sortKey,
             Pageable pageable
     ) {
         // 🔹 문자열 → enum으로 변환
@@ -67,14 +69,23 @@ public class ReservationFilterController {
         List<Long> validRegionIds = (regionIds == null || regionIds.isEmpty()) ? null : regionIds;
         List<String> validFishTypes = (fishTypes == null || fishTypes.isEmpty()) ? null : fishTypes;
 
+
+
         // 🔹 서비스 호출
         Page<ReservationPost> page = reservationPostService.filterPosts(
-                enumType, validRegionIds, parsedDate, validFishTypes, pageable
+                enumType, validRegionIds, parsedDate, validFishTypes, keyword, sortKey, pageable
         );
+
 
         // 🔹 DTO 변환 후 반환
         return page.stream()
                 .map(ReservationCardDto::from)
                 .toList();
+    }
+
+    // ✅ ReservationFilterController.java
+    @GetMapping("/regions/names") // 혹은 "/regions/used"
+    public List<String> getUsedRegionNames() {
+        return reservationPostService.getUsedRegionNames();  // 서비스로 위임
     }
 }
