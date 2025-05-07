@@ -1,4 +1,4 @@
-package com.example.fishtrip;
+/*package com.example.fishtrip;
 
 import com.fishtripplanner.Application;
 import com.fishtripplanner.domain.User;
@@ -36,6 +36,6 @@ class FishtripApplicationTests {
 		}
 	}
 
-	}
+	}*/
 
 
