@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class ReservationCardDto {
 
+    private Long id;
     private String title;
     private String content;
     private String companyName;
@@ -50,6 +51,7 @@ public class ReservationCardDto {
         }
 
         return new ReservationCardDto(
+                post.getId(),
                 post.getTitle(),
                 post.getContent(),
                 post.getCompanyName(),

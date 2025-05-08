@@ -42,8 +42,8 @@
 </div>
 
 <div class="ad-card-list" id="cardContainer">
-  <div class="ad-card" th:each="card : ${cards}">
-    <div th:if="${card instanceof T(com.fishtripplanner.dto.reservation.ReservationCardDto)}">
+  <div class="ad-card" th:each="card : ${cards}" th:if="${card instanceof T(com.fishtripplanner.dto.reservation.ReservationCardDto)}">
+    <a th:href="@{'/reservation/detail/' + ${card.id}}" class="ad-card-link">
       <div class="ad-image">
         <img th:src="@{${card.imageUrl}}" alt="예약 이미지">
       </div>
@@ -54,7 +54,7 @@
         <p th:text="'어종: ' + ${#strings.arrayJoin(card.fishTypes.toArray(), ', ')}">어종</p>
         <p th:text="${card.content}">내용</p>
       </div>
-    </div>
+    </a>
   </div>
 </div>
 

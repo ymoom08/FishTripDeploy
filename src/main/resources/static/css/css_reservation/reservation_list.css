@@ -113,7 +113,7 @@ h1 {
 
 /* ✅ 카드 제목 */
 .ad-desc {
-  border-top: 2px solid black;
+  border-top: 2px;
   padding-top: 6px;
   font-weight: bold;
 }
@@ -123,6 +123,13 @@ h1 {
   font-size: 14px;
   margin-top: 10px;
   text-align: left;
+}
+
+.ad-card-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  height: 100%;
 }
 
 /* ✅ 페이징 */
