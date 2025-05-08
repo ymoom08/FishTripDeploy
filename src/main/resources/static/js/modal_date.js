@@ -43,9 +43,21 @@ export function initDateModal() {
     dateFormat: "Y-m-d",
     inline: true,
     locale: "ko",
+    onDayCreate: function(dObj, dStr, fp, dayElem) {
+      const date = dayElem.dateObj;
+      const day = date.getDay(); // 0: 일요일, 6: 토요일
+
+      if (day === 0) {
+        dayElem.classList.add("sunday");
+      } else if (day === 6) {
+        dayElem.classList.add("saturday");
+      }
+    },
     onChange: (selectedDates, dateStr) => {
-      selectedDate.value = dateStr; // ✅ 에러 해결된 부분
+      selectedDate.value = dateStr;
     },
     appendTo: document.getElementById("datePickerContainer")
   });
 }
+
+
