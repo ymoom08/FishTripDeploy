@@ -4,11 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FishTrip</title>
-    <link rel="stylesheet" th:href="@{/css/MainPage.css}">
-    <link rel="stylesheet" th:href="@{/css/LoginModal.css}">
-    <link rel="stylesheet" th:href="@{/css/header.css}">
-    <link rel="stylesheet" th:href="@{/css/footer.css}">
-    <script th:src="@{/js/common.js}"></script>
+
+    <!-- 정적 CSS 경로 -->
+    <link rel="stylesheet" href="/css/MainPage.css">
+    <link rel="stylesheet" href="/css/header.css">
+    <link rel="stylesheet" href="/css/footer.css">
+    <script src="/js/common.js" defer></script>
 </head>
 <body>
 <div class="container">
@@ -21,9 +22,10 @@
         </div>
         <div class="imageContainer">
             <div class="videoSlider">
-                <video class="video" th:src="@{/videos/sea1.mp4}" type="video/mp4" autoplay muted loop playsinline></video>
-                <video class="video" th:src="@{/videos/sea2.mp4}" type="video/mp4" autoplay muted loop playsinline></video>
-                <video class="video" th:src="@{/videos/sea3.mp4}" type="video/mp4" autoplay muted loop playsinline></video>
+                <!-- Spring Boot static 하위 경로로 직접 접근 -->
+                <video class="video" src="/videos/sea1.mp4" autoplay muted loop playsinline></video>
+                <video class="video" src="/videos/sea2.mp4" autoplay muted loop playsinline></video>
+                <video class="video" src="/videos/sea3.mp4" autoplay muted loop playsinline></video>
             </div>
         </div>
     </main>
@@ -50,13 +52,11 @@
         <div class="catchTextBlock">
             <h2>🎣 예약하기</h2>
             <p>언제 어디서든 예약이 가능해요<br/>여러 선택지로 익사이팅한 낚시</p>
-            <!-- ✅ 수정된 부분: 버튼 -> <a> 태그 -->
-            <a th:href="@{/reservation}" class="button">예약하러 가기</a>
+            <a href="/reservation" class="button">예약하러 가기</a>
         </div>
         <div class="catchPhoneMockup">
             <div class="deviceContainer">
-                <!-- ✅ 이미지 경로 수정 -->
-                <img th:src="@{/images/com.png}" alt="낚시 기록 모바일 UI" class="mockup phone">
+                <img src="/images/com.png" alt="낚시 기록 모바일 UI" class="mockup phone">
             </div>
         </div>
     </section>
