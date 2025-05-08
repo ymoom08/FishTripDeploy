@@ -1,0 +1,131 @@
+/* ✅ 전체 컨테이너 */
+.reservation-detail-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 32px 24px;
+  font-family: 'Noto Sans KR', sans-serif;
+  color: #222;
+}
+
+/* ✅ 제목 */
+.reservation-title {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* ✅ 대표 이미지 */
+.image-wrapper {
+  text-align: center;
+  margin-bottom: 30px;
+}
+.reservation-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+}
+
+/* ✅ 기본 정보 */
+.basic-info {
+  background-color: #f9f9f9;
+  padding: 16px 20px;
+  border-radius: 8px;
+  margin-bottom: 32px;
+}
+.basic-info p {
+  margin: 6px 0;
+  font-size: 16px;
+}
+
+/* ✅ 날짜 리스트 영역 */
+.available-dates-section h2 {
+  font-size: 22px;
+  margin-bottom: 16px;
+}
+.date-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ✅ 개별 예약 날짜 행 */
+.date-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 14px 20px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+}
+
+/* ✅ 좌측 날짜 박스 */
+.date-box .date-text {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* ✅ 중앙 정보 박스 */
+.info-box {
+  flex: 1;
+  padding: 0 20px;
+}
+.info-box p {
+  margin: 4px 0;
+  font-size: 15px;
+  color: #555;
+}
+
+/* ✅ 우측 액션 박스 */
+.action-box {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  min-width: 130px;
+}
+.remaining {
+  font-size: 15px;
+  font-weight: 500;
+  color: #007BFF; /* 파란색 강조 */
+  margin-bottom: 8px;
+}
+.reserve-button {
+  padding: 8px 16px;
+  background-color: #007BFF;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.reserve-button:hover {
+  background-color: #005fcc;
+}
+
+/* ✅ 상세 설명 */
+.description-section h2 {
+  font-size: 22px;
+  margin: 32px 0 12px;
+}
+.description-section p {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* ✅ 뒤로가기 */
+.back-link-container {
+  margin-top: 40px;
+  text-align: center;
+}
+.back-link {
+  color: #555;
+  font-size: 15px;
+  text-decoration: none;
+}
+.back-link:hover {
+  text-decoration: underline;
+}

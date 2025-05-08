@@ -3,6 +3,7 @@ package com.fishtripplanner.controller.reservation;
 import com.fishtripplanner.api.reservation.ReservationService;
 import com.fishtripplanner.domain.reservation.ReservationPost;
 import com.fishtripplanner.domain.reservation.ReservationType;
+import com.fishtripplanner.domain.reservation.mapper.ReservationTypeMapper;
 import com.fishtripplanner.dto.reservation.ReservationCardDto;
 import com.fishtripplanner.dto.reservation.ReservationDetailResponseDto;
 import com.fishtripplanner.repository.ReservationPostRepository;
@@ -35,24 +36,16 @@ public class ReservationViewController {
     public String reservationDetailPage(@PathVariable("type") String type,
                                         @RequestParam(name = "page", defaultValue = "0") int page,
                                         Model model) {
-
-        String koreanTitle = switch (type.toLowerCase()) {
-            case "boat" -> "선상낚시";
-            case "stay" -> "숙박/민박/캠핑";
-            case "float" -> "좌대";
-            case "island" -> "섬";
-            case "rock" -> "갯바위";
-            default -> "낚시 예약";
-        };
-        model.addAttribute("title", koreanTitle);
-        model.addAttribute("type", type); // 페이징 링크에 사용됨
-
         ReservationType enumType;
         try {
             enumType = ReservationType.valueOf(type.toUpperCase());
         } catch (IllegalArgumentException e) {
             return "redirect:/error";
         }
+
+        String koreanTitle = ReservationTypeMapper.toKorean(enumType); // ✅ 깔끔하게 변경됨
+        model.addAttribute("title", koreanTitle);
+        model.addAttribute("type", type); // 페이징 링크에 사용됨
 
         // 실제 예약 카드 생성
         List<ReservationPost> filteredPosts = reservationPostRepository.findByType(enumType);
@@ -74,6 +67,7 @@ public class ReservationViewController {
 
         return "reservation_page/reservation_list";
     }
+
 
     // 지역 필터용 API
     @RestController

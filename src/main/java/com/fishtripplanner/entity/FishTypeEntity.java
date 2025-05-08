@@ -17,10 +17,5 @@ public class FishTypeEntity {
     @Column(name = "name")
     private String name;
 
-    public String getName() {
-        return name;
-    }
-
-
 }
 

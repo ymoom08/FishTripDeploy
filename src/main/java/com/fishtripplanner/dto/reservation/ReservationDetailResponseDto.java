@@ -14,8 +14,11 @@ public class ReservationDetailResponseDto {
     private String imageUrl;
     private String regionName;
     private String companyName;
+
     private String type;
     private String typeLower;
+    private String typeKorean;
+
     private Integer price;
     private String content;
     private List<String> fishTypes;

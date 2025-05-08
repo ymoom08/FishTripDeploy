@@ -2,6 +2,7 @@ package com.fishtripplanner.api.reservation;
 
 import com.fishtripplanner.domain.User;
 import com.fishtripplanner.domain.reservation.*;
+import com.fishtripplanner.domain.reservation.mapper.ReservationTypeMapper;
 import com.fishtripplanner.dto.ReservationPostRequest;
 import com.fishtripplanner.dto.ReservationPostResponse;
 import com.fishtripplanner.dto.reservation.CreateReservationRequestDto;
@@ -160,6 +161,7 @@ public class ReservationService {
                 .companyName(post.getCompanyName())
                 .type(post.getType().name())
                 .typeLower(post.getType().name().toLowerCase()) // 👉 이거도 같이 들어가야 템플릿에서 사용 가능
+                .typeKorean(ReservationTypeMapper.toKorean(post.getType())) //한국어로 변경
                 .price(post.getPrice())
                 .content(post.getContent())
                 .fishTypes(
