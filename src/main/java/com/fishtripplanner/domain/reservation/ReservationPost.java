@@ -5,6 +5,7 @@ import com.fishtripplanner.entity.FishTypeEntity;
 import com.fishtripplanner.entity.RegionEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -51,6 +52,7 @@ public class ReservationPost {
     }
 
     @ManyToMany
+    @BatchSize(size = 20)
     @JoinTable(
             name = "reservationpost_fishtype",
             joinColumns = @JoinColumn(name = "reservationpost_id"),
@@ -60,6 +62,7 @@ public class ReservationPost {
 
 
     @OneToMany(mappedBy = "reservationPost")
+    @BatchSize(size = 20)
     private List<ReservationPostAvailableDate> availableDates;
 
 

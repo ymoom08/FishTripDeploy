@@ -72,7 +72,7 @@ public class ReservationViewController {
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", (int) Math.ceil((double) allCards.size() / pageSize));
 
-        return "reservation_list/reservation_list";
+        return "reservation_page/reservation_list";
     }
 
     // 지역 필터용 API
@@ -93,10 +93,10 @@ public class ReservationViewController {
     }
 
     @GetMapping("/detail/{id}")
-    public String getReservationDetail(@PathVariable Long id, Model model) {
+    public String getReservationDetail(@PathVariable("id") Long id, Model model) {
         ReservationDetailResponseDto dto = reservationService.getReservationDetail(id);
         model.addAttribute("reservation", dto);
-        return "reservation/reservation_detail_view";
+        return "reservation_page/reservation_detail";
     }
 
 }

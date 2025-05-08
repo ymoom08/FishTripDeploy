@@ -171,12 +171,13 @@ public interface ReservationPostRepository extends JpaRepository<ReservationPost
     @Query("SELECT DISTINCT r.region.name FROM ReservationPost r")
     List<String> findAllRegionNames();
 
-    // ✅ 상세 조회 시 연관 엔티티 포함
+    // ✅ 상세 조회 시 연관 엔티티 포함 (Bag fetch 충돌 방지: availableDates만 fetch, 나머지는 Lazy + @BatchSize)
     @Query("""
         SELECT r FROM ReservationPost r
-        LEFT JOIN FETCH r.fishTypes
         LEFT JOIN FETCH r.availableDates
         WHERE r.id = :id
     """)
-    Optional<ReservationPost> findByIdWithFishTypesAndDate(@Param("id") Long id);
+    Optional<ReservationPost> findByIdWithAvailableDatesOnly(@Param("id") Long id);
+
+    // ✅ fishTypes는 LAZY + @BatchSize(size = 20) 설정 권장
 }

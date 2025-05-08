@@ -145,8 +145,8 @@ public class ReservationService {
      */
     @Transactional(readOnly = true)
     public ReservationDetailResponseDto getReservationDetail(Long id) {
-        ReservationPost post = reservationPostRepository.findByIdWithFishTypesAndDate(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 예약글이 존재하지 않습니다."));
+        ReservationPost post = reservationPostRepository.findByIdWithAvailableDatesOnly(id)
+                .orElseThrow(() -> new RuntimeException("예약글을 찾을 수 없습니다."));
 
         return ReservationDetailResponseDto.builder()
                 .id(post.getId())
