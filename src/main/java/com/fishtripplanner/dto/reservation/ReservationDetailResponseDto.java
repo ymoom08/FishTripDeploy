@@ -15,6 +15,7 @@ public class ReservationDetailResponseDto {
     private String regionName;
     private String companyName;
     private String type;
+    private String typeLower;
     private Integer price;
     private String content;
     private List<String> fishTypes;
@@ -25,5 +26,7 @@ public class ReservationDetailResponseDto {
     public static class AvailableDateDto {
         private String date;       // YYYY-MM-DD
         private int remaining;     // 남은 인원 수
+
     }
+
 }

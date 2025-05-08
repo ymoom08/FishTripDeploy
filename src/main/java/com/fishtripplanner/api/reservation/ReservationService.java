@@ -151,10 +151,15 @@ public class ReservationService {
         return ReservationDetailResponseDto.builder()
                 .id(post.getId())
                 .title(post.getTitle())
-                .imageUrl(post.getImageUrl())
+                .imageUrl(
+                        post.getImageUrl() != null && !post.getImageUrl().isEmpty()
+                                ? post.getImageUrl()
+                                : "/images/" + post.getType().name().toLowerCase() + ".jpg"
+                )
                 .regionName(post.getRegion().getName())
                 .companyName(post.getCompanyName())
                 .type(post.getType().name())
+                .typeLower(post.getType().name().toLowerCase()) // 👉 이거도 같이 들어가야 템플릿에서 사용 가능
                 .price(post.getPrice())
                 .content(post.getContent())
                 .fishTypes(
@@ -166,10 +171,11 @@ public class ReservationService {
                         post.getAvailableDates().stream()
                                 .map(date -> ReservationDetailResponseDto.AvailableDateDto.builder()
                                         .date(date.getAvailableDate().toString())
-                                        .remaining(10) // ⚠️ 예시 값
-                                        .build())
-                                .toList()
+                                        .remaining(10) // TODO: 추후 동적으로 처리
+                                        .build()
+                                ).toList()
                 )
                 .build();
+
     }
 }

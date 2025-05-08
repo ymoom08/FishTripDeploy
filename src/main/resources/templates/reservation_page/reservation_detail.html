@@ -11,7 +11,18 @@
   <!-- ✅ 예약 제목 및 대표 이미지 -->
   <div class="summary-section">
     <h1 th:text="${reservation.title}" class="reservation-title">예약 제목</h1>
-    <img th:src="@{${reservation.imageUrl}}" alt="예약 이미지" class="reservation-image"/>
+
+    <!-- ✅ 이미지가 있을 경우 -->
+    <img th:if="${reservation.imageUrl != null and !reservation.imageUrl.isEmpty()}"
+         th:src="@{${reservation.imageUrl}}"
+         alt="예약 이미지" class="reservation-image"/>
+
+    <!-- ✅ 이미지가 없을 경우 → 예약 타입 기반 기본 이미지로 처리 -->
+    <img th:unless="${reservation.imageUrl != null and !reservation.imageUrl.isEmpty()}"
+         th:src="@{'/images/' + ${reservation.typeLower} + '.jpg'}"
+         alt="기본 이미지" class="reservation-image"/>
+
+
   </div>
 
   <!-- ✅ 예약 기본 정보 -->
@@ -43,7 +54,9 @@
 
   <!-- ✅ 뒤로가기 -->
   <div class="back-link-container">
-    <a href="/reservation/list" class="back-link">← 목록으로 돌아가기</a>
+    <a th:href="@{'/reservation/' + ${#strings.toLowerCase(reservation.type)}}" class="back-link">
+      ← 목록으로 돌아가기
+    </a>
   </div>
 
 </div>

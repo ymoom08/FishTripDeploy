@@ -130,19 +130,22 @@ function updateCards(cards) {
     ? '<p style="text-align:center;">조건에 맞는 예약이 없습니다.</p>'
     : cards.map(card => `
       <div class="ad-card">
-        <div class="ad-image">
-          <img src="${card.imageUrl || "/images/boat.jpg"}" alt="예약 이미지" class="card-image">
-        </div>
-        <div class="ad-desc">${card.title}</div>
-        <div class="ad-detail">
-          <p>지역: ${card.region ?? "없음"}</p>
-          <p>회사명: ${card.companyName ?? "알 수 없음"}</p>
-          <p>어종: ${card.fishTypes?.join(", ") ?? "정보 없음"}</p>
-          <p>${card.content}</p>
-        </div>
+        <a href="/reservation/detail/${card.id}" class="ad-card-link">
+          <div class="ad-image">
+            <img src="${card.imageUrl || "/images/boat.jpg"}" alt="예약 이미지" class="card-image">
+          </div>
+          <div class="ad-desc">${card.title}</div>
+          <div class="ad-detail">
+            <p>지역: ${card.region ?? "없음"}</p>
+            <p>회사명: ${card.companyName ?? "알 수 없음"}</p>
+            <p>어종: ${card.fishTypes?.join(", ") ?? "정보 없음"}</p>
+            <p>${card.content}</p>
+          </div>
+        </a>
       </div>
     `).join('');
 }
+
 
 // ✅ 필터 실행 함수
 export function applyFilters({ sortKey = "latest" }) {
