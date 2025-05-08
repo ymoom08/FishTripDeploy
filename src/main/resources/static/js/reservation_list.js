@@ -146,10 +146,28 @@ function updateCards(cards) {
     `).join('');
 }
 
-
 // ✅ 필터 실행 함수
 export function applyFilters({ sortKey = "latest" }) {
   fetchFilteredCards(sortKey);
+}
+
+// 🔧 지역 텍스트 조합 유틸 함수
+function getCompactRegionText() {
+  const grouped = getSelectedRegions().reduce((acc, cur) => {
+    (acc[cur.parent] = acc[cur.parent] || []).push(cur);
+    return acc;
+  }, {});
+
+  return Object.entries(grouped)
+    .flatMap(([parentName, selectedChildren]) => {
+      const parentRegion = getCachedRegions().find(r => r.name === parentName);
+      const totalChildren = parentRegion?.children.length || 0;
+
+      return selectedChildren.length === totalChildren
+        ? [`(${parentName}) 전체`]
+        : selectedChildren.map(c => `(${parentName}) ${c.name}`);
+    })
+    .join(", ");
 }
 
 // ✅ 선택된 지역 텍스트 갱신
@@ -160,15 +178,7 @@ export function updateSelectedRegionTextOnly() {
   let text = "선택된 지역 없음";
 
   if (regions.length > 0) {
-    const grouped = regions.reduce((acc, cur) => {
-      (acc[cur.parent] = acc[cur.parent] || []).push(cur.name);
-      return acc;
-    }, {});
-    const regionTexts = Object.entries(grouped).map(([parent, names]) => {
-      const total = getCachedRegions().find(r => r.name === parent)?.children.length || 0;
-      return names.length === total ? `(${parent}) 전체` : `(${parent}) ${names.join(", ")}`;
-    });
-    text = `현재 선택 지역: ${regionTexts.join(", ")}`;
+    text = `현재 선택 지역: ${getCompactRegionText()}`;
   }
 
   modalDiv.innerText = text;
@@ -184,7 +194,7 @@ export function updateSelectedDateTextOnly() {
   modalDiv.innerText = dateText;
 
   const regionText = getSelectedRegions().length > 0
-    ? `현재 선택 지역: ${getSelectedRegions().map(r => r.name).join(", ")}`
+    ? `현재 선택 지역: ${getCompactRegionText()}`
     : "";
   pageDiv.innerText = [regionText, dateText].filter(Boolean).join("\n");
 }
@@ -198,7 +208,7 @@ export function updateSelectedFishText() {
   modalDiv.innerText = fishText;
 
   const regionText = getSelectedRegions().length > 0
-    ? `현재 선택 지역: ${getSelectedRegions().map(r => r.name).join(", ")}`
+    ? `현재 선택 지역: ${getCompactRegionText()}`
     : "";
   const dateText = selectedDate.value ? `선택한 날짜: ${selectedDate.value}` : "";
   pageDiv.innerText = [regionText, dateText, fishText].filter(Boolean).join("\n");
