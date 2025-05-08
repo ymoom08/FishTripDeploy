@@ -19,7 +19,7 @@ public class ReservationPostService {
     /**
      * ✅ 예약글 필터링 비즈니스 로직
      * - 정렬 키(sortKey)에 따라 정렬 기준 동적 생성
-     * - 필터 조건(type, regionIds, date, fishTypes)에 따라 쿼리 분기
+     * - 필터 조건(type, regionIds, date, fishTypes, keyword)에 따라 쿼리 분기
      */
     public Page<ReservationPost> filterPosts(
             ReservationType type,
@@ -30,6 +30,11 @@ public class ReservationPostService {
             String sortKey,
             Pageable pageable
     ) {
+        // ✅ null-safe 처리
+        List<Long> safeRegionIds = (regionIds == null || regionIds.isEmpty()) ? null : regionIds;
+        List<String> safeFishTypes = (fishTypes == null || fishTypes.isEmpty()) ? null : fishTypes;
+        String safeKeyword = (keyword == null || keyword.isBlank()) ? null : keyword;
+
         // ✅ 정렬 기준 처리
         Sort sort = switch (sortKey) {
             case "priceAsc"  -> Sort.by("price").ascending();
@@ -39,27 +44,36 @@ public class ReservationPostService {
         };
         Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
 
-        boolean hasRegion = regionIds != null && !regionIds.isEmpty();
+        boolean hasRegion = safeRegionIds != null;
         boolean hasDate = date != null;
-        boolean hasFish = fishTypes != null && !fishTypes.isEmpty();
+        boolean hasFish = safeFishTypes != null;
 
-        return switch (String.format("%s-%s-%s", hasRegion, hasDate, hasFish)) {
+        String conditionKey = String.format("%s-%s-%s", hasRegion, hasDate, hasFish);
+
+        // ✅ 조건에 따라 분기
+        return switch (conditionKey) {
             case "true-true-true"   -> reservationPostRepository.findByFiltersStrict(
-                    type, regionIds, date, fishTypes, sortedPageable);
+                    type, safeRegionIds, date, safeFishTypes, sortedPageable);
             case "true-true-false"  -> reservationPostRepository.findByTypeAndRegionIdsAndDate(
-                    type, regionIds, date, sortedPageable);
+                    type, safeRegionIds, date, sortedPageable);
             case "false-true-true"  -> reservationPostRepository.findByDateAndFishTypes(
-                    type, date, fishTypes, sortedPageable);
+                    type, date, safeFishTypes, sortedPageable);
             case "true-false-true"  -> reservationPostRepository.findByRegionIdsAndFishTypes(
-                    type, regionIds, fishTypes, sortedPageable);
+                    type, safeRegionIds, safeFishTypes, sortedPageable);
             case "false-false-true" -> reservationPostRepository.findByFishTypes(
-                    type, fishTypes, sortedPageable);
+                    type, safeFishTypes, sortedPageable);
             case "false-true-false" -> reservationPostRepository.findByTypeAndDate(
                     type, date, sortedPageable);
             case "true-false-false" -> reservationPostRepository.findByTypeAndRegionIds(
-                    type, regionIds, sortedPageable);
-            default                 -> reservationPostRepository.findByFilters(
-                    type, regionIds, date, fishTypes, keyword, sortedPageable);
+                    type, safeRegionIds, sortedPageable);
+            default -> {
+                // 🔥 모든 필터가 없는 경우에는 전체 조회 (이걸 안 하면 오류 남!)
+                if (safeRegionIds == null && date == null && safeFishTypes == null && safeKeyword == null) {
+                    yield reservationPostRepository.findByType(type, sortedPageable);
+                }
+                yield reservationPostRepository.findByFilters(
+                        type, safeRegionIds, date, safeFishTypes, safeKeyword, sortedPageable);
+            }
         };
     }
 
@@ -74,3 +88,4 @@ public class ReservationPostService {
         return reservationPostRepository.findAllRegionNames();
     }
 }
+

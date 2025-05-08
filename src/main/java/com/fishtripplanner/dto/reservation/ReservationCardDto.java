@@ -55,7 +55,7 @@ public class ReservationCardDto {
                 post.getCompanyName(),
                 imageUrl,
                 regionText,
-                post.getFishTypeEntities().stream()
+                post.getFishTypes().stream()  // ✅ 수정된 부분
                         .map(FishTypeEntity::getName)
                         .collect(Collectors.toList())
         );

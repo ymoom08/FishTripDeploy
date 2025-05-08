@@ -1,6 +1,7 @@
 package com.fishtripplanner.dto;
 
 import com.fishtripplanner.domain.reservation.ReservationPost;
+import com.fishtripplanner.domain.reservation.ReservationPostAvailableDate;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -27,16 +28,33 @@ public class ReservationPostResponse {
         String parent = post.getRegion().getParent() != null ? post.getRegion().getParent().getName() : null;
         String regionText = parent != null ? "(" + parent + ") " + child : child;
 
+        // ✅ imageUrl 처리 (기본 이미지 fallback 포함)
+        String imageUrl = post.getImageUrl();
+        if (imageUrl == null || imageUrl.isBlank()) {
+            imageUrl = switch (post.getType()) {
+                case BOAT -> "/images/boat.png";
+                case STAY -> "/images/stay.png";
+                case ISLAND -> "/images/island.png";
+                case FLOAT -> "/images/float.png";
+                case ROCK -> "/images/rock.png";
+                default -> "/images/default.jpg";
+            };
+        }
+
         return ReservationPostResponse.builder()
                 .id(post.getId())
                 .title(post.getTitle())
                 .content(post.getContent())
-                .region(regionText) // ✅ 여기가 핵심!
+                .region(regionText)
                 .type(post.getType().name())
-                .availableDates(post.getAvailableDates())
                 .price(post.getPrice())
-                .imageUrl(post.getImageUrl())
+                .imageUrl(imageUrl)
                 .createdAt(post.getCreatedAt())
+                .availableDates(
+                        post.getAvailableDates().stream()
+                                .map(ReservationPostAvailableDate::getAvailableDate)
+                                .toList()
+                )
                 .build();
     }
 }

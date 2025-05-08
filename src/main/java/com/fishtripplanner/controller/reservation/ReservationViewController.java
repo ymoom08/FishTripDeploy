@@ -1,8 +1,10 @@
 package com.fishtripplanner.controller.reservation;
 
+import com.fishtripplanner.api.reservation.ReservationService;
 import com.fishtripplanner.domain.reservation.ReservationPost;
 import com.fishtripplanner.domain.reservation.ReservationType;
 import com.fishtripplanner.dto.reservation.ReservationCardDto;
+import com.fishtripplanner.dto.reservation.ReservationDetailResponseDto;
 import com.fishtripplanner.repository.ReservationPostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -10,7 +12,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Controller
@@ -19,6 +20,7 @@ import java.util.List;
 public class ReservationViewController {
 
     private final ReservationPostRepository reservationPostRepository;
+    private final ReservationService reservationService;
 
     // 기본 예약 진입 페이지
     @GetMapping("")
@@ -70,7 +72,7 @@ public class ReservationViewController {
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", (int) Math.ceil((double) allCards.size() / pageSize));
 
-        return "reservation_detail/reservation_detail";
+        return "reservation_list/reservation_list";
     }
 
     // 지역 필터용 API
@@ -89,4 +91,12 @@ public class ReservationViewController {
             return repo.findAllRegionNames();  // ✅ 올바른 메서드 이름
         }
     }
+
+    @GetMapping("/detail/{id}")
+    public String getReservationDetail(@PathVariable Long id, Model model) {
+        ReservationDetailResponseDto dto = reservationService.getReservationDetail(id);
+        model.addAttribute("reservation", dto);
+        return "reservation/reservation_detail_view";
+    }
+
 }

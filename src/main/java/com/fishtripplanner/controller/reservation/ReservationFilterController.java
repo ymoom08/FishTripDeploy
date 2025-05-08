@@ -46,7 +46,7 @@ public class ReservationFilterController {
 
     /**
      * ✅ 예약글 필터링 API
-     * - type(필수) + regionId/date/fishType(선택)
+     * - type(필수) + regionId/date/fishType/keyword(선택)
      * - 필터 조합에 따라 ReservationPost 목록 반환
      */
     @GetMapping("/reservation")
@@ -55,7 +55,7 @@ public class ReservationFilterController {
             @RequestParam(value = "regionId", required = false) List<Long> regionIds,
             @RequestParam(value = "date", required = false) String dateStr,
             @RequestParam(value = "fishType", required = false) List<String> fishTypes,
-            @RequestParam(value = "keyword", required = false) String keyword, // ✅ 이 줄 추가
+            @RequestParam(value = "keyword", required = false) String keyword,
             @RequestParam(value = "sort", defaultValue = "latest") String sortKey,
             Pageable pageable
     ) {
@@ -65,17 +65,15 @@ public class ReservationFilterController {
         // 🔹 날짜 파싱
         LocalDate parsedDate = (dateStr != null && !dateStr.isBlank()) ? LocalDate.parse(dateStr) : null;
 
-        // 🔹 빈 리스트는 null로 처리 (서비스에서 조건 분기 처리)
+        // 🔹 빈 값 null-safe 처리
         List<Long> validRegionIds = (regionIds == null || regionIds.isEmpty()) ? null : regionIds;
         List<String> validFishTypes = (fishTypes == null || fishTypes.isEmpty()) ? null : fishTypes;
-
-
+        String validKeyword = (keyword == null || keyword.isBlank()) ? null : keyword;
 
         // 🔹 서비스 호출
         Page<ReservationPost> page = reservationPostService.filterPosts(
-                enumType, validRegionIds, parsedDate, validFishTypes, keyword, sortKey, pageable
+                enumType, validRegionIds, parsedDate, validFishTypes, validKeyword, sortKey, pageable
         );
-
 
         // 🔹 DTO 변환 후 반환
         return page.stream()
@@ -83,9 +81,12 @@ public class ReservationFilterController {
                 .toList();
     }
 
-    // ✅ ReservationFilterController.java
-    @GetMapping("/regions/names") // 혹은 "/regions/used"
+    /**
+     * ✅ 실제 사용된 지역 이름 목록 반환
+     * - 지역 필터용
+     */
+    @GetMapping("/regions/names")
     public List<String> getUsedRegionNames() {
-        return reservationPostService.getUsedRegionNames();  // 서비스로 위임
+        return reservationPostService.getUsedRegionNames();
     }
 }

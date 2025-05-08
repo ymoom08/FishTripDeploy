@@ -6,9 +6,9 @@ import com.fishtripplanner.entity.RegionEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+
 
 @Entity
 @Getter @Setter
@@ -33,9 +33,6 @@ public class ReservationPost {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    @ElementCollection
-    private List<LocalDate> availableDates;
-
     private int price;
 
     private String imageUrl;
@@ -48,18 +45,24 @@ public class ReservationPost {
     @JoinColumn(name = "region_id")
     private RegionEntity region;
 
-    @ManyToMany
-    @JoinTable(
-            name = "reservationpost_fishtype",
-            joinColumns = @JoinColumn(name = "reservationpost_id"),
-            inverseJoinColumns = @JoinColumn(name = "fish_id")
-    )
-    private List<FishTypeEntity> fishTypeEntities;
-
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
     }
+
+    @ManyToMany
+    @JoinTable(
+            name = "reservationpost_fishtype",
+            joinColumns = @JoinColumn(name = "reservationpost_id"),
+            inverseJoinColumns = @JoinColumn(name = "fish_type_id")
+    )
+    private List<FishTypeEntity> fishTypes;
+
+
+    @OneToMany(mappedBy = "reservationPost")
+    private List<ReservationPostAvailableDate> availableDates;
+
+
 
 
 }
