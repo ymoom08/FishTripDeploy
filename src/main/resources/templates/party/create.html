@@ -2,67 +2,245 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title>파티 생성</title>
+  <title>파티 모집글 작성</title>
   <link rel="stylesheet" href="/css/party-create.css">
-  <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=API_KEY&libraries=services"></script>
+  <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=0b84a2179b2534016530526202844771&autoload=false&libraries=services"></script>
+  <style>
+    #mapContextMenu {
+      position: absolute;
+      background: white;
+      border: 1px solid #333;
+      padding: 8px;
+      z-index: 9999;
+      display: none;
+      box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+    }
+    #mapContextMenu button {
+      display: block;
+      width: 100px;
+      margin: 5px 0;
+      padding: 5px;
+      font-size: 14px;
+      text-align: center;
+      background: white;
+      border: 1px solid #333;
+      cursor: pointer;
+    }
+    #searchSuggestions {
+      background: white;
+      border: 1px solid #ccc;
+      position: absolute;
+      z-index: 999;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .suggestion {
+      padding: 5px;
+      cursor: pointer;
+    }
+    .suggestion:hover {
+      background: #eee;
+    }
+  </style>
 </head>
 <body>
-<h1>파티 생성</h1>
+<h1>파티 모집글 작성</h1>
 
-<form id="partyForm" th:action="@{/party/save}" method="post">
-  <label>제목:</label>
-  <input type="text" name="title" required><br>
+<!-- 주소 검색창 -->
+<input type="text" id="addressSearch" placeholder="주소 검색 (2자 이상 입력)" autocomplete="off" />
+<button onclick="window.openSearchModal()">검색</button>
+<div id="searchSuggestions"></div>
+<div id="searchModal" style="display:none; position:fixed; top:10%; left:50%; transform:translateX(-50%); background:white; padding:20px; border:1px solid #ccc; z-index:9999; max-height:400px; overflow:auto;"></div>
 
-  <label>간단 설명:</label>
-  <textarea name="description" required></textarea><br>
-
-  <label>상세 설명:</label>
-  <textarea name="detail"></textarea><br>
-
-  <label>모집 대상 설명:</label>
-  <textarea name="memberDetail"></textarea><br>
-
-  <label>출발 시간:</label>
-  <input type="datetime-local" name="departureTime" required><br>
-
-  <label>마감 시간:</label>
-  <input type="datetime-local" name="deadline" required><br>
-
-  <label>출발지:</label>
-  <input type="text" id="departurePoint" name="departurePoint" readonly><br>
-
-  <label>목적지:</label>
-  <input type="text" id="destination" name="destination" readonly><br>
-
-  <label>모집 인원:</label>
-  <input type="number" name="maxParticipants" required><br>
-
-  <label>예상 비용(원):</label>
-  <input type="number" id="estimatedCost" name="estimatedCost" readonly><br>
-
-  <!-- Hidden 좌표 필드 -->
-  <input type="hidden" name="departureLat" id="departureLat">
-  <input type="hidden" name="departureLng" id="departureLng">
-  <input type="hidden" name="destinationLat" id="destinationLat">
-  <input type="hidden" name="destinationLng" id="destinationLng">
-
-  <!-- 경유지, 파티원은 JSON 문자열로 hidden 필드에 담아 전송 -->
-  <input type="hidden" name="waypointsJson" id="waypointsJson">
-  <input type="hidden" name="partyMembersJson" id="partyMembersJson">
-
-  <div id="map" style="width:100%;height:400px;margin-top:10px;"></div><br>
-
-  <button type="button" id="openRouteSelect">경로 선택</button>
-  <button type="submit">등록하기</button>
+<form id="partyForm" method="post" th:action="@{/party/save}">
+  <input type="text" name="title" placeholder="제목" required><br>
+  <input type="text" id="departurePoint" name="departurePoint" readonly placeholder="출발지">
+  <input type="text" id="destination" name="destination" readonly placeholder="도착지">
+  <input type="text" id="stopoverDisplay" name="stopoverDisplay" readonly placeholder="경유지">
+  <div id="waypointInputs"></div>
+  <div id="routeInfo" style="margin: 20px auto; width: 90%; max-width: 600px; font-size: 1rem; background: #f8f9fa; border: 1px solid #ccc; padding: 15px; border-radius: 8px; display: none;">
+    <strong>📍 예상 소요 정보</strong><br>
+    <span id="durationText"></span><br>
+    <span id="tollText"></span>
+  </div>
+  <button type="submit">등록</button>
 </form>
 
-<!-- 모달: 경로 선택 카드 -->
-<div id="routeModal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); width:80%; background:white; border:1px solid gray; padding:20px;">
-  <h2>경로 선택</h2>
-  <div id="routeOptions"></div>
-  <button id="closeRouteModal">닫기</button>
-</div>
 
-<script src="/js/party-create.js"></script>
+<div id="map" style="width:100%;height:500px;margin-top:20px;"></div>
+<div id="mapContextMenu"></div>
+
+<script>
+  window.onload = function () {
+    kakao.maps.load(() => {
+      const map = new kakao.maps.Map(document.getElementById('map'), {
+        center: new kakao.maps.LatLng(37.5665, 126.9780),
+        level: 5
+      });
+
+      const geocoder = new kakao.maps.services.Geocoder();
+      const places = new kakao.maps.services.Places();
+      let waypoints = [];
+      let departure = null;
+      let destination = null;
+      let polyline = null;
+      let tempMarker = null;
+
+      const searchBox = document.getElementById('addressSearch');
+      const suggestions = document.getElementById('searchSuggestions');
+      let debounceTimer;
+      searchBox.addEventListener('input', () => {
+        const keyword = searchBox.value.trim();
+        clearTimeout(debounceTimer);
+        if (keyword.length < 2) {
+          suggestions.style.display = 'none';
+          return;
+        }
+        debounceTimer = setTimeout(() => {
+          places.keywordSearch(keyword, (data, status) => {
+            if (status === kakao.maps.services.Status.OK) {
+              suggestions.innerHTML = '';
+              data.forEach(place => {
+                const div = document.createElement('div');
+                div.className = 'suggestion';
+                div.textContent = place.place_name;
+                div.onclick = () => {
+                  map.setCenter(new kakao.maps.LatLng(place.y, place.x));
+                  suggestions.style.display = 'none';
+                };
+                suggestions.appendChild(div);
+              });
+              suggestions.style.display = 'block';
+            }
+          });
+        }, 300);
+      });
+
+      window.openSearchModal = () => {
+        const keyword = searchBox.value.trim();
+        if (keyword.length < 2) return;
+        places.keywordSearch(keyword, (data, status) => {
+          if (status === kakao.maps.services.Status.OK) {
+            const modal = document.getElementById('searchModal');
+            modal.innerHTML = '<h3>검색 결과</h3>';
+            data.forEach(place => {
+              const div = document.createElement('div');
+              div.textContent = place.place_name;
+              div.style.cursor = 'pointer';
+              div.onclick = () => {
+                map.setCenter(new kakao.maps.LatLng(place.y, place.x));
+                modal.style.display = 'none';
+              };
+              modal.appendChild(div);
+            });
+            modal.style.display = 'block';
+          }
+        });
+      };
+
+      function tryAutoFetchRoute() {
+        if (departure && destination) {
+          fetch(`/api/route?startX=${departure.getPosition().getLng()}&startY=${departure.getPosition().getLat()}&endX=${destination.getPosition().getLng()}&endY=${destination.getPosition().getLat()}${waypoints.length ? '&waypoints=' + waypoints.map(m => m.getPosition().getLng() + ',' + m.getPosition().getLat()).join('_') : ''}`)
+            .then(res => res.json())
+            .then(data => {
+              if (polyline) polyline.setMap(null);
+              const route = data.routes[0];
+              const path = route.path.map(p => new kakao.maps.LatLng(p[1], p[0]));
+              polyline = new kakao.maps.Polyline({
+                path,
+                strokeWeight: 5,
+                strokeColor: '#007BFF',
+                strokeOpacity: 0.9,
+                strokeStyle: 'solid'
+              });
+              polyline.setMap(map);
+              // 예상 시간, 거리, 비용 표시
+  const minutes = Math.round(data.duration / 60);
+  const toll = data.toll || 0;
+
+  document.getElementById('durationText').textContent = `예상 소요 시간: 약 ${minutes}분`;
+  document.getElementById('tollText').textContent = `예상 톨게이트 비용: 약 ${toll.toLocaleString()}원`;
+
+  document.getElementById('routeInfo').style.display = 'block';
+});
+
+        }
+      }
+
+      kakao.maps.event.addListener(map, 'rightclick', function(mouseEvent) {
+        const latlng = mouseEvent.latLng;
+        const containerRect = document.getElementById('map').getBoundingClientRect();
+        const menuX = containerRect.left + mouseEvent.point.x;
+        const menuY = containerRect.top + mouseEvent.point.y;
+
+        if (tempMarker) tempMarker.setMap(null);
+        tempMarker = new kakao.maps.Marker({ position: latlng, map });
+
+        const menu = document.getElementById('mapContextMenu');
+        menu.innerHTML = `
+          <button onclick="selectPoint('departure')">출발지</button>
+          <button onclick="selectPoint('waypoint')">경유지</button>
+          <button onclick="selectPoint('destination')">도착지</button>
+        `;
+        menu.style.left = `${menuX}px`;
+        menu.style.top = `${menuY}px`;
+        menu.style.display = 'block';
+
+        window.selectPoint = function(type) {
+  const position = tempMarker.getPosition();
+  tempMarker.setMap(null);
+  tempMarker = null;
+  menu.style.display = 'none';
+
+  if (type === 'departure') {
+    if (departure) departure.setMap(null);
+    departure = new kakao.maps.Marker({ position, map });
+    geocoder.coord2Address(position.getLng(), position.getLat(), (result, status) => {
+      if (status === kakao.maps.services.Status.OK) {
+        document.getElementById('departurePoint').value = result[0].address.address_name;
+        tryAutoFetchRoute();
+      }
+    });
+  } else if (type === 'destination') {
+    if (destination) destination.setMap(null);
+    destination = new kakao.maps.Marker({ position, map });
+    geocoder.coord2Address(position.getLng(), position.getLat(), (result, status) => {
+      if (status === kakao.maps.services.Status.OK) {
+        document.getElementById('destination').value = result[0].address.address_name;
+        tryAutoFetchRoute();
+      }
+    });
+  } else if (type === 'waypoint') {
+    const marker = new kakao.maps.Marker({ position, map });
+    waypoints.push(marker);
+    kakao.maps.event.addListener(marker, 'click', () => {
+      if (confirm('이 마커를 삭제할까요?')) {
+        marker.setMap(null);
+        waypoints = waypoints.filter(m => m !== marker);
+        tryAutoFetchRoute();
+      }
+    });
+    tryAutoFetchRoute();
+  }
+};
+      });
+
+      document.getElementById('partyForm').addEventListener('submit', () => {
+        const container = document.getElementById('waypointInputs');
+        container.innerHTML = '';
+        waypoints.forEach((marker, idx) => {
+          const lat = marker.getPosition().getLat();
+          const lng = marker.getPosition().getLng();
+          container.innerHTML += `
+            <input type="hidden" name="waypoints[${idx}].lat" value="${lat}" />
+            <input type="hidden" name="waypoints[${idx}].lng" value="${lng}" />
+            <input type="hidden" name="waypoints[${idx}].name" value="경유지${idx + 1}" />
+          `;
+        });
+      });
+    });
+  }
+</script>
 </body>
 </html>
+
