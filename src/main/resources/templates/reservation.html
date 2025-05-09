@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <title>예약 하기</title>
-  <link rel="stylesheet" th:href="@{/css/Header.css}">
   <link rel="stylesheet" th:href="@{/css/css_reservation/reservation.css}">
+  <link rel="stylesheet" th:href="@{/css/Header.css}">
+  <link rel="stylesheet" href="/css/footer.css">
   <script th:src="@{/js/common.js}" defer></script>
 </head>
 <body>
@@ -44,5 +45,6 @@
     </a>
   </div>
 </main>
+<div th:replace="fragments/footer :: footerFragment"></div>
 </body>
 </html>
