@@ -6,6 +6,7 @@ import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Builder
@@ -13,6 +14,7 @@ public class PartyDetailResponse {
     private Long id;
     private String title;
     private String description;
+    private String detail;
     private String region;
 
     private String departurePoint;
@@ -24,10 +26,8 @@ public class PartyDetailResponse {
     private double destinationLng;
 
     private LocalDateTime departureTime;
-    private LocalDateTime arrivalTime;
-
+    private LocalDateTime deadline;
     private int estimatedCost;
-    private int expectedDuration;
     private int maxParticipants;
 
     private List<String> stopovers;
@@ -35,13 +35,14 @@ public class PartyDetailResponse {
 
     private String leaderName;
     private List<String> participantNames;
-    private List<String> approvedParticipantNames;
+    private String memberDetail;
 
     public static PartyDetailResponse from(Party party) {
         return PartyDetailResponse.builder()
                 .id(party.getId())
                 .title(party.getTitle())
                 .description(party.getDescription())
+                .detail(party.getDetail())
                 .region(party.getRegion())
                 .departurePoint(party.getDeparturePoint())
                 .departureLat(party.getDepartureLat())
@@ -50,15 +51,14 @@ public class PartyDetailResponse {
                 .destinationLat(party.getDestinationLat())
                 .destinationLng(party.getDestinationLng())
                 .departureTime(party.getDepartureTime())
-                .arrivalTime(party.getArrivalTime())
+                .deadline(party.getDeadline())
                 .estimatedCost(party.getEstimatedCost())
-                .expectedDuration(party.getExpectedDuration())
                 .maxParticipants(party.getMaxParticipants())
-                .stopovers(party.getStopovers())
-                .stopoverStayTimes(party.getStopoverStayTimes())
+                .stopovers(party.getWaypoints().stream().map(w -> w.getName()).collect(Collectors.toList()))
+                .stopoverStayTimes(party.getWaypoints().stream().map(w -> w.getStayTime()).collect(Collectors.toList()))
                 .leaderName(party.getLeader().getUsername())
-                .participantNames(party.getParticipants().stream().map(user -> user.getUsername()).toList())
-                .approvedParticipantNames(party.getApprovedParticipants().stream().map(user -> user.getUsername()).toList())
+                .participantNames(party.getPartyMembers().stream().map(u -> u.getUsername()).collect(Collectors.toList()))
+                .memberDetail(party.getMemberDetail())
                 .build();
     }
 }

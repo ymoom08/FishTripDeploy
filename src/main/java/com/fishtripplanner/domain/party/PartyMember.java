@@ -20,7 +20,7 @@ public class PartyMember {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "username")
     private User user;
 
     @ManyToOne
@@ -28,4 +28,8 @@ public class PartyMember {
     private Party party;
 
     private LocalDateTime joinedAt;
+
+    public String getUsername() {
+        return user.getUsername();
+    }
 }

@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class    WaypointRequest {
+public class WaypointRequest {
     private String name;
     private double lat;
     private double lng;
