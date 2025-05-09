@@ -2,28 +2,38 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title>게시글 보기</title>
+  <title th:text="${post.title}">게시글 보기</title>
+  <link rel="stylesheet" th:href="@{/css/Header.css}">
+  <script th:src="@{/js/common.js}" defer></script>
+  <style>
+    body { background-color: #b2ebf2; font-family: 'Pretendard', sans-serif; margin: 0; padding: 0; }
+    .view-container { max-width: 600px; margin: 4rem auto; background: white; border-radius: 10px; padding: 2rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    h1 { margin-top: 0; color: #00796b; }
+    .content { margin: 1rem 0; }
+    .button-group { display: flex; justify-content: space-between; margin-top: 2rem; }
+    .button-group a { padding: 0.5rem 1.2rem; text-decoration: none; border-radius: 5px; font-weight: bold; }
+    .edit-btn { background-color: #0288d1; color: white; }
+    .delete-btn { background-color: #d32f2f; color: white; }
+    .back-btn { background-color: #00796b; color: white; margin-left: auto; }
+    img, video { max-width: 100%; margin-top: 1rem; border-radius: 5px; }
+  </style>
 </head>
 <body>
-<h1 th:text="${post.title}"></h1>
-<p><strong>작성자:</strong> <span th:text="${post.writer}"></span></p>
-<p><strong>내용:</strong></p>
-<p th:text="${post.content}"></p>
-
-<div>
-  <p th:if="${post.profileImagePath != null}">
-    <img th:src="@{${post.profileImagePath}}" alt="프리폴 사진" style="width:100px;">
-  </p>
-  <p th:if="${post.imagePath != null}">
-    <img th:src="@{${post.imagePath}}" alt="사진" style="max-width:400px;">
-  </p>
-  <p th:if="${post.videoPath != null}">
-    <video th:src="@{${post.videoPath}}" controls style="max-width:500px;"></video>
-  </p>
+<div th:replace="~{fragments/header :: headerFragment}"></div>
+<div class="view-container">
+  <h1 th:text="${post.title}">제목</h1>
+  <p><strong>작성자:</strong> <span th:text="${post.writer}"></span></p>
+  <div class="content" th:text="${post.content}">내용</div>
+  <div>
+    <img th:if="${post.profileImagePath}" th:src="@{${post.profileImagePath}}" alt="프리폴 이미지">
+    <img th:if="${post.imagePath}" th:src="@{${post.imagePath}}" alt="참부 이미지">
+    <video th:if="${post.videoPath}" th:src="@{${post.videoPath}}" controls></video>
+  </div>
+  <div class="button-group">
+    <a th:href="@{'/posts/edit/' + ${post.id}}" class="edit-btn">수정</a>
+    <a th:href="@{'/posts/delete/' + ${post.id}}" class="delete-btn">삭제</a>
+    <a th:href="@{/posts}" class="back-btn">목록으로</a>
+  </div>
 </div>
-
-<a th:href="@{'/posts/edit/' + ${post.id}}">수정</a> |
-<a th:href="@{'/posts/delete/' + ${post.id}}">삭제</a> |
-<a th:href="@{/posts}">목록</a>
 </body>
 </html>

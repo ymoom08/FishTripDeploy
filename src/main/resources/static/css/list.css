@@ -1,0 +1,148 @@
+body {
+  background-color: #b2ebf2;
+  margin: 0;
+  padding: 0;
+  font-family: 'Pretendard', sans-serif;
+}
+
+.board-container {
+  background: white;
+  max-width: 700px;
+  margin: 120px auto 2rem;
+  border-radius: 10px;
+  padding: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+  text-align: center;
+  color: #00796b;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+}
+
+.section-title {
+  color: #004d40;
+  font-weight: bold;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+
+.post-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.post-item {
+  background-color: #e0f7fa;
+  border-radius: 10px;
+  padding: 0.8rem 1rem;
+  display: flex;
+  align-items: center;
+  transition: 0.2s ease;
+  min-height: 50px;
+  box-sizing: border-box;
+}
+
+.post-item:hover {
+  background-color: #b2ebf2;
+  transform: scale(1.02);
+}
+
+.post-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem; /* 간격을 약간 더 넓힘 */
+  width: 100%;
+}
+
+.profile-area {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.profile-thumb {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.default-icon {
+  width: 36px;
+  height: 36px;
+  font-size: 1.4rem;
+  background-color: #cfd8dc;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #37474f;
+}
+
+.post-link {
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+  font-size: 1rem;
+  line-height: 1.4;
+  padding-top: 2px; /* 텍스트 수직 정렬 보정 */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+
+.pagination {
+  margin-top: 2rem;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+.pagination a {
+  text-decoration: none;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  color: #333;
+  background-color: white;
+  transition: background-color 0.2s ease;
+}
+
+.pagination a:hover {
+  background-color: #e0f7fa;
+}
+
+.pagination .current {
+  background-color: #004d40;
+  color: white;
+  font-weight: bold;
+  border: none;
+}
+
+.write-btn {
+  display: block;
+  margin: 2rem auto 0;
+  padding: 0.6rem 1.5rem;
+  background-color: #00796b;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+}
+
+.write-btn:hover {
+  background-color: #004d40;
+}

@@ -26,4 +26,7 @@ public class Post extends BaseTimeEntity {
     private String imagePath;
     private String videoPath;
     private String profileImagePath;
+
+    @Column(nullable = false)
+    private int viewCount = 0; // ← 조회수 필드 추가
 }
