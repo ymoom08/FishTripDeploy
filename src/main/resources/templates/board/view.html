@@ -6,34 +6,122 @@
   <link rel="stylesheet" th:href="@{/css/Header.css}">
   <script th:src="@{/js/common.js}" defer></script>
   <style>
-    body { background-color: #b2ebf2; font-family: 'Pretendard', sans-serif; margin: 0; padding: 0; }
-    .view-container { max-width: 600px; margin: 4rem auto; background: white; border-radius: 10px; padding: 2rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-    h1 { margin-top: 0; color: #00796b; }
-    .content { margin: 1rem 0; }
-    .button-group { display: flex; justify-content: space-between; margin-top: 2rem; }
-    .button-group a { padding: 0.5rem 1.2rem; text-decoration: none; border-radius: 5px; font-weight: bold; }
-    .edit-btn { background-color: #0288d1; color: white; }
-    .delete-btn { background-color: #d32f2f; color: white; }
-    .back-btn { background-color: #00796b; color: white; margin-left: auto; }
-    img, video { max-width: 100%; margin-top: 1rem; border-radius: 5px; }
+    body {
+      background-color: #b2ebf2;
+      font-family: 'Pretendard', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .view-container {
+      max-width: 600px;
+      margin: 4rem auto;
+      background: white;
+      border-radius: 10px;
+      padding: 2rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    h1 {
+      margin-top: 0;
+      color: #00796b;
+    }
+    .content {
+      margin: 1rem 0;
+    }
+    .button-group {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 2rem;
+    }
+    .button-group a {
+      padding: 0.5rem 1.2rem;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+    .edit-btn {
+      background-color: #0288d1;
+      color: white;
+    }
+    .delete-btn {
+      background-color: #d32f2f;
+      color: white;
+    }
+    .back-btn {
+      background-color: #00796b;
+      color: white;
+      margin-left: auto;
+    }
+    img, video {
+      max-width: 100%;
+      margin-top: 1rem;
+      border-radius: 5px;
+    }
+    .comment-section {
+      margin-top: 3rem;
+      border-top: 1px solid #ccc;
+      padding-top: 1rem;
+    }
+    .comment {
+      margin-bottom: 1rem;
+    }
+    .comment small {
+      color: gray;
+      font-size: 0.85rem;
+    }
+    textarea {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      resize: vertical;
+      font-family: inherit;
+    }
+    .comment-form input,
+    .comment-form button {
+      margin-top: 0.5rem;
+    }
   </style>
 </head>
 <body>
 <div th:replace="~{fragments/header :: headerFragment}"></div>
+
 <div class="view-container">
   <h1 th:text="${post.title}">제목</h1>
   <p><strong>작성자:</strong> <span th:text="${post.writer}"></span></p>
   <div class="content" th:text="${post.content}">내용</div>
+
   <div>
-    <img th:if="${post.profileImagePath}" th:src="@{${post.profileImagePath}}" alt="프리폴 이미지">
-    <img th:if="${post.imagePath}" th:src="@{${post.imagePath}}" alt="참부 이미지">
+    <img th:if="${post.profileImagePath}" th:src="@{${post.profileImagePath}}" alt="프로필 이미지">
+    <img th:if="${post.imagePath}" th:src="@{${post.imagePath}}" alt="첨부 이미지">
     <video th:if="${post.videoPath}" th:src="@{${post.videoPath}}" controls></video>
   </div>
+
   <div class="button-group">
     <a th:href="@{'/posts/edit/' + ${post.id}}" class="edit-btn">수정</a>
     <a th:href="@{'/posts/delete/' + ${post.id}}" class="delete-btn">삭제</a>
     <a th:href="@{/posts}" class="back-btn">목록으로</a>
   </div>
+
+  <!-- 댓글 목록 -->
+  <div class="comment-section">
+    <h3>💬 댓글</h3>
+    <div th:if="${comments != null}">
+      <div th:each="comment : ${comments}" class="comment">
+        <strong th:text="${comment.writer}">작성자</strong>
+        <p th:text="${comment.content}">내용</p>
+        <small th:text="${#temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm')}"></small>
+      </div>
+    </div>
+
+    <!-- ✅ 댓글 작성 폼 -->
+    <form th:action="@{/comments/add}" method="post" class="comment-form">
+      <input type="hidden" name="postId" th:value="${post.id}"/>
+      <input type="text" name="writer" placeholder="작성자" required class="form-input"/><br>
+      <textarea name="content" rows="4" placeholder="댓글을 입력하세요" required></textarea><br>
+      <button type="submit">댓글 등록</button>
+    </form>
+  </div>
 </div>
+
 </body>
 </html>
