@@ -63,8 +63,17 @@
     <span id="durationText"></span><br>
     <span id="tollText"></span>
   </div>
+
+  <!-- 차량 검색창 -->
+  <div style="width: 90%; max-width: 600px; margin: 20px auto;">
+    <label for="carSearchInput">🚘 차량 검색:</label>
+    <input type="text" id="carSearchInput" placeholder="예: 볼보 XC60" autocomplete="off" />
+    <div id="carSuggestions" style="border: 1px solid #ccc; background: white; max-height: 200px; overflow-y: auto; display: none;"></div>
+  </div>
+
   <button type="submit">등록</button>
 </form>
+
 
 
 <div id="map" style="width:100%;height:500px;margin-top:20px;"></div>
@@ -154,7 +163,10 @@
                 strokeStyle: 'solid'
               });
               polyline.setMap(map);
-              // 예상 시간, 거리, 비용 표시
+
+
+              ///////////////////////////////////////////////////////////////////////////
+  // 예상 시간, 거리, 비용 표시
   const minutes = Math.round(data.duration / 60);
   const toll = data.toll || 0;
 
@@ -240,6 +252,119 @@
       });
     });
   }
+
+
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////
+  // 연료 단가 비동기로 받아서 유류비 계산에 반영
+async function calculateFuelCost(routeData, vehicleData) {
+  const distanceKm = routeData.distance / 1000;
+  const cityEff = vehicleData.cityEff;
+  const highwayEff = vehicleData.highwayEff;
+  const fuelType = vehicleData.fuelType;
+
+  // 최신 유가 정보 fetch
+  const fuelPrices = await fetch("/api/fuel-price")
+    .then(res => res.json())
+    .catch(() => {
+      alert("유가 정보를 불러올 수 없습니다.");
+      return null;
+    });
+
+  if (!fuelPrices || !fuelPrices[fuelType]) {
+    alert(`'${fuelType}'에 대한 유가 정보가 없습니다.`);
+    return;
+  }
+
+  const fuelPrice = fuelPrices[fuelType]; // 최신 단가 적용
+
+  // 가중 평균 연비
+  const weightedEff = routeData.highwayRatio * highwayEff + routeData.generalRatio * cityEff;
+  const usedFuel = distanceKm / weightedEff;
+  const fuelCost = Math.round(usedFuel * fuelPrice);
+
+  // 결과 객체 반환
+  return {
+    fuelUsed: usedFuel.toFixed(2),
+    fuelCost: fuelCost,
+    fuelType: fuelType,
+    fuelPrice: fuelPrice
+  };
+}
+  /////////////////////////////////////////////////////////////
+  //차량 자동검색 및 연비 출력
+ const carInput = document.getElementById("carSearchInput");
+const suggestionBox = document.getElementById("carSuggestions");
+let selectedVehicle = null;
+
+let carDebounce;
+carInput.addEventListener("input", () => {
+  const keyword = carInput.value.trim();
+  clearTimeout(carDebounce);
+  if (keyword.length < 2) {
+    suggestionBox.style.display = "none";
+    return;
+  }
+
+  carDebounce = setTimeout(() => {
+    fetch(`/api/car/search?keyword=${encodeURIComponent(keyword)}`)
+      .then(res => res.json())
+      .then(data => {
+        suggestionBox.innerHTML = "";
+        data.forEach(fullModelName => {
+          const div = document.createElement("div");
+          div.textContent = fullModelName; // 예: "볼보 XC60"
+          div.classList.add("suggestion");
+          div.style.padding = "8px";
+          div.style.cursor = "pointer";
+          div.onclick = () => selectCarModel(fullModelName);
+          suggestionBox.appendChild(div);
+        });
+        suggestionBox.style.display = "block";
+      });
+  }, 300);
+});
+
+function selectCarModel(modelName) {
+  carInput.value = modelName;
+  suggestionBox.style.display = "none";
+
+  fetch(`/api/car/model?name=${encodeURIComponent(modelName)}`)
+    .then(res => {
+      if (!res.ok) throw new Error("차량 정보 없음");
+      return res.json();
+    })
+    .then(data => {
+      selectedVehicle = {
+        cityEff: data.cityEff,
+        highwayEff: data.highwayEff,
+        fuelType: data.fuelType
+      };
+
+      // 연비 정보 표시
+      document.getElementById("fuelText").innerHTML =
+        `🚘 선택 차량: ${modelName}<br>` +
+        `도심연비: ${data.cityEff} km/L, 고속도로연비: ${data.highwayEff} km/L<br>` +
+        `연료 종류: ${data.fuelType}`;
+    })
+    .catch(() => {
+      alert("차량 정보 로드 실패");
+    });
+}
+
+  //계산
+calculateFuelCost(routeData, selectedVehicle).then(result => {
+  if (result) {
+    document.getElementById("fuelText").innerHTML =
+      `예상 연료 사용량: ${result.fuelUsed}L<br>` +
+      `유류 단가 (${result.fuelType}): ${result.fuelPrice.toLocaleString()}원/L<br>` +
+      `<strong>예상 연료비: ${result.fuelCost.toLocaleString()}원</strong>`;
+  }
+});
+
+
+
+
 </script>
 </body>
 </html>

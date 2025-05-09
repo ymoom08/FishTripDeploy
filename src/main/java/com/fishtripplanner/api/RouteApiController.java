@@ -55,10 +55,23 @@ public class RouteApiController {
 
             JsonNode firstRoute = routes.get(0);
             JsonNode summary = firstRoute.path("summary");
+            // 거리 누적용 변수 추가
+            int highwayDist = 0;
+            int generalDist = 0;
 
             List<List<Double>> path = new ArrayList<>();
             for (JsonNode section : firstRoute.path("sections")) {
                 for (JsonNode road : section.path("roads")) {
+
+                    int distance = road.path("distance").asInt(0);
+                    int type = road.path("type").asInt(-1);
+
+                    if (type == 3) {
+                        highwayDist += distance;
+                    } else {
+                        generalDist += distance;
+                    }
+
                     JsonNode vertex = road.path("vertexes");
                     for (int i = 0; i < vertex.size(); i += 2) {
                         double x = vertex.get(i).asDouble();
@@ -67,13 +80,24 @@ public class RouteApiController {
                     }
                 }
             }
+            //톨게이트비용!
             int toll = summary.path("fare").path("toll").asInt(0);
+            //여기는 고속도로,일반도로 비율계산 섹션이예유
+            int totalDist = highwayDist + generalDist;
+            double highwayRatio = totalDist > 0 ? (double) highwayDist / totalDist : 0;
+            double generalRatio = totalDist > 0 ? (double) generalDist / totalDist : 0;
+
             Map<String, Object> result = new HashMap<>();
             result.put("distance", summary.path("distance").asInt());
             result.put("duration", summary.path("duration").asInt());
             result.put("path", path);
             result.put("routes", List.of(Map.of("path", path))); // 프론트 호환용
             result.put("toll", toll);
+            // 🚀 고속도로/일반도로 비율 정보 추가(연비/유류비 계산용)
+            result.put("highwayDistance", highwayDist);
+            result.put("generalDistance", generalDist);
+            result.put("highwayRatio", highwayRatio);
+            result.put("generalRatio", generalRatio);
 
             return ResponseEntity.ok(result);
         } catch (Exception e) {
