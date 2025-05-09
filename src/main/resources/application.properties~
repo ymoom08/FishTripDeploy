@@ -1,5 +1,0 @@
-spring.application.name=fishtrip
-
-mybatis.mapper-locations=classpath:mapper/*.xml
-mybatis.type-aliases-package=com.example.project.dto
-mybatis.configuration.log-impl=org.apache.ibatis.logging.stdout.StdOutImpl

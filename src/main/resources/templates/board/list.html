@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>게시판 목록</title>
+  <link rel="stylesheet" th:href="@{/css/header.css}">
+  <link rel="stylesheet" th:href="@{/css/list.css}">
+  <script th:src="@{/js/common.js}" defer></script>
+</head>
+<body>
+<div th:replace="~{fragments/header :: headerFragment}"></div>
+
+<main class="board-container">
+  <h2>📣 게시판 글 목록</h2>
+
+  <section th:if="${popularPosts != null and !popularPosts.isEmpty()}">
+    <h3 class="section-title">🔥 인기 게시글</h3>
+    <ul class="post-list">
+      <li class="post-item" th:each="post : ${popularPosts}">
+        <div class="post-card">
+          <div class="profile-area">
+            <img th:if="${post.profileImagePath != null}" th:src="@{${post.profileImagePath}}" class="profile-thumb" alt="프로필">
+            <span class="default-icon" th:if="${post.profileImagePath == null}">📌</span>
+          </div>
+          <div class="text-area">
+            <a th:href="@{'/posts/' + ${post.id}}" th:text="${post.title}" class="post-link">인기글 제목</a>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </section>
+
+  <ul class="post-list">
+    <li class="post-item" th:each="post : ${posts.content}">
+      <div class="post-card">
+        <div class="profile-area">
+          <img th:if="${post.profileImagePath != null}" th:src="@{${post.profileImagePath}}" class="profile-thumb" alt="프로필">
+          <span class="default-icon" th:if="${post.profileImagePath == null}">📝</span>
+        </div>
+        <div class="text-area">
+          <a th:href="@{'/posts/' + ${post.id}}" th:text="${post.title}" class="post-link">게시글 제목</a>
+        </div>
+      </div>
+    </li>
+  </ul>
+
+  <div class="pagination" th:if="${posts.totalPages > 1}">
+    <a th:each="page : ${#numbers.sequence(0, posts.totalPages - 1)}"
+       th:href="@{'/posts?page=' + ${page}}"
+       th:text="${page + 1}"
+       th:classappend="${page == posts.number} ? 'current'">
+    </a>
+  </div>
+
+  <a th:href="@{/posts/new}">
+    <button class="write-btn">글 작성</button>
+  </a>
+</main>
+</body>
+</html>

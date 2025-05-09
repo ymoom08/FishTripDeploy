@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <title>예약 페이지</title>
-  <link rel="stylesheet" href="/css/css_reservation/reservation_detail.css">
+  <link rel="stylesheet" href="/css/css_reservation/reservation_list.css">
+  <link rel="stylesheet" href="/css/css_reservation/reservation_modals.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 </head>
 <body>
@@ -22,31 +23,38 @@
     </div>
     <div class="filter-group">
       <button id="sortBtn">정렬기준</button>
+
+      <!-- 🔽 정렬 옵션 버튼 목록 -->
+      <div id="sortOptions" class="sort-options hidden">
+        <button data-sort="latest">최신순</button>
+        <button data-sort="priceAsc">가격 낮은순</button>
+        <button data-sort="priceDesc">가격 높은순</button>
+      </div>
     </div>
   </div>
 
   <div class="search-row">
-    <input type="text" placeholder="검색창" class="search-input">
-    <button class="search-button">검색하기</button>
+    <input type="text" id="searchInput" placeholder="검색창" class="search-input">
+    <button id="searchButton" class="search-button">검색하기</button>
   </div>
 
   <div id="selectedInfo" class="selected-info"></div>
 </div>
 
 <div class="ad-card-list" id="cardContainer">
-  <div class="ad-card" th:each="card : ${cards}">
-    <div th:if="${card instanceof T(com.fishtripplanner.dto.reservation.ReservationCardDto)}">
+  <div class="ad-card" th:each="card : ${cards}" th:if="${card instanceof T(com.fishtripplanner.dto.reservation.ReservationCardDto)}">
+    <a th:href="@{'/reservation/detail/' + ${card.id}}" class="ad-card-link">
       <div class="ad-image">
         <img th:src="@{${card.imageUrl}}" alt="예약 이미지">
       </div>
-      <div class="ad-desc" th:text="${card.title}">명목</div>
+      <div class="ad-desc" th:text="${card.title}">제목</div>
       <div class="ad-detail">
         <p th:text="${card.region != null ? card.region : '없음'}">지역</p>
         <p th:text="'회사명: ' + ${card.companyName}">회사명</p>
         <p th:text="'어종: ' + ${#strings.arrayJoin(card.fishTypes.toArray(), ', ')}">어종</p>
         <p th:text="${card.content}">내용</p>
       </div>
-    </div>
+    </a>
   </div>
 </div>
 
@@ -111,6 +119,6 @@
 <!-- ✅ 스크립트 -->
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
-<script src="/js/reservation_detail.js"></script>
+<script type="module" src="/js/reservation_list.js"></script>
 </body>
 </html>

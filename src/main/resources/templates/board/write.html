@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>게시글 작성</title>
+  <style>
+    body {
+      font-family: 'Pretendard', sans-serif;
+      background-color: #e0f7fa;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 50px auto;
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: #00796b;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin: 15px 0 5px;
+      color: #333;
+      font-weight: bold;
+    }
+
+    input[type="text"],
+    textarea,
+    input[type="file"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-sizing: border-box;
+      font-size: 14px;
+    }
+
+    textarea {
+      resize: vertical;
+      height: 120px;
+    }
+
+    button {
+      background-color: #00897b;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 25px;
+      font-weight: bold;
+      margin-top: 20px;
+      width: 100%;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background-color: #00695c;
+    }
+
+    a {
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+      color: #00897b;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>게시글 작성</h2>
+
+  <form method="post" enctype="multipart/form-data" th:action="@{/posts}" th:object="${post}">
+    <label th:for="*{title}">제목</label>
+    <input type="text" th:field="*{title}" placeholder="제목" required>
+
+    <label th:for="*{writer}">작성자</label>
+    <input type="text" th:field="*{writer}" placeholder="작성자" required>
+
+    <label th:for="*{content}">내용</label>
+    <textarea th:field="*{content}" placeholder="내용" required></textarea>
+
+    <label for="profileImageFile">프로필 사진</label>
+    <input type="file" name="profileImageFile" id="profileImageFile">
+
+    <label for="imageFile">이미지 첨부</label>
+    <input type="file" name="imageFile" id="imageFile">
+
+    <label for="videoFile">동영상 첨부</label>
+    <input type="file" name="videoFile" id="videoFile">
+
+    <button type="submit">등록</button>
+  </form>
+
+  <a th:href="@{/posts}">← 목록으로 돌아가기</a>
+</div>
+
+</body>
+</html>

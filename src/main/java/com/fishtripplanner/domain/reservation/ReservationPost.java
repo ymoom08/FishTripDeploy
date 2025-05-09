@@ -5,10 +5,11 @@ import com.fishtripplanner.entity.FishTypeEntity;
 import com.fishtripplanner.entity.RegionEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+
 
 @Entity
 @Getter @Setter
@@ -33,9 +34,6 @@ public class ReservationPost {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    @ElementCollection
-    private List<LocalDate> availableDates;
-
     private int price;
 
     private String imageUrl;
@@ -48,13 +46,26 @@ public class ReservationPost {
     @JoinColumn(name = "region_id")
     private RegionEntity region;
 
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
+
     @ManyToMany
+    @BatchSize(size = 20)
     @JoinTable(
             name = "reservationpost_fishtype",
             joinColumns = @JoinColumn(name = "reservationpost_id"),
-            inverseJoinColumns = @JoinColumn(name = "fish_id")
+            inverseJoinColumns = @JoinColumn(name = "fish_type_id")
     )
-    private List<FishTypeEntity> fishTypeEntities;
+    private List<FishTypeEntity> fishTypes;
+
+
+    @OneToMany(mappedBy = "reservationPost")
+    @BatchSize(size = 20)
+    private List<ReservationPostAvailableDate> availableDates;
+
+
 
 
 }

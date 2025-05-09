@@ -31,7 +31,7 @@
                     <div class="subMenu" id="subMenu0" style="display: none;">
                         <ul class="subMenuList">
                             <li class="subMenuItem">
-                                <a th:href="@{/reservation}" class="subMenuButton">예약 1</a>
+                                <a th:href="@{/reservation}" class="subMenuButton">예약하기</a>
                             </li>
                         </ul>
                     </div>
@@ -75,8 +75,8 @@
                     <button class="menuButton">커뮤니티</button>
                     <div class="subMenu" id="subMenu5" style="display: none;">
                         <ul class="subMenuList">
-                            <li class="subMenuItem"><a href="#" class="subMenuButton" onclick="navigatePage('/community/free')">커뮤니티 1</a></li>
-                            <li class="subMenuItem"><a href="#" class="subMenuButton" onclick="navigatePage('/community/reviews')">커뮤니티 2</a></li>
+                            <li class="subMenuItem"><a th:href="@{/posts/popular}" class="subMenuButton">인기 게시글</a></li>
+                            <li class="subMenuItem"><a th:href="@{/posts}" class="subMenuButton">전체 게시판</a></li>
                         </ul>
                     </div>
                 </li>

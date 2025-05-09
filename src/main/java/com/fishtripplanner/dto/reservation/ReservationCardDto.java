@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class ReservationCardDto {
 
+    private Long id;
     private String title;
     private String content;
     private String companyName;
@@ -50,12 +51,13 @@ public class ReservationCardDto {
         }
 
         return new ReservationCardDto(
+                post.getId(),
                 post.getTitle(),
                 post.getContent(),
                 post.getCompanyName(),
                 imageUrl,
                 regionText,
-                post.getFishTypeEntities().stream()
+                post.getFishTypes().stream()  // ✅ 수정된 부분
                         .map(FishTypeEntity::getName)
                         .collect(Collectors.toList())
         );

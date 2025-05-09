@@ -1,0 +1,150 @@
+/* ✅ 모달 공통 (지역, 날짜 선택) */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.modal.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  width: 90vh;
+  max-height: 80%;
+  overflow-y: auto;
+}
+
+/* ✅ 지역 선택 모달 내부 구조 */
+.region-group {
+  margin-bottom: 20px;
+}
+
+.region-title {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.region-children {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.region-child-btn {
+  padding: 6px 10px;
+  border: 2px solid #aaa;
+  background-color: #f2f2f2;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.region-child-btn:hover {
+  background-color: #e0e0e0;
+}
+
+.region-child-btn.selected {
+  background-color: #007bff;
+  color: white;
+  font-weight: bold;
+  border: 2px solid #0056b3;
+}
+
+/* 초기화 버튼 스타일 */
+#regionReset {
+  background: #eee;
+  color: #333;
+  padding: 6px 14px;
+  border: 1px solid #aaa;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+/* ✅ 달력 관련 */
+#datePickerContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30px;
+  min-height: 450px;
+  min-width: 450px;
+  position: relative; /* ⚠️ 필수: appendTo 대상은 위치 기준 잡기 위해 relative 필요 */
+}
+
+.flatpickr-calendar {
+  transform: scale(1.5); /* 사이즈 1.5배 확대 */
+  transform-origin: center center; /* 확대 기준점 중앙 */
+  font-size: 18px; /* 날짜 글자도 키움 */
+}
+
+/* ✅ 요일 색상 지정 */
+.flatpickr-day.sunday {
+  color: #e74c3c;  /* 연한 빨강 */
+  font-weight: 500;
+}
+
+.flatpickr-day.saturday {
+  color: #3498db;  /* 연한 파랑 */
+  font-weight: 500;
+}
+
+/* ✅ 어종 선택 스타일 */
+.fish-type-btn {
+  padding: 6px 10px;
+  border: 2px solid #aaa;
+  background-color: #f9f9f9;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 4px;
+  font-size: 15px;
+}
+
+.fish-type-btn:hover {
+  background-color: #e0e0e0;
+}
+
+.fish-type-btn.selected {
+  background-color: #007bff;
+  color: white;
+  font-weight: bold;
+  border: 2px solid #0056b3;
+}
+
+/* ✅ 초성 그룹별 줄바꿈 정렬을 위한 스타일 */
+.fish-group {
+  display: block;
+  margin-bottom: 25px;
+}
+
+.fish-group-title {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.fish-group-body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.fish-modal-body {
+  display: block;
+  padding: 10px;
+}

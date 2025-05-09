@@ -46,15 +46,17 @@ public class ReservationFilterController {
 
     /**
      * ✅ 예약글 필터링 API
-     * - type(필수) + regionId/date/fishType(선택)
+     * - type(필수) + regionId/date/fishType/keyword(선택)
      * - 필터 조합에 따라 ReservationPost 목록 반환
      */
     @GetMapping("/reservation")
     public List<ReservationCardDto> getFilteredCards(
-            @RequestParam("type") String type, // 필수
+            @RequestParam("type") String type,
             @RequestParam(value = "regionId", required = false) List<Long> regionIds,
             @RequestParam(value = "date", required = false) String dateStr,
             @RequestParam(value = "fishType", required = false) List<String> fishTypes,
+            @RequestParam(value = "keyword", required = false) String keyword,
+            @RequestParam(value = "sort", defaultValue = "latest") String sortKey,
             Pageable pageable
     ) {
         // 🔹 문자열 → enum으로 변환
@@ -63,18 +65,28 @@ public class ReservationFilterController {
         // 🔹 날짜 파싱
         LocalDate parsedDate = (dateStr != null && !dateStr.isBlank()) ? LocalDate.parse(dateStr) : null;
 
-        // 🔹 빈 리스트는 null로 처리 (서비스에서 조건 분기 처리)
+        // 🔹 빈 값 null-safe 처리
         List<Long> validRegionIds = (regionIds == null || regionIds.isEmpty()) ? null : regionIds;
         List<String> validFishTypes = (fishTypes == null || fishTypes.isEmpty()) ? null : fishTypes;
+        String validKeyword = (keyword == null || keyword.isBlank()) ? null : keyword;
 
         // 🔹 서비스 호출
         Page<ReservationPost> page = reservationPostService.filterPosts(
-                enumType, validRegionIds, parsedDate, validFishTypes, pageable
+                enumType, validRegionIds, parsedDate, validFishTypes, validKeyword, sortKey, pageable
         );
 
         // 🔹 DTO 변환 후 반환
         return page.stream()
                 .map(ReservationCardDto::from)
                 .toList();
+    }
+
+    /**
+     * ✅ 실제 사용된 지역 이름 목록 반환
+     * - 지역 필터용
+     */
+    @GetMapping("/regions/names")
+    public List<String> getUsedRegionNames() {
+        return reservationPostService.getUsedRegionNames();
     }
 }
