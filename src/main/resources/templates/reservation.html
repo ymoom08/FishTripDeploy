@@ -1,16 +1,19 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
 <head>
-  <meta charset="UTF-8">
-  <title>예약 하기</title>
-  <link rel="stylesheet" th:href="@{/css/css_reservation/reservation.css}">
-  <link rel="stylesheet" th:href="@{/css/Header.css}">
-  <link rel="stylesheet" href="/css/footer.css">
-  <script th:src="@{/js/common.js}" defer></script>
+  <title layout:fragment="title">예약 하기</title>
+
+  <!-- ✅ 개별 CSS는 여기에 -->
+  <th:block layout:fragment="add-css">
+    <link rel="stylesheet" th:href="@{/css/css_reservation/reservation.css}">
+  </th:block>
 </head>
-<body>
-<div th:replace="fragments/header :: headerFragment"></div>
-<main class="reservation-content">
+
+<!-- ✅ 본문 내용만 여기에 -->
+<main layout:fragment="content" class="reservation-content">
   <div class="card-grid">
 
     <a th:href="@{/reservation/boat}" class="card-link">
@@ -19,24 +22,28 @@
         <div class="card-title">선상낚시</div>
       </div>
     </a>
+
     <a th:href="@{/reservation/rock}" class="card-link">
       <div class="card" style="cursor: pointer;">
         <img th:src="@{/images/rock.jpg}" alt="갯바위" class="card-image" />
         <div class="card-title">갯바위</div>
       </div>
     </a>
+
     <a th:href="@{/reservation/float}" class="card-link">
       <div class="card" style="cursor: pointer;">
         <img th:src="@{/images/float.png}" alt="좌대" class="card-image" />
         <div class="card-title">좌대</div>
       </div>
     </a>
+
     <a th:href="@{/reservation/island}" class="card-link">
       <div class="card" style="cursor: pointer;">
         <img th:src="@{/images/island.jpg}" alt="섬" class="card-image" />
         <div class="card-title">섬</div>
       </div>
     </a>
+
     <a th:href="@{/reservation/stay}" class="card-link">
       <div class="card" style="cursor: pointer;">
         <img th:src="@{/images/stay.png}" alt="숙박/민박/캠핑" class="card-image" />
@@ -45,6 +52,10 @@
     </a>
   </div>
 </main>
-<div th:replace="fragments/footer :: footerFragment"></div>
-</body>
+
+<!-- ✅ JS는 여기에 (필요 시만) -->
+<th:block layout:fragment="add-js">
+  <!-- 예: <script th:src="@{/js/reservation.js}" defer></script> -->
+</th:block>
+
 </html>

@@ -51,11 +51,11 @@
   display: block;
 }
 
-a {
+.card-link {
   text-decoration: none;
   color: black;
 }
 
-a:visited {
+.card-link:visited {
   color: black;
 }
