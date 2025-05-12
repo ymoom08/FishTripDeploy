@@ -61,7 +61,7 @@ public class PostController {
             post.setProfileImagePath(fileUploadService.upload(profileImageFile));
         }
 
-        post.setViewCount(0); // 조회수 초기화
+        post.setViewCount(0);
         postRepository.save(post);
         return "redirect:/posts";
     }
