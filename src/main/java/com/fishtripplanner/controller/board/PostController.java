@@ -2,11 +2,14 @@ package com.fishtripplanner.controller.board;
 
 import com.fishtripplanner.domain.board.Post;
 import com.fishtripplanner.repository.PostRepository;
+import com.fishtripplanner.security.CustomOAuth2User;
+import com.fishtripplanner.security.CustomUserDetails;
 import com.fishtripplanner.service.FileUploadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -67,7 +70,16 @@ public class PostController {
     }
 
     @GetMapping("/{id}")
-    public String view(@PathVariable("id") Long id, Model model) {
+    public String view(@PathVariable("id") Long id, Model model, @AuthenticationPrincipal Object principal) {
+        //밑 조건문은 세션에 저장되었는지 확인하는 디버그 용도임.
+        if (principal instanceof CustomUserDetails userDetails) {
+            System.out.println("🧍 일반 로그인 사용자: " + userDetails.getUsername());
+        } else if (principal instanceof CustomOAuth2User oauthUser) {
+            System.out.println("🧍‍♂️ 소셜 로그인 사용자: " + oauthUser.getUser().getUsername());
+        } else {
+            System.out.println("⚠️ 로그인 정보 없음 또는 알 수 없는 타입");
+        }
+        //여기까지 디버그 용도임 추후에 지울거임.
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("글을 찾을 수 없습니다."));
 

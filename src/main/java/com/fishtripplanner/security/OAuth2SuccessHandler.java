@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.DefaultRedirectStrategy;
@@ -72,15 +73,34 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         session.setAttribute("oauth_name", name);
 
 
+        Optional<User> existing = userRepository.findByEmail(email); // ❗ email 기준
 
-
-
-        Optional<User> existing = userRepository.findByNickname(nickname);
         if (existing.isPresent()) {
-            // 로그인된 상태로 홈으로
+            User existingUser = existing.get();
+
+            // ✅ 수동 로그인 처리
+            CustomOAuth2User userDetails = new CustomOAuth2User(existingUser);
+            OAuth2AuthenticationToken authToken = new OAuth2AuthenticationToken(
+                    userDetails,
+                    userDetails.getAuthorities(),
+                    token.getAuthorizedClientRegistrationId()
+            );
+            SecurityContextHolder.getContext().setAuthentication(authToken);
+
             redirectStrategy.sendRedirect(request, response, "/");
         } else {
-            // 회원가입 페이지로 이동
+            // 신규 사용자: 회원가입 폼으로 이동
+
+            session.setAttribute("oauth_nickname", nickname);
+            session.setAttribute("oauth_profile_image", profileImage);
+            session.setAttribute("oauth_email", email);
+            session.setAttribute("oauth_gender", gender);
+            session.setAttribute("oauth_age", age);
+            session.setAttribute("oauth_birthday", birthday);
+            session.setAttribute("oauth_birthyear", birthyear);
+            session.setAttribute("oauth_mobile", mobile);
+            session.setAttribute("oauth_name", name);
+
             redirectStrategy.sendRedirect(request, response, "/join/oauth");
         }
     }
