@@ -70,7 +70,8 @@
     <input type="text" id="carSearchInput" placeholder="예: 볼보 XC60" autocomplete="off" />
     <div id="carSuggestions" style="border: 1px solid #ccc; background: white; max-height: 200px; overflow-y: auto; display: none;"></div>
   </div>
-
+  <!--연료비-->
+  <div id="fuelText" style="margin: 20px auto; width: 90%; max-width: 600px; font-size: 1rem; background: #f8f9fa; border: 1px solid #ccc; padding: 15px; border-radius: 8px;"></div>
   <button type="submit">등록</button>
 </form>
 
@@ -80,6 +81,8 @@
 <div id="mapContextMenu"></div>
 
 <script>
+  let routeData = null;
+  let selectedVehicle = null;
   window.onload = function () {
     kakao.maps.load(() => {
       const map = new kakao.maps.Map(document.getElementById('map'), {
@@ -152,6 +155,7 @@
           fetch(`/api/route?startX=${departure.getPosition().getLng()}&startY=${departure.getPosition().getLat()}&endX=${destination.getPosition().getLng()}&endY=${destination.getPosition().getLat()}${waypoints.length ? '&waypoints=' + waypoints.map(m => m.getPosition().getLng() + ',' + m.getPosition().getLat()).join('_') : ''}`)
             .then(res => res.json())
             .then(data => {
+             routeData = data;
               if (polyline) polyline.setMap(null);
               const route = data.routes[0];
               const path = route.path.map(p => new kakao.maps.LatLng(p[1], p[0]));
@@ -174,6 +178,20 @@
   document.getElementById('tollText').textContent = `예상 톨게이트 비용: 약 ${toll.toLocaleString()}원`;
 
   document.getElementById('routeInfo').style.display = 'block';
+   // ✅ 연료비 계산 추가
+        if (selectedVehicle) {
+          calculateFuelCost(routeData, selectedVehicle).then(result => {
+            if (result) {
+              document.getElementById("fuelText").innerHTML =
+                `🚘 선택 차량: ${carInput.value}<br>` +
+                `도심연비: ${selectedVehicle.cityEff} km/L, 고속도로연비: ${selectedVehicle.highwayEff} km/L<br>` +
+                `연료 종류: ${selectedVehicle.fuelType}<br><br>` +
+                `예상 연료 사용량: ${result.fuelUsed}L<br>` +
+                `유류 단가 (${result.fuelType}): ${result.fuelPrice.toLocaleString()}원/L<br>` +
+                `<strong>예상 연료비: ${result.fuelCost.toLocaleString()}원</strong>`;
+            }
+          });
+        }
 });
 
         }
@@ -295,7 +313,7 @@ async function calculateFuelCost(routeData, vehicleData) {
   //차량 자동검색 및 연비 출력
  const carInput = document.getElementById("carSearchInput");
 const suggestionBox = document.getElementById("carSuggestions");
-let selectedVehicle = null;
+
 
 let carDebounce;
 carInput.addEventListener("input", () => {
@@ -326,6 +344,7 @@ carInput.addEventListener("input", () => {
 });
 
 function selectCarModel(modelName) {
+  console.log("선택된 모델명:", modelName);
   carInput.value = modelName;
   suggestionBox.style.display = "none";
 
@@ -335,33 +354,39 @@ function selectCarModel(modelName) {
       return res.json();
     })
     .then(data => {
+      console.log("차량 정보 받아옴:", data);
       selectedVehicle = {
         cityEff: data.cityEff,
         highwayEff: data.highwayEff,
         fuelType: data.fuelType
       };
 
-      // 연비 정보 표시
       document.getElementById("fuelText").innerHTML =
         `🚘 선택 차량: ${modelName}<br>` +
         `도심연비: ${data.cityEff} km/L, 고속도로연비: ${data.highwayEff} km/L<br>` +
         `연료 종류: ${data.fuelType}`;
+
+      if (routeData) {
+        console.log("routeData 있음. 연료비 계산 시작");
+        calculateFuelCost(routeData, selectedVehicle).then(result => {
+          if (result) {
+            document.getElementById("fuelText").innerHTML +=
+              `<br><br>예상 연료 사용량: ${result.fuelUsed}L<br>` +
+              `유류 단가 (${result.fuelType}): ${result.fuelPrice.toLocaleString()}원/L<br>` +
+              `<strong>예상 연료비: ${result.fuelCost.toLocaleString()}원</strong>`;
+          }
+        }).catch(err => {
+          console.error("연료비 계산 에러:", err);
+        });
+      } else {
+        console.warn("routeData가 아직 null임. 지도에서 출발지/도착지를 먼저 지정해야 함.");
+      }
     })
-    .catch(() => {
+    .catch((err) => {
+      console.error("🚨 차량 정보 로드 실패", err);
       alert("차량 정보 로드 실패");
     });
 }
-
-  //계산
-calculateFuelCost(routeData, selectedVehicle).then(result => {
-  if (result) {
-    document.getElementById("fuelText").innerHTML =
-      `예상 연료 사용량: ${result.fuelUsed}L<br>` +
-      `유류 단가 (${result.fuelType}): ${result.fuelPrice.toLocaleString()}원/L<br>` +
-      `<strong>예상 연료비: ${result.fuelCost.toLocaleString()}원</strong>`;
-  }
-});
-
 
 
 
