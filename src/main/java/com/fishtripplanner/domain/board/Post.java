@@ -1,5 +1,6 @@
 package com.fishtripplanner.domain.board;
 
+import com.fishtripplanner.domain.User;
 import com.fishtripplanner.domain.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -28,5 +29,9 @@ public class Post extends BaseTimeEntity {
     private String profileImagePath;
 
     @Column(nullable = false)
-    private int viewCount = 0; // ← 조회수 필드 추가
+    private int viewCount = 0;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 }
