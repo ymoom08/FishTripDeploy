@@ -26,70 +26,51 @@ public class Party {
     private User leader;
 
     private String title;
-
-    @Column(length = 1000)
     private String description;
-
+    private String detail; // 상세 설명 추가
     private String region;
-
     private String departurePoint;
     private double departureLat;
     private double departureLng;
-
     private String destination;
     private double destinationLat;
     private double destinationLng;
-
     private LocalDateTime departureTime;
-    private LocalDateTime arrivalTime;
-
-    private int estimatedCost;
-    private int expectedDuration;
+    private LocalDateTime deadline; // 마감일시 추가
     private int maxParticipants;
-
-    @Builder.Default
+    private int estimatedCost;
+    private String memberDetail; // 모집 대상 설명 추가
     private boolean closed = false;
+    private LocalDateTime createdAt = LocalDateTime.now();
 
-    @ElementCollection
-    private List<String> stopovers;
-
-    @ElementCollection
-    private List<Integer> stopoverStayTimes;
-
-    @Enumerated(EnumType.STRING)
-    private PartyStatus status;
-
-    private LocalDateTime createdAt;
-
-    @Builder.Default
-    @ManyToMany
-    @JoinTable(name = "party_participants",
-            joinColumns = @JoinColumn(name = "party_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id"))
-    private List<User> participants = new ArrayList<>();
-
-    @Builder.Default
-    @ManyToMany
-    @JoinTable(name = "party_approved_participants",
-            joinColumns = @JoinColumn(name = "party_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id"))
-    private List<User> approvedParticipants = new ArrayList<>();
-
-    @Builder.Default
-    @ElementCollection
-    private List<String> board = new ArrayList<>();
-
-    @Builder.Default
-    @ElementCollection
-    private List<String> chat = new ArrayList<>();
+    @OneToMany(mappedBy = "party", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Waypoint> waypoints = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "reservation_post_id")
     private ReservationPost reservationPost;
 
     @OneToMany(mappedBy = "party", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Waypoint> waypoints = new ArrayList<>();
+    private List<PartyMember> partyMembers = new ArrayList<>();
 
+    public void addPartyMember(PartyMember partyMember) {
+        this.partyMembers.add(partyMember);
+        partyMember.setParty(this);
+    }
 
+    public void setWaypoints(List<Waypoint> waypoints) {
+        this.waypoints = waypoints;
+        if (waypoints != null) {
+            for (Waypoint waypoint : waypoints) {
+                waypoint.setParty(this);
+            }
+        }
+    }
 
+    @PrePersist
+    public void prePersist() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
+    }
 }

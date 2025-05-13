@@ -1,6 +1,7 @@
 package com.fishtripplanner.dto.party;
 
 import com.fishtripplanner.domain.party.Party;
+import com.fishtripplanner.domain.party.Waypoint;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -23,6 +24,7 @@ public class PartyResponse {
     private int estimatedCost;
     private List<String> stopovers;
     private List<Integer> stopoverStayTimes;
+    private List<Waypoint> waypoints;
 
     public static PartyResponse from(Party party) {
         return PartyResponse.builder()
@@ -37,8 +39,7 @@ public class PartyResponse {
                 .departureTime(party.getDepartureTime())
                 .maxParticipants(party.getMaxParticipants())
                 .estimatedCost(party.getEstimatedCost())
-                .stopovers(party.getStopovers())
-                .stopoverStayTimes(party.getStopoverStayTimes())
+                .waypoints(party.getWaypoints())
                 .build();
     }
 }

@@ -10,7 +10,6 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class Waypoint {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -18,8 +17,8 @@ public class Waypoint {
     private String name;
     private double lat;
     private double lng;
-    private int stayTime; // 머무는 시간 (분)
-    private int orderIndex; // 경유 순서 (0: 출발지, n: 경유지, 마지막: 목적지)
+    private int stayTime;
+    private int orderIndex;
 
     @Enumerated(EnumType.STRING)
     private WaypointType type;
