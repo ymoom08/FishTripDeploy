@@ -25,8 +25,10 @@
     <!-- ✅ 공통 헤더 -->
     <header th:replace="fragments/header :: headerFragment"></header>
 
+    <div class="page-wrapper">
     <!-- ✅ 페이지 본문 -->
     <main layout:fragment="content"></main>
+    </div>
 
     <!-- ✅ 공통 푸터 -->
     <footer th:replace="fragments/footer :: footerFragment"></footer>

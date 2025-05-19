@@ -4,12 +4,9 @@ import com.fishtripplanner.domain.User;
 import com.fishtripplanner.domain.board.Post;
 import com.fishtripplanner.domain.comment.Comment;
 import com.fishtripplanner.repository.PostRepository;
-<<<<<<< HEAD
 import com.fishtripplanner.security.CustomOAuth2User;
 import com.fishtripplanner.security.CustomUserDetails;
-=======
 import com.fishtripplanner.repository.CommentRepository;
->>>>>>> fce91a1 (2025-5-13)
 import com.fishtripplanner.service.FileUploadService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;

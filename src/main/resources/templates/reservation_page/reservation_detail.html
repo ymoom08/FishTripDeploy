@@ -1,11 +1,21 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+
 <head>
   <meta charset="UTF-8">
   <title th:text="${reservation.title}">예약 상세</title>
-  <link rel="stylesheet" href="/css/css_reservation/reservation_detail.css">
+
+  <th:block layout:fragment="add-css">
+    <link rel="stylesheet" th:href="@{/css/css_reservation/reservation_detail.css}">
+  </th:block>
+
 </head>
+
 <body>
+<main layout:fragment="content">
 <div class="reservation-detail-container">
 
   <!-- ✅ 예약 제목 및 대표 이미지 -->
@@ -73,5 +83,12 @@
   </div>
 
 </div>
+</main>
 </body>
+
+<th:block layout:fragment="add-js">
+  <!-- 필요 시 JS 추가 -->
+
+</th:block>
+
 </html>
