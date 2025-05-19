@@ -12,29 +12,42 @@ repositories {
 }
 
 dependencies {
+    // 웹, MVC, Thymeleaf
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.1.0'
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6' // ★ 추가됨
+
+    // JPA, DB
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
     runtimeOnly 'com.oracle.database.jdbc:ojdbc8'
     implementation 'org.postgresql:postgresql:42.5.1'
+
+    // 보안
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
+    // CSV 파싱
+    implementation 'com.opencsv:opencsv:5.8'
+
+    // 개발 편의
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+    // Lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
+
+    // 테스트
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
-    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-    implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.1.0'
-    implementation 'com.opencsv:opencsv:5.8'
-
-
 }
 
 test {
     useJUnitPlatform()
 }
+
 tasks.withType(JavaCompile) {
     options.compilerArgs += '-parameters'
 }
