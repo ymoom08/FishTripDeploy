@@ -35,7 +35,17 @@ form#partyForm input[type="text"] {
   border-radius: 8px;
   font-size: 1rem;
   box-sizing: border-box;
+
 }
+   #lb4d{
+   width: 100%;
+   padding: 12px;
+   margin-bottom: 15px;
+   border: 1px solid #ced4da;
+   border-radius: 8px;
+   font-size: 1rem;
+   box-sizing: border-box;
+ }
 
 form#partyForm input[readonly] {
   background-color: #e9ecef;

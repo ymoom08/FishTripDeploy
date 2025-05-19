@@ -94,6 +94,13 @@
       }
     }).open();
   }
+  function appendAddressDetail() {
+      const base = document.getElementById("address").value;
+      const detail = document.getElementById("address2").value;
+      if (base && detail) {
+        document.getElementById("address").value = base + ' ' + detail;
+      }
+    }
 </script>
 </body>
 </html>
