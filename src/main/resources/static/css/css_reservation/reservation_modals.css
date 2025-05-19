@@ -20,6 +20,10 @@
   pointer-events: auto;
 }
 
+.show {
+  display: flex !important;
+}
+
 .modal-content {
   background: white;
   padding: 20px;

@@ -124,13 +124,15 @@
     </div>
   </div>
 </div>
+</main>
 
 <!-- ✅ 스크립트 -->
-  <th:block layout:fragment="add-js">
-    <script th:src="@{'https://cdn.jsdelivr.net/npm/flatpickr'}"></script>
-    <script th:src="@{'https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js'}"></script>
-    <script type="module" th:src="@{/js/reservation_list.js}"></script>
-  </th:block>
+<th:block layout:fragment="add-js">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
+  <script type="module" src="/js/reservation_list.js"></script>
 
-</main>
+
+</th:block>
+</body>
 </html>
