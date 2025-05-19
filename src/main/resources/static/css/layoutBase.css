@@ -1,0 +1,23 @@
+/* LayoutBase.css — 모든 페이지에서 공통으로 적용될 기본 구조 */
+
+html, body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Pretendard', sans-serif;
+  color: #333;
+}
+
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
+.container {
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+  background-color: white;
+  padding: 0;
+  margin: 0;
+}

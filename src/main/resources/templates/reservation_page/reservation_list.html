@@ -1,13 +1,22 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+
 <head>
   <meta charset="UTF-8">
-  <title>예약 페이지</title>
-  <link rel="stylesheet" href="/css/css_reservation/reservation_list.css">
-  <link rel="stylesheet" href="/css/css_reservation/reservation_modals.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <title layout:fragment="title" th:text="${title}">예약 목록</title>
+
+  <th:block layout:fragment="add-css">
+    <link rel="stylesheet" th:href="@{/css/css_reservation/reservation_list.css}">
+    <link rel="stylesheet" th:href="@{/css/css_reservation/reservation_modals.css}">
+    <link rel="stylesheet" th:href="@{'https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css'}">
+  </th:block>
 </head>
-<body>
+
+<main layout:fragment="content" class="page-wrapper">
+
 <h1 th:text="${title}">예약</h1>
 
 <div class="filter-container">
@@ -117,8 +126,11 @@
 </div>
 
 <!-- ✅ 스크립트 -->
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
-<script type="module" src="/js/reservation_list.js"></script>
-</body>
+  <th:block layout:fragment="add-js">
+    <script th:src="@{'https://cdn.jsdelivr.net/npm/flatpickr'}"></script>
+    <script th:src="@{'https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js'}"></script>
+    <script type="module" th:src="@{/js/reservation_list.js}"></script>
+  </th:block>
+
+</main>
 </html>

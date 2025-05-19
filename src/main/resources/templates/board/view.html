@@ -163,7 +163,7 @@
     <!-- ✅ 댓글 작성 폼 -->
     <form th:action="@{/comments/add}" method="post" class="comment-form">
       <input type="hidden" name="postId" th:value="${post.id}"/>
-      <input type="text" name="writer"  th:value="${loginUser.nickname}" /><br>
+      <input type="text" name="writer" /><br>
       <textarea name="content" rows="4" placeholder="댓글을 입력하세요" required></textarea><br>
       <button type="submit">댓글 등록</button>
     </form>
