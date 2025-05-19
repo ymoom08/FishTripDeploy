@@ -16,18 +16,16 @@
     <div th:replace="fragments/header :: headerFragment"></div>
 
     <main class="mainContent">
-        <div class="textBlock">
-            <p class="subText">혼자서도,<br />함께도,<br />낚시 계획의 <br />모든것<br />Finder</p>
-            <button class="button" onclick="navigatePage('/plan/create')">🐟 일정 짜기</button>
-        </div>
-        <div class="imageContainer">
-            <div class="videoSlider">
-                <video class="video" src="/videos/sea1.mp4" autoplay muted loop playsinline></video>
-                <video class="video" src="/videos/sea2.mp4" autoplay muted loop playsinline></video>
-                <video class="video" src="/videos/sea3.mp4" autoplay muted loop playsinline></video>
+        <div class="videoWrapper">
+            <video class="backgroundVideo" src="/videos/beach.mp4" autoplay muted loop playsinline></video>
+            <div class="overlayText">
+                <h1>혼자서도,<br>함께도,<br>낚시 계획의<br>모든것<br><strong>Finder</strong></h1>
+                <button class="button" onclick="navigatePage('/plan/create')">🐟 일정 짜기</button>
             </div>
         </div>
+
     </main>
+
     <div class="eventSection">
         <h2 class="sectionTitle">🔥 인기 게시글</h2>
         <ul class="sectionList">
@@ -41,6 +39,7 @@
             </li>
         </ul>
     </div>
+
     <section class="catchLogSection">
         <div class="catchTextBlock">
             <h2>🎣 예약하기</h2>

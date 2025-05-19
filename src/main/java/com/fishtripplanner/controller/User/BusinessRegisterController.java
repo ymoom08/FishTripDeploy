@@ -4,6 +4,7 @@ import com.fishtripplanner.domain.User;
 import com.fishtripplanner.domain.UserRole;
 import com.fishtripplanner.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,8 @@ public class BusinessRegisterController {
 
     private final UserRepository userRepository;
 
+    private final PasswordEncoder passwordEncoder;
+
 
 
     @PostMapping("/register/business")
@@ -29,7 +32,6 @@ public class BusinessRegisterController {
             @RequestParam("address") String address,
             @RequestParam("address2") String address2,
             @RequestParam("nickname") String nickname,
-            @RequestParam("service") String service,
             @RequestParam("phonenumber") Number phonenumber,
             @RequestParam String birthyear,
             @RequestParam String birthday,
@@ -39,10 +41,13 @@ public class BusinessRegisterController {
         // 가입일시
         LocalDateTime now = LocalDateTime.now();
 
+        // ✅ 암호화
+        String encodedPassword = passwordEncoder.encode(password);
+
         // 1. User 생성
         User user = User.builder()
                 .username(username)
-                .password(password) // 비밀번호 암호화
+                .password(encodedPassword) // 비밀번호 암호화
                 .email(email)
                 .nickname(nickname)
                 .name(name)
@@ -61,7 +66,6 @@ public class BusinessRegisterController {
         businessInfo.setUser(user);
         businessInfo.setCompanyName(company);
         businessInfo.setAddress(address + " " + address2);
-        businessInfo.setServiceTypes(Set.of(service)); // 다중 선택이면 Set.of(...)
 
         user.setBusinessInfo(businessInfo); // 양방향 연결
 

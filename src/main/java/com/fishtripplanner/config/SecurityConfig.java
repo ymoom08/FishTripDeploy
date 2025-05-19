@@ -16,6 +16,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+
     private final OAuth2SuccessHandler oAuth2LoginSuccessHandler;
 
     @Bean
@@ -24,7 +25,16 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/login", "/register/**", "/css/**", "/js/**", "/images/**", "/join/**").permitAll()
+                        .requestMatchers(
+                                "/",
+                                "/login",
+                                "/register/**",
+                                "/css/**",
+                                "/js/**",
+                                "/images/**",
+                                "/videos/**",   // <<== 비디오 리소스 접근 허용 추가
+                                "/join/**"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
@@ -38,7 +48,9 @@ public class SecurityConfig {
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/")
+                        .logoutSuccessUrl("/login?logout")
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
                         .permitAll()
                 );
 
@@ -49,12 +61,9 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
-
-
-
 }
-

@@ -26,7 +26,5 @@ public class BusinessInfo {
     private String businessNumber;
     private String address;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    private Set<String> serviceTypes; // ex: 선상, 갯바위, 섬 등
 }
 

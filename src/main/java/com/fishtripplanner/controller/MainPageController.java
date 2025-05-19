@@ -32,9 +32,4 @@ public class MainPageController {
         model.addAttribute("popularPosts", popularPosts);
         return "MainPage";
     }
-
-    @GetMapping("/notifications")
-    public String showNotificationsPage() {
-        return "notifications";
-    }
 }
