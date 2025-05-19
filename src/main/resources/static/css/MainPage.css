@@ -3,10 +3,10 @@ body, html {
   padding: 0;
   overflow-x: hidden;
   height: 100%;
+  font-family: 'Noto Sans KR', sans-serif;
 }
 
 .container {
-  font-family: 'Pretendard', sans-serif;
   background-color: #b2ebf2;
   min-height: 100vh;
   width: 100%;
@@ -16,7 +16,6 @@ body, html {
   scroll-padding-top: 120px;
 }
 
-/* 스크롤 스냅 구간 */
 .mainContent,
 .eventSection,
 .additionalContent,
@@ -24,7 +23,6 @@ body, html {
   scroll-snap-align: start;
 }
 
-/* 메인 콘텐츠 */
 .mainContent {
   min-height: 100vh;
   display: flex;
@@ -51,12 +49,11 @@ body, html {
   text-align: center;
 }
 
-/* 버튼 공통 */
-.button {
+.button, a.button {
   margin: 2rem auto;
   padding: 0.8rem 3rem;
   border-radius: 30px;
-  background: linear-gradient(135deg, #00acc1, #00796b);
+  background: linear-gradient(to right, #0077b6, #00b4d8);
   color: #fff;
   font-size: 1rem;
   font-weight: 600;
@@ -66,14 +63,14 @@ body, html {
   display: block;
   width: fit-content;
   min-width: 140px;
+  text-decoration: none !important;
 }
 
 .button:hover {
-  background: linear-gradient(135deg, #0097a7, #004d40);
   transform: scale(1.05);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
 }
 
-/* 이미지/비디오 */
 .imageContainer {
   flex: 1.5;
   display: flex;
@@ -89,19 +86,15 @@ body, html {
 }
 
 .videoSlider {
-  display: flex;
-  gap: 1rem;
+  position: relative;
   width: 100%;
   height: 100%;
   overflow: hidden;
   border-radius: 20px;
-  position: relative;
 }
 
 .videoSlider .video {
   position: absolute;
-  top: 0;
-  left: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -115,7 +108,6 @@ body, html {
   z-index: 1;
 }
 
-/* 🐟 헤엄치는 물고기 */
 .fish {
   position: fixed;
   width: 100px;
@@ -134,7 +126,6 @@ body, html {
   100% { transform: translateX(0) translateY(0) rotateY(180deg); }
 }
 
-/* 이벤트 섹션 */
 .eventSection {
   background-color: #b2ebf2;
   border-radius: 16px;
@@ -184,7 +175,6 @@ body, html {
   background-color: #e0f7fa;
 }
 
-/* 예약 섹션 */
 .catchLogSection {
   min-height: 100vh;
   background-color: #b2ebf2;
@@ -229,6 +219,7 @@ body, html {
   cursor: pointer;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
   transition: all 0.3s ease;
+  text-decoration: none !important;
 }
 
 .catchTextBlock .reserveBtn:hover {
@@ -236,7 +227,6 @@ body, html {
   transform: scale(1.05);
 }
 
-/* 기기 목업 */
 .catchPhoneMockup {
   flex: 1 1 300px;
   display: flex;
@@ -282,7 +272,6 @@ body, html {
   height: 300px;
 }
 
-/* 애니메이션 키프레임 */
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -314,7 +303,17 @@ body, html {
   }
 }
 
-/* 반응형 - 태블릿 이하 */
+.fade-in {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.6s ease-out;
+}
+
+.fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 @media (max-width: 768px) {
   .mainContent {
     flex-direction: column;
@@ -355,7 +354,6 @@ body, html {
   }
 }
 
-/* 반응형 - 모바일 */
 @media (max-width: 480px) {
   .subText {
     font-size: 1.5rem;

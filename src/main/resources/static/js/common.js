@@ -180,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setInterval(() => {
             current = (current + 1) % videos.length;
             showVideo(current);
-        }, 4000); // 4초마다 전환
+        }, 4000);
     }
 });
 

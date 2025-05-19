@@ -4,12 +4,9 @@ import com.fishtripplanner.domain.User;
 import com.fishtripplanner.domain.board.Post;
 import com.fishtripplanner.domain.comment.Comment;
 import com.fishtripplanner.repository.PostRepository;
-<<<<<<< HEAD
+import com.fishtripplanner.repository.CommentRepository;
 import com.fishtripplanner.security.CustomOAuth2User;
 import com.fishtripplanner.security.CustomUserDetails;
-=======
-import com.fishtripplanner.repository.CommentRepository;
->>>>>>> fce91a1 (2025-5-13)
 import com.fishtripplanner.service.FileUploadService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -92,7 +89,7 @@ public class PostController {
     @Transactional
     @GetMapping("/{id}")
     public String view(@PathVariable("id") Long id, Model model, @AuthenticationPrincipal Object principal) {
-        //밑 조건문은 세션에 저장되었는지 확인하는 디버그 용도임.
+        // 디버그용 로그인 사용자 정보 출력
         if (principal instanceof CustomUserDetails userDetails) {
             System.out.println("🧍 일반 로그인 사용자: " + userDetails.getUsername());
         } else if (principal instanceof CustomOAuth2User oauthUser) {
@@ -100,11 +97,11 @@ public class PostController {
         } else {
             System.out.println("⚠️ 로그인 정보 없음 또는 알 수 없는 타입");
         }
-        //여기까지 디버그 용도임 추후에 지울거임.
+
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("글을 찾을 수 없습니다."));
 
-        post.setViewCount(post.getViewCount() + 1); // Hibernate가 자동 dirty checking
+        post.setViewCount(post.getViewCount() + 1);
 
         List<Comment> comments = commentRepository.findByPostIdOrderByCreatedAtAsc(id);
         model.addAttribute("post", post);
