@@ -87,7 +87,6 @@ public class JoinController {
         BusinessInfo businessInfo = BusinessInfo.builder()
                 .companyName(request.getCompanyName())
                 .businessNumber(request.getBusinessNumber())
-                .serviceTypes(Collections.singleton(request.getServiceType()))
                 .user(user)
                 .build();
 

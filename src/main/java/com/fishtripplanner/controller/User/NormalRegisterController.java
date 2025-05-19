@@ -5,6 +5,7 @@ import com.fishtripplanner.domain.User;
 import com.fishtripplanner.domain.UserRole;
 import com.fishtripplanner.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,6 +17,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class NormalRegisterController {
         private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
 
         @PostMapping("/register/normal")
@@ -37,10 +39,13 @@ public class NormalRegisterController {
             // 가입일시
             LocalDateTime now = LocalDateTime.now();
 
+            // ✅ 암호화
+            String encodedPassword = passwordEncoder.encode(password);
+
             // 1. User 생성
             User user = User.builder()
                     .username(username)
-                    .password(password) // 비밀번호 암호화
+                    .password(encodedPassword) // 비밀번호 암호화
                     .email(email)
                     .name(name)
                     .nickname(nickname)
