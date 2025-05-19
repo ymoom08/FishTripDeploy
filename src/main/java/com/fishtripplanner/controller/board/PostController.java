@@ -1,13 +1,25 @@
 package com.fishtripplanner.controller.board;
 
+import com.fishtripplanner.domain.User;
 import com.fishtripplanner.domain.board.Post;
+import com.fishtripplanner.domain.comment.Comment;
 import com.fishtripplanner.repository.PostRepository;
+<<<<<<< HEAD
+import com.fishtripplanner.security.CustomOAuth2User;
+import com.fishtripplanner.security.CustomUserDetails;
+=======
+import com.fishtripplanner.repository.CommentRepository;
+>>>>>>> fce91a1 (2025-5-13)
 import com.fishtripplanner.service.FileUploadService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,6 +32,7 @@ import java.util.List;
 public class PostController {
 
     private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
     private final FileUploadService fileUploadService;
 
     @GetMapping
@@ -32,7 +45,7 @@ public class PostController {
                 ? postRepository.findByTitleContainingOrContentContaining(keyword, keyword, pageable)
                 : postRepository.findAll(pageable);
 
-        List<Post> popularPosts = postRepository.findTop5ByOrderByViewCountDesc();
+        List<Post> popularPosts = postRepository.findTop9ByOrderByViewCountDesc();
 
         model.addAttribute("posts", posts);
         model.addAttribute("popularPosts", popularPosts);
@@ -49,7 +62,17 @@ public class PostController {
     public String save(@ModelAttribute Post post,
                        @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
                        @RequestParam(value = "videoFile", required = false) MultipartFile videoFile,
-                       @RequestParam(value = "profileImageFile", required = false) MultipartFile profileImageFile) {
+                       @RequestParam(value = "profileImageFile", required = false) MultipartFile profileImageFile,
+                       HttpServletRequest request) {
+
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            throw new IllegalStateException("로그인된 사용자 정보가 없습니다.");
+        }
+
+        User loggedInUser = (User) session.getAttribute("user");
+        post.setWriter(loggedInUser.getNickname());
+        post.setUser(loggedInUser);
 
         if (imageFile != null && !imageFile.isEmpty()) {
             post.setImagePath(fileUploadService.upload(imageFile));
@@ -61,20 +84,31 @@ public class PostController {
             post.setProfileImagePath(fileUploadService.upload(profileImageFile));
         }
 
-        post.setViewCount(0); // 조회수 초기화
+        post.setViewCount(0);
         postRepository.save(post);
         return "redirect:/posts";
     }
 
+    @Transactional
     @GetMapping("/{id}")
-    public String view(@PathVariable("id") Long id, Model model) {
+    public String view(@PathVariable("id") Long id, Model model, @AuthenticationPrincipal Object principal) {
+        //밑 조건문은 세션에 저장되었는지 확인하는 디버그 용도임.
+        if (principal instanceof CustomUserDetails userDetails) {
+            System.out.println("🧍 일반 로그인 사용자: " + userDetails.getUsername());
+        } else if (principal instanceof CustomOAuth2User oauthUser) {
+            System.out.println("🧍‍♂️ 소셜 로그인 사용자: " + oauthUser.getUser().getUsername());
+        } else {
+            System.out.println("⚠️ 로그인 정보 없음 또는 알 수 없는 타입");
+        }
+        //여기까지 디버그 용도임 추후에 지울거임.
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("글을 찾을 수 없습니다."));
 
-        post.setViewCount(post.getViewCount() + 1); // 조회수 증가
-        postRepository.save(post);
+        post.setViewCount(post.getViewCount() + 1); // Hibernate가 자동 dirty checking
 
+        List<Comment> comments = commentRepository.findByPostIdOrderByCreatedAtAsc(id);
         model.addAttribute("post", post);
+        model.addAttribute("comments", comments);
         return "board/view";
     }
 
