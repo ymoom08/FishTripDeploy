@@ -18,7 +18,7 @@ public class MainPageController {
     @GetMapping("/")
     public String rootRedirectToMain(Model model) {
         List<Post> posts = postRepository.findTop10ByOrderByCreatedAtDesc();
-        List<Post> popularPosts = postRepository.findTop9ByOrderByViewCountDesc(); // 🔄 인기글 9개로 변경
+        List<Post> popularPosts = postRepository.findTop9ByOrderByViewCountDesc();
         model.addAttribute("posts", posts);
         model.addAttribute("popularPosts", popularPosts);
         return "MainPage";
@@ -27,9 +27,14 @@ public class MainPageController {
     @GetMapping("/MainPage")
     public String showMainPage(Model model) {
         List<Post> posts = postRepository.findTop10ByOrderByCreatedAtDesc();
-        List<Post> popularPosts = postRepository.findTop9ByOrderByViewCountDesc(); // 🔄 동일하게 적용
+        List<Post> popularPosts = postRepository.findTop9ByOrderByViewCountDesc();
         model.addAttribute("posts", posts);
         model.addAttribute("popularPosts", popularPosts);
         return "MainPage";
+    }
+
+    @GetMapping("/notifications")
+    public String showNotificationsPage() {
+        return "notifications";
     }
 }
