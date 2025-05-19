@@ -7,6 +7,11 @@ import com.fishtripplanner.dto.user.JoinRequest;
 import com.fishtripplanner.repository.UserRepository;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,6 +23,8 @@ import java.util.Collections;
 @Controller
 @RequiredArgsConstructor
 public class JoinController {
+    private final UserDetailsService userDetailsService;
+    private final AuthenticationManager authenticationManager;
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -123,7 +130,16 @@ public class JoinController {
                 .build();
 
         userRepository.save(user);
-        session.invalidate();
+
+
+        // 2. 자동 로그인 처리
+        var userDetails = userDetailsService.loadUserByUsername(user.getUsername());
+        var authToken = new UsernamePasswordAuthenticationToken(userDetails, request.getPassword(), userDetails.getAuthorities());
+        Authentication authentication = authenticationManager.authenticate(authToken);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        // 3. (선택) 세션 저장
+        session.setAttribute("loginUser", user);
         return "redirect:/login";
     }
 }

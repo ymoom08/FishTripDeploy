@@ -88,8 +88,7 @@
     <label th:for="*{title}">제목</label>
     <input type="text" th:field="*{title}" placeholder="제목" required>
 
-    <label th:for="*{writer}">작성자</label>
-    <input type="text" th:field="*{writer}" placeholder="작성자" required>
+    <!-- 작성자 필드는 제거 -->
 
     <label th:for="*{content}">내용</label>
     <textarea th:field="*{content}" placeholder="내용" required></textarea>

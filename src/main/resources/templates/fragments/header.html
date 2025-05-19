@@ -40,6 +40,7 @@
                     <button class="menuButton">낚시파티모집</button>
                     <div class="subMenu" id="subMenu1" style="display: none;">
                         <ul class="subMenuList">
+                            <a th:href="@{/party/create}" class="subMenuButton">파티모집글 작성하기</a>
                             <li class="subMenuItem"><a href="#" class="subMenuButton" onclick="navigatePage('/fishing-party/list')">모집 1</a></li>
                             <li class="subMenuItem"><a href="#" class="subMenuButton" onclick="navigatePage('/fishing-party/create')">모집 2</a></li>
                         </ul>
@@ -75,7 +76,6 @@
                     <button class="menuButton">커뮤니티</button>
                     <div class="subMenu" id="subMenu5" style="display: none;">
                         <ul class="subMenuList">
-                            <li class="subMenuItem"><a th:href="@{/posts/popular}" class="subMenuButton">인기 게시글</a></li>
                             <li class="subMenuItem"><a th:href="@{/posts}" class="subMenuButton">전체 게시판</a></li>
                         </ul>
                     </div>

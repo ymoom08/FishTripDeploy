@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FishTrip</title>
 
-    <!-- 정적 CSS 경로 -->
     <link rel="stylesheet" href="/css/MainPage.css">
     <link rel="stylesheet" href="/css/header.css">
     <link rel="stylesheet" href="/css/footer.css">
@@ -23,7 +22,6 @@
         </div>
         <div class="imageContainer">
             <div class="videoSlider">
-                <!-- Spring Boot static 하위 경로로 직접 접근 -->
                 <video class="video" src="/videos/sea1.mp4" autoplay muted loop playsinline></video>
                 <video class="video" src="/videos/sea2.mp4" autoplay muted loop playsinline></video>
                 <video class="video" src="/videos/sea3.mp4" autoplay muted loop playsinline></video>
@@ -31,24 +29,22 @@
         </div>
     </main>
 
+    <!-- ✅ 인기 게시글 섹션 -->
     <div class="eventSection">
-        <h2 class="sectionTitle">🙋‍♂️ 게시판 인기글 자리!</h2>
+        <h2 class="sectionTitle">🔥 인기 게시글</h2>
         <ul class="sectionList">
-            <li>🐟 같이 즐길수록 재미는 두 배</li>
-            <li>🎁 어종 크기별 다양한 경품</li>
-            <li>🚤 바다낚시 지금 바로 출항!</li>
-            <li>🎣 이번 주말 놓치면 후회할 조황 정보</li>
-            <li>📢 초보 낚시꾼 필독 가이드</li>
-            <li>🗺️ 숨겨진 낚시 명당 대공개</li>
-            <li>🤝 낚시 친구/동료 구함</li>
-            <li>📸 나의 Best Fishing Moment 자랑하기</li>
-            <li>📜 낚시 관련 법규 및 안전 수칙</li>
-            <li>💡 낚시 장비 관리 및 선택 팁</li>
-            <li>📰 최신 낚시 뉴스 및 트렌드</li>
-            <li>🗣️ 자유롭게 이야기 나누는 잡담 게시판</li>
+            <li th:each="post : ${popularPosts}" style="display: flex; align-items: center; background-color: #e0f7fa; border-radius: 10px; padding: 10px; margin-bottom: 10px;">
+                <a th:href="@{'/posts/' + ${post.id}}" style="display: flex; align-items: center; text-decoration: none; color: #222; font-weight: 500;">
+                    <span th:if="${post.profileImagePath == null}" style="font-size: 20px; margin-right: 10px;">🧍</span>
+                    <img th:if="${post.profileImagePath != null}" th:src="@{${post.profileImagePath}}"
+                         alt="프로필" style="width: 32px; height: 32px; border-radius: 50%; margin-right: 10px;">
+                    <span th:text="${post.title}">제목</span>
+                </a>
+            </li>
         </ul>
     </div>
 
+    <!-- 🎣 예약하기 섹션 -->
     <section class="catchLogSection">
         <div class="catchTextBlock">
             <h2>🎣 예약하기</h2>
