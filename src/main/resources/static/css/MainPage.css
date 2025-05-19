@@ -5,11 +5,10 @@ body, html {
   height: 100%;
 }
 
-.container {
-  font-family: 'Pretendard', sans-serif;
+/* ✅ MainPage.css — 수정된 버전 */
+
+.main-page-container {
   background-color: #b2ebf2;
-  min-height: 100vh;
-  width: 100%;
   overflow-y: auto;
   scroll-snap-type: y mandatory;
   scroll-behavior: smooth;

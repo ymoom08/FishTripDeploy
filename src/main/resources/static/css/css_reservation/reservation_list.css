@@ -1,8 +1,9 @@
 /* ✅ 기본 바디 스타일 */
 body {
   font-family: sans-serif;
-  padding: 20px;
   font-size: clamp(15px, 1.4vw, 18px);
+  margin: 0;
+  padding: 0; /* ✅ 요거 0으로!! header 내려가는 문제 해결 */
 }
 
 /* ✅ 페이지 제목 */

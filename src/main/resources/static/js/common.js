@@ -135,7 +135,6 @@ function renderFullMenu() {
     });
 }
 
-
 document.addEventListener('DOMContentLoaded', () => {
     renderFullMenu();
 
@@ -143,7 +142,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (fullMenuBox) {
         fullMenuBox.style.display = 'none';
     }
-
 
     document.addEventListener('click', (event) => {
         const fullMenuBox = document.querySelector('.fullMenuBox');
@@ -161,30 +159,4 @@ document.addEventListener('DOMContentLoaded', () => {
             if (menuIcon) menuIcon.textContent = '☰';
         }
     });
-
-
-    const videos = document.querySelectorAll('.videoSlider .video');
-    let current = 0;
-
-    function showVideo(index) {
-        videos.forEach((video, i) => {
-            video.classList.remove('active');
-            if (i === index) {
-                video.classList.add('active');
-            }
-        });
-    }
-
-    if (videos.length > 0) {
-        showVideo(current);
-        setInterval(() => {
-            current = (current + 1) % videos.length;
-            showVideo(current);
-        }, 4000); // 4초마다 전환
-    }
 });
-
-
-function selectRegion(regionName) {
-    alert(`선택된 해역: ${regionName}`);
-}
