@@ -100,6 +100,12 @@
         </div>
 
         <div class="navRight">
+
+            <!-- ✅ 사업자 전용 메뉴 -->
+            <div sec:authorize="hasRole('OWNER')">
+                <button class="menuButton" onclick="navigatePage('/reservation/new')">예약글 작성(사업자용)</button>
+            </div>
+
             <button class="menuButton" onclick="navigatePage('/special-exhibition')">기획전</button>
 
 
