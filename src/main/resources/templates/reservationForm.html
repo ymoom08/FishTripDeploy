@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+  <meta charset="UTF-8">
+  <title layout:fragment="title">예약글 작성</title>
+
+  <!-- ✅ 개별 CSS -->
+  <th:block layout:fragment="add-css">
+    <link rel="stylesheet" th:href="@{/css/reservation_form.css}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  </th:block>
+</head>
+
+<body>
+<main layout:fragment="content" class="reservation-form-container">
+  <h1>예약글 작성</h1>
+
+  <form th:action="@{/reservation/new}" method="post" enctype="multipart/form-data">
+    <!-- 🔹 제목 -->
+    <div>
+      <label for="title">제목</label>
+      <input type="text" id="title" name="title" required>
+    </div>
+
+    <!-- 🔹 예약 타입 -->
+    <div>
+      <label for="type">예약 타입</label>
+      <select id="type" name="type" required>
+        <option value="">선택하세요</option>
+        <option value="BOAT">선상낚시</option>
+        <option value="ROCK">갯바위</option>
+        <option value="FLOAT">좌대</option>
+        <option value="ISLAND">섬</option>
+        <option value="STAY">숙박/민박/캠핑</option>
+      </select>
+    </div>
+
+    <!-- 🔹 지역 선택 -->
+    <div>
+      <label for="regionId">지역</label>
+      <select id="regionId" name="regionId" required>
+        <option th:each="region : ${regions}"
+                th:value="${region.id}"
+                th:text="${region.name}">지역명</option>
+      </select>
+    </div>
+
+    <!-- 🔹 어종 선택 -->
+    <div>
+      <label>대상 어종</label><br/>
+      <div th:each="fish : ${fishTypes}">
+        <label>
+          <input type="checkbox" name="fishTypeIds" th:value="${fish.id}" />
+          <span th:text="${fish.name}">어종명</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- 🔹 가격 -->
+    <div>
+      <label for="price">가격</label>
+      <input type="number" id="price" name="price" required>
+    </div>
+
+    <!-- 🔹 이미지 업로드 -->
+    <div>
+      <label for="image">대표 이미지</label>
+      <input type="file" id="image" name="imageFile">
+    </div>
+
+    <!-- 🔹 상세 설명 -->
+    <div>
+      <label for="content">상세 설명</label>
+      <textarea id="content" name="content" rows="5" required></textarea>
+    </div>
+
+    <!-- 🔹 날짜 + 정원 선택 -->
+    <div>
+      <label>예약 가능 날짜 + 정원</label><br>
+      <input type="text" id="datePicker" placeholder="날짜를 선택하세요" readonly>
+      <div id="dateContainer"></div>
+    </div>
+
+    <!-- 🔹 제출 -->
+    <div style="margin-top: 20px;">
+      <button type="submit">등록하기</button>
+    </div>
+  </form>
+</main>
+
+<!-- ✅ 개별 JS -->
+<th:block layout:fragment="add-js">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script>
+    flatpickr("#datePicker", {
+      mode: "multiple",
+      dateFormat: "Y-m-d",
+      onChange: function(selectedDates, dateStr, instance) {
+        const container = document.getElementById("dateContainer");
+        container.innerHTML = "";
+
+        selectedDates.forEach((date, idx) => {
+          const formatted = date.toISOString().split("T")[0];
+
+          const div = document.createElement("div");
+          div.innerHTML = `
+            <label>${formatted}</label>
+            <input type="hidden" name="availableDates[${idx}].date" value="${formatted}">
+            <input type="number" name="availableDates[${idx}].capacity" placeholder="정원" min="1" required>
+          `;
+          container.appendChild(div);
+        });
+      }
+    });
+  </script>
+</th:block>
+</body>
+</html>
