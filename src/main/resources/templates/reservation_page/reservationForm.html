@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+
+<head>
+  <meta charset="UTF-8">
+  <title layout:fragment="title">예약글 작성</title>
+
+  <!-- ✅ 개별 CSS -->
+  <th:block layout:fragment="add-css">
+    <link rel="stylesheet" th:href="@{/css/css_reservation/reservation_form.css}">
+    <link rel="stylesheet" th:href="@{/css/css_reservation/reservation_modals.css}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  </th:block>
+</head>
+
+<body>
+<main layout:fragment="content" class="reservation-form-container">
+  <h1>예약글 작성</h1>
+
+  <form th:action="@{/reservation/new}" method="post" enctype="multipart/form-data">
+    <!-- 제목 -->
+    <div>
+      <label for="title">제목</label>
+      <input type="text" id="title" name="title" required>
+    </div>
+
+    <!-- 예약 타입 -->
+    <div>
+      <label for="type">예약 타입</label>
+      <select id="type" name="type" required>
+        <option value="">선택하세요</option>
+        <option value="BOAT">선상낚시</option>
+        <option value="ROCK">갯바위</option>
+        <option value="FLOAT">좌대</option>
+        <option value="ISLAND">섬</option>
+        <option value="STAY">숙박/민박/캠핑</option>
+      </select>
+    </div>
+
+    <!-- 지역 -->
+    <div>
+      <label>지역</label><br>
+      <button type="button" id="regionBtn">지역 선택하기</button>
+      <div id="selectedRegionText">선택된 지역 없음</div>
+      <input type="hidden" name="regionId" id="regionIdInput">
+    </div>
+
+    <!-- 어종 -->
+    <div>
+      <label>대상 어종</label><br>
+      <button type="button" id="fishBtn">어종 선택하기</button>
+      <div id="selectedFishText">선택된 어종 없음</div>
+      <div id="fishTypeInputGroup"></div>
+    </div>
+
+    <!-- 가격 -->
+    <div>
+      <label for="price">가격</label>
+      <input type="number" id="price" name="price" required>
+    </div>
+
+    <!-- 이미지 -->
+    <div>
+      <label for="image">대표 이미지</label>
+      <input type="file" id="image" name="imageFile">
+    </div>
+
+    <!-- 설명 -->
+    <div>
+      <label for="content">상세 설명</label>
+      <textarea id="content" name="content" rows="5" required></textarea>
+    </div>
+
+    <!-- 날짜 -->
+    <div>
+      <label>예약 가능 날짜 + 정원</label><br>
+      <input type="text" id="datePicker" placeholder="날짜를 선택하세요" readonly>
+      <div id="dateContainer"></div>
+    </div>
+
+    <!-- 제출 -->
+    <div style="margin-top: 20px;">
+      <button type="submit">등록하기</button>
+    </div>
+  </form>
+
+<!-- ✅ 모달 -->
+<div th:replace="fragments/modals :: regionAndFishModals"></div>
+</main>
+
+<!-- ✅ 개별 JS: 반드시 body 끝에 위치 -->
+<th:block layout:fragment="add-js">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script type="module">
+    window.addEventListener("load", async () => {
+      const { initRegionModal } = await import('/js/modal_region.js');
+      const { initFishModal } = await import('/js/modal_fish.js');
+      const { getSelectedRegions, getSelectedFishTypes } = await import('/js/modal_state.js');
+
+      console.log("✅ window load 이후 JS 시작");
+
+      initRegionModal();
+      initFishModal();
+
+      const regionApply = document.getElementById("regionApply");
+      const regionIdInput = document.getElementById("regionIdInput");
+      if (regionApply && regionIdInput) {
+        regionApply.addEventListener("click", () => {
+          const selected = getSelectedRegions();
+          regionIdInput.value = selected.length > 0 ? selected[0].id : '';
+        });
+      }
+
+      const fishApply = document.getElementById("fishApply");
+      const fishTypeInputGroup = document.getElementById("fishTypeInputGroup");
+      if (fishApply && fishTypeInputGroup) {
+        fishApply.addEventListener("click", () => {
+          fishTypeInputGroup.innerHTML = '';
+          getSelectedFishTypes().forEach(fish => {
+            const input = document.createElement("input");
+            input.type = "hidden";
+            input.name = "fishTypeNames";
+            input.value = fish;
+            fishTypeInputGroup.appendChild(input);
+          });
+        });
+      }
+
+      flatpickr("#datePicker", {
+        mode: "multiple",
+        dateFormat: "Y-m-d",
+        onChange: (selectedDates) => {
+          const container = document.getElementById("dateContainer");
+          container.innerHTML = "";
+          selectedDates.forEach((date, idx) => {
+            const formatted = date.toLocaleDateString("sv-SE");
+            const div = document.createElement("div");
+            div.innerHTML = `
+              <label>${formatted}</label>
+              <input type="hidden" name="availableDates[${idx}].date" value="${formatted}">
+              <input type="number" name="availableDates[${idx}].capacity" placeholder="정원" min="1" required>
+            `;
+            container.appendChild(div);
+          });
+        }
+      });
+    });
+  </script>
+  <script type="module" th:src="@{/js/reservation_form.js}"></script>
+</th:block>
+
+</body>
+
+</html>

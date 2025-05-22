@@ -15,11 +15,6 @@
   transition: opacity 0.3s ease;
 }
 
-.modal.show {
-  opacity: 1;
-  pointer-events: auto;
-}
-
 .show {
   display: flex !important;
 }
@@ -151,4 +146,10 @@
 .fish-modal-body {
   display: block;
   padding: 10px;
+}
+
+.modal.show {
+  display: flex !important;
+  opacity: 1;
+  pointer-events: auto;
 }

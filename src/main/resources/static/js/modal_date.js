@@ -1,7 +1,5 @@
 // ✅ modal_date.js
-import { selectedDate } from "./reservation_list.js";
-import { closeModal } from "./reservation_list.js";
-import { fetchFilteredCards, updateSelectedDateTextOnly } from "./reservation_list.js";
+import { selectedDate } from "./modal_state.js";
 
 /**
  * ✅ 날짜 모달 초기화
@@ -58,6 +56,11 @@ export function initDateModal() {
     },
     appendTo: document.getElementById("datePickerContainer")
   });
+}
+
+function closeModal(modal) {
+  modal.classList.remove("show");
+  modal.classList.add("hidden");
 }
 
 

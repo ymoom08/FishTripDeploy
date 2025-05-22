@@ -1,0 +1,44 @@
+.reservation-form-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: "Noto Sans KR", sans-serif;
+}
+
+.reservation-form-container h1 {
+  font-size: 28px;
+  margin-bottom: 24px;
+}
+
+.reservation-form-container form > div {
+  margin-bottom: 20px;
+}
+
+.reservation-form-container label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.reservation-form-container input[type="text"],
+.reservation-form-container input[type="number"],
+.reservation-form-container textarea,
+.reservation-form-container select {
+  width: 100%;
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+.reservation-form-container input[type="checkbox"] {
+  margin-right: 8px;
+}
+
+.reservation-form-container button[type="submit"] {
+  background-color: #0088cc;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+}

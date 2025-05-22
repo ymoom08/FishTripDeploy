@@ -103,11 +103,8 @@
 
             <!-- ✅ 사업자 전용 메뉴 -->
             <div sec:authorize="hasRole('OWNER')">
-                <button class="menuButton" onclick="navigatePage('/reservation/new')">예약글 작성(사업자용)</button>
+                <button class="menuButton" onclick="navigatePage('/reservation/write')">예약글 작성(사업자용)</button>
             </div>
-
-            <button class="menuButton" onclick="navigatePage('/special-exhibition')">기획전</button>
-
 
             <div sec:authorize="isAuthenticated()">
                 <form th:action="@{/logout}" method="post" style="display:inline;">
@@ -120,7 +117,6 @@
                 <a th:href="@{/join/oauth}" class="menuButton" style="text-decoration: none;">회원가입</a>
             </div>
 
-            <button class="menuButton" onclick="navigatePage('/customer-service')">고객센터</button>
         </div>
     </nav>
 

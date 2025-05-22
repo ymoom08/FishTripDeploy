@@ -1,11 +1,12 @@
-// ✅ modal_fish.js - 어종 모달 리팩토링 버전
-import { getSelectedFishTypes, setSelectedFishTypes } from "./reservation_list.js";
-import { closeModal } from "./reservation_list.js";
-import { fetchFilteredCards, updateSelectedFishText } from "./reservation_list.js";
+import { getSelectedFishTypes, setSelectedFishTypes } from "./modal_state.js";
 
-/**
- * ✅ 어종 모달 초기화
- */
+// ✅ 모달 닫기 함수
+function closeModal(modal) {
+  modal?.classList.remove("show");
+  modal?.classList.add("hidden");
+}
+
+// ✅ 초기화 함수
 export function initFishModal() {
   const fishBtn = document.getElementById("fishBtn");
   const fishModal = document.getElementById("fishModal");
@@ -13,12 +14,17 @@ export function initFishModal() {
   const fishApply = document.getElementById("fishApply");
   const fishReset = document.getElementById("fishReset");
 
-  // 🔘 모달 열기
-  fishBtn?.addEventListener("click", () => {
+  if (!fishBtn || !fishModal || !fishList || !fishApply || !fishReset) {
+    console.warn("⚠️ [initFishModal] 필수 요소가 없음. HTML 확인 필요.");
+    return;
+  }
+
+  fishBtn.addEventListener("click", () => {
     fishModal.classList.remove("hidden");
     fishModal.classList.add("show");
 
-    if (fishList.children.length > 0) return; // 이미 렌더링 됐다면 재요청 X
+    // 매번 새로 렌더링
+    fishList.innerHTML = '';
 
     fetch("/api/fish-types")
       .then(res => res.json())
@@ -26,28 +32,21 @@ export function initFishModal() {
         data.sort((a, b) => a.localeCompare(b, 'ko'));
         const grouped = groupByInitial(data);
         fishList.innerHTML = renderGroupedFish(grouped);
-        attachFishButtonEvents();
+        attachFishButtonEvents(fishModal);
       });
   });
 
-  // 🔘 적용 버튼
-  fishApply?.addEventListener("click", () => {
+  fishApply.addEventListener("click", () => {
     closeModal(fishModal);
-    updateSelectedFishText();
-    fetchFilteredCards();
   });
 
-  // 🔘 초기화 버튼
-  fishReset?.addEventListener("click", () => {
+  fishReset.addEventListener("click", () => {
     setSelectedFishTypes([]);
     document.querySelectorAll(".fish-type-btn.selected").forEach(btn => btn.classList.remove("selected"));
-    updateSelectedFishText();
+    updateSelectedFishTextOnly(fishModal);
   });
 }
 
-/**
- * ✅ 초성 기준으로 어종 그룹핑
- */
 function groupByInitial(data) {
   const grouped = {};
   data.forEach(name => {
@@ -58,9 +57,6 @@ function groupByInitial(data) {
   return grouped;
 }
 
-/**
- * ✅ 그룹된 어종을 HTML로 렌더링
- */
 function renderGroupedFish(grouped) {
   return Object.entries(grouped).map(([initial, names]) => {
     const groupHTML = names.map(name =>
@@ -75,10 +71,7 @@ function renderGroupedFish(grouped) {
   }).join("");
 }
 
-/**
- * ✅ 어종 버튼 이벤트 등록
- */
-function attachFishButtonEvents() {
+function attachFishButtonEvents(modalRoot) {
   document.querySelectorAll(".fish-type-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       const value = btn.dataset.fish;
@@ -86,20 +79,22 @@ function attachFishButtonEvents() {
 
       const types = getSelectedFishTypes();
       const idx = types.indexOf(value);
-      if (idx !== -1) {
-        types.splice(idx, 1);
-      } else {
-        types.push(value);
-      }
+      if (idx !== -1) types.splice(idx, 1);
+      else types.push(value);
       setSelectedFishTypes(types);
-      updateSelectedFishText();
+
+      updateSelectedFishTextOnly(modalRoot);
     });
   });
 }
 
-/**
- * ✅ 한글 초성 추출 함수
- */
+function updateSelectedFishTextOnly(modalRoot) {
+  const types = getSelectedFishTypes();
+  const text = types.length > 0 ? types.join(', ') : "선택된 어종 없음";
+  const label = modalRoot.querySelector(".current-selection");
+  if (label) label.textContent = text;
+}
+
 function getInitialConsonant(kor) {
   const initialTable = ["ㄱ","ㄲ","ㄴ","ㄷ","ㄸ","ㄹ","ㅁ","ㅂ","ㅃ","ㅅ","ㅆ","ㅇ","ㅈ","ㅉ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
   const uni = kor.charCodeAt(0) - 44032;
