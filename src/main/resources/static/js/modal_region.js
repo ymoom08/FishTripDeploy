@@ -79,8 +79,11 @@ export function initRegionModalIfExist(onApply) {
 }
 
 // ✅ 지역 리스트 렌더링
+// 지역 리스트 렌더링 수정 (선택된 지역 반영)
 function renderFilteredRegions(data, container, modalRoot) {
   container.innerHTML = '';
+
+  const selectedRegions = getSelectedRegions();
 
   data.forEach(region => {
     const parentWrapper = document.createElement('div');
@@ -98,6 +101,14 @@ function renderFilteredRegions(data, container, modalRoot) {
     const selectAllBtn = document.createElement('button');
     selectAllBtn.className = 'region-child-btn region-select-all-btn';
     selectAllBtn.innerText = '전체';
+
+    // 전체 버튼 상태 반영
+    const allSelected = region.children.every(child =>
+      selectedRegions.some(r => r.id == child.id)
+    );
+    if (allSelected) {
+      selectAllBtn.classList.add("selected");
+    }
 
     selectAllBtn.addEventListener("click", () => {
       const allSelected = region.children.every(child =>
@@ -136,6 +147,11 @@ function renderFilteredRegions(data, container, modalRoot) {
       btn.className = 'region-child-btn';
       btn.innerText = child.name;
       btn.dataset.regionId = child.id;
+
+      // 이미 선택된 지역은 "selected" 클래스 추가
+      if (selectedRegions.some(r => r.id === child.id)) {
+        btn.classList.add('selected');
+      }
 
       btn.addEventListener("click", () => {
         btn.classList.toggle("selected");
