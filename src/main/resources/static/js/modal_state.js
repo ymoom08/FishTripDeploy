@@ -23,7 +23,7 @@ export function setSelectedRegions(regions) {
   state.selectedRegions = regions;
 }
 
-// ✅ 날짜는 객체 형태로 외부와 값 공유
+// ✅ 날짜 객체 getter/setter
 export const selectedDate = {
   get value() {
     return state.selectedDate;
@@ -32,3 +32,9 @@ export const selectedDate = {
     state.selectedDate = val;
   }
 };
+
+// ✅ 공통 유틸: 모달 닫기 함수
+export function closeModal(modal) {
+  modal.classList.remove("show");
+  modal.classList.add("hidden");
+}

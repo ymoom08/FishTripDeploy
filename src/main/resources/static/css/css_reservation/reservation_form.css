@@ -42,3 +42,19 @@
   font-size: 16px;
   cursor: pointer;
 }
+
+.date-entry {
+  display: inline-block;
+  align-items: center;
+  gap: 8px;
+  margin-right: 5px;
+  margin-bottom: 8px;
+}
+
+.remove-date {
+  background: transparent;
+  border: none;
+  color: red;
+  cursor: pointer;
+  font-size: 18px;
+}
