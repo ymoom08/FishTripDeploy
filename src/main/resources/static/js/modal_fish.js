@@ -74,9 +74,13 @@ function groupByInitial(data) {
 
 function renderGroupedFish(grouped) {
   return Object.entries(grouped).map(([initial, names]) => {
-    const groupHTML = names.map(name =>
-      `<button class="fish-type-btn" data-fish="${name}">${name}</button>`
-    ).join("");
+    const groupHTML = names.map(name => {
+      // 어종이 선택되어 있으면 'selected' 클래스 추가
+      const isSelected = getSelectedFishTypes().includes(name);
+      return `
+        <button class="fish-type-btn ${isSelected ? 'selected' : ''}" data-fish="${name}">${name}</button>
+      `;
+    }).join("");
 
     return `
       <div class="fish-group">
@@ -85,6 +89,7 @@ function renderGroupedFish(grouped) {
       </div>`;
   }).join("");
 }
+
 
 function attachFishButtonEvents(modalRoot) {
   document.querySelectorAll(".fish-type-btn").forEach(btn => {
@@ -103,12 +108,14 @@ function attachFishButtonEvents(modalRoot) {
   });
 }
 
+
 function updateSelectedFishTextOnly(modalRoot) {
   const types = getSelectedFishTypes();
   const text = types.length > 0 ? types.join(', ') : "선택된 어종 없음";
   const label = modalRoot.querySelector(".current-selection");
   if (label) label.textContent = text;
 }
+
 
 function getInitialConsonant(kor) {
   const initialTable = ["ㄱ","ㄲ","ㄴ","ㄷ","ㄸ","ㄹ","ㅁ","ㅂ","ㅃ","ㅅ","ㅆ","ㅇ","ㅈ","ㅉ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
