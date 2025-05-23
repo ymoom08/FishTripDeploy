@@ -1,47 +1,59 @@
-// ✅ modal_date.js
 import { selectedDate } from "./modal_state.js";
 
 /**
  * ✅ 날짜 모달 초기화
+ * @param {Object} options - 설정 객체
+ * @param {Function} options.onApply - 날짜 적용 시 실행할 외부 콜백 함수
  */
-export function initDateModal() {
+export function initDateModal({ onApply } = {}) {
   const dateBtn = document.getElementById("dateBtn");
   const dateModal = document.getElementById("dateModal");
   const dateApply = document.getElementById("dateApply");
   const dateCancel = document.getElementById("dateCancel");
   const dateReset = document.getElementById("dateReset");
 
+  if (!dateBtn || !dateModal || !dateApply || !dateCancel || !dateReset) {
+    console.warn("⚠️ [initDateModal] 필수 요소가 없음. HTML 확인 필요.");
+    return;
+  }
+
   // 🔘 버튼 클릭 시 모달 열기
-  dateBtn?.addEventListener("click", () => {
+  dateBtn.addEventListener("click", () => {
     dateModal.classList.remove("hidden");
     dateModal.classList.add("show");
   });
 
   // 🔘 날짜 적용 버튼
-  dateApply?.addEventListener("click", () => {
+  dateApply.addEventListener("click", () => {
     closeModal(dateModal);
-    updateSelectedDateTextOnly();
-    fetchFilteredCards();
+    if (typeof onApply === "function") onApply();
   });
 
   // 🔘 닫기 버튼
-  dateCancel?.addEventListener("click", () => {
+  dateCancel.addEventListener("click", () => {
     closeModal(dateModal);
   });
 
   // 🔘 초기화 버튼
-  dateReset?.addEventListener("click", () => {
+  dateReset.addEventListener("click", () => {
     selectedDate.value = null;
-    updateSelectedDateTextOnly();
+    if (typeof onApply === "function") onApply();
+  });
+
+  // ✅ 외부 클릭 시 모달 닫기
+  dateModal.addEventListener("click", (e) => {
+    if (e.target.classList.contains("modal")) {
+      closeModal(dateModal);
+    }
   });
 
   // ✅ 달력 위젯 초기화
-  flatpickr.localize(flatpickr.l10ns.ko); // 한국어 설정
+  flatpickr.localize(flatpickr.l10ns.ko);
   flatpickr("#datePickerContainer", {
     dateFormat: "Y-m-d",
     inline: true,
     locale: "ko",
-    onDayCreate: function(dObj, dStr, fp, dayElem) {
+    onDayCreate: function (dObj, dStr, fp, dayElem) {
       const date = dayElem.dateObj;
       const day = date.getDay(); // 0: 일요일, 6: 토요일
 
@@ -58,9 +70,17 @@ export function initDateModal() {
   });
 }
 
+// ✅ 모달 닫기 함수
 function closeModal(modal) {
   modal.classList.remove("show");
   modal.classList.add("hidden");
 }
 
-
+/**
+ * ✅ 조건부 초기화 (버튼 존재 시만)
+ * 기본 초기화만 필요할 경우 사용
+ */
+export function initDateModalIfExist() {
+  const dateBtn = document.getElementById("dateBtn");
+  if (dateBtn) initDateModal();
+}

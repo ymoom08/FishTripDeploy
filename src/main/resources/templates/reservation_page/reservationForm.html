@@ -8,7 +8,7 @@
   <meta charset="UTF-8">
   <title layout:fragment="title">예약글 작성</title>
 
-  <!-- ✅ 개별 CSS -->
+  <!-- ✅ CSS -->
   <th:block layout:fragment="add-css">
     <link rel="stylesheet" th:href="@{/css/css_reservation/reservation_form.css}">
     <link rel="stylesheet" th:href="@{/css/css_reservation/reservation_modals.css}">
@@ -87,47 +87,66 @@
     </div>
   </form>
 
-<!-- ✅ 모달 -->
-<div th:replace="fragments/modals :: regionAndFishModals"></div>
+  <!-- ✅ 모달 영역 -->
+  <div th:replace="fragments/modals :: regionAndFishModals"></div>
 </main>
 
-<!-- ✅ 개별 JS: 반드시 body 끝에 위치 -->
+<!-- ✅ JS -->
+<!-- ✅ JS -->
 <th:block layout:fragment="add-js">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script type="module">
     window.addEventListener("load", async () => {
-      const { initRegionModal } = await import('/js/modal_region.js');
+      const { initRegionModal, getCachedRegions } = await import('/js/modal_region.js');
       const { initFishModal } = await import('/js/modal_fish.js');
       const { getSelectedRegions, getSelectedFishTypes } = await import('/js/modal_state.js');
 
-      console.log("✅ window load 이후 JS 시작");
-
-      initRegionModal();
-      initFishModal();
-
-      const regionApply = document.getElementById("regionApply");
       const regionIdInput = document.getElementById("regionIdInput");
-      if (regionApply && regionIdInput) {
-        regionApply.addEventListener("click", () => {
-          const selected = getSelectedRegions();
-          regionIdInput.value = selected.length > 0 ? selected[0].id : '';
+      const fishTypeInputGroup = document.getElementById("fishTypeInputGroup");
+
+      function getCompactRegionText(selectedRegions, regionHierarchy) {
+        const grouped = {};
+        selectedRegions.forEach(r => {
+          const parent = r.parent || "기타";
+          if (!grouped[parent]) grouped[parent] = [];
+          grouped[parent].push(r.name);
         });
+
+        return Object.entries(grouped).map(([parent, names]) => {
+          const region = regionHierarchy.find(r => r.name === parent);
+          const isAll = region && region.children.every(child =>
+            selectedRegions.find(sel => sel.name === child.name)
+          );
+          return isAll ? `${parent}(전체)` : names.map(name => `(${parent}) ${name}`).join(", ");
+        }).join(", ");
       }
 
-      const fishApply = document.getElementById("fishApply");
-      const fishTypeInputGroup = document.getElementById("fishTypeInputGroup");
-      if (fishApply && fishTypeInputGroup) {
-        fishApply.addEventListener("click", () => {
+      initRegionModal({
+        onApply: () => {
+          const selected = getSelectedRegions();
+          const cached = getCachedRegions();
+          const label = getCompactRegionText(selected, cached);
+
+          regionIdInput.value = selected.length > 0 ? selected[0].id : '';
+          document.getElementById("selectedRegionText").innerText = label || "선택된 지역 없음";
+        }
+      });
+
+      initFishModal({
+        onApply: () => {
+          const fish = getSelectedFishTypes();
           fishTypeInputGroup.innerHTML = '';
-          getSelectedFishTypes().forEach(fish => {
+          fish.forEach(name => {
             const input = document.createElement("input");
             input.type = "hidden";
             input.name = "fishTypeNames";
-            input.value = fish;
+            input.value = name;
             fishTypeInputGroup.appendChild(input);
           });
-        });
-      }
+          document.getElementById("selectedFishText").innerText =
+            fish.length > 0 ? fish.join(", ") : "선택된 어종 없음";
+        }
+      });
 
       flatpickr("#datePicker", {
         mode: "multiple",
@@ -149,9 +168,8 @@
       });
     });
   </script>
-  <script type="module" th:src="@{/js/reservation_form.js}"></script>
 </th:block>
 
-</body>
 
+</body>
 </html>

@@ -6,8 +6,12 @@ function closeModal(modal) {
   modal?.classList.add("hidden");
 }
 
-// ✅ 초기화 함수
-export function initFishModal() {
+/**
+ * ✅ 어종 모달 초기화
+ * @param {Object} options - 설정 객체
+ * @param {Function} options.onApply - 어종 적용 시 실행할 외부 콜백 함수
+ */
+export function initFishModal({ onApply } = {}) {
   const fishBtn = document.getElementById("fishBtn");
   const fishModal = document.getElementById("fishModal");
   const fishList = document.getElementById("fishList");
@@ -19,11 +23,11 @@ export function initFishModal() {
     return;
   }
 
+  // 🔘 모달 열기
   fishBtn.addEventListener("click", () => {
     fishModal.classList.remove("hidden");
     fishModal.classList.add("show");
 
-    // 매번 새로 렌더링
     fishList.innerHTML = '';
 
     fetch("/api/fish-types")
@@ -36,14 +40,25 @@ export function initFishModal() {
       });
   });
 
+  // 🔘 어종 적용
   fishApply.addEventListener("click", () => {
     closeModal(fishModal);
+    if (typeof onApply === "function") onApply();
   });
 
+  // 🔘 초기화
   fishReset.addEventListener("click", () => {
     setSelectedFishTypes([]);
     document.querySelectorAll(".fish-type-btn.selected").forEach(btn => btn.classList.remove("selected"));
     updateSelectedFishTextOnly(fishModal);
+    if (typeof onApply === "function") onApply();
+  });
+
+  // ✅ 외부 클릭 시 닫기
+  fishModal.addEventListener("click", (e) => {
+    if (e.target.classList.contains("modal")) {
+      closeModal(fishModal);
+    }
   });
 }
 
@@ -101,4 +116,12 @@ function getInitialConsonant(kor) {
   if (uni < 0 || uni > 11171) return "#";
   const index = Math.floor(uni / 588);
   return initialTable[index];
+}
+
+/**
+ * ✅ 조건부 초기화
+ */
+export function initFishModalIfExist() {
+  const fishBtn = document.getElementById("fishBtn");
+  if (fishBtn) initFishModal();
 }
