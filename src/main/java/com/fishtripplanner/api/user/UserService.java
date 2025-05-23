@@ -35,7 +35,7 @@ public class UserService {
     }
 
     @Transactional
-    public void updateUser(Long userId, User updatedUser) {
+    public User updateUser(Long userId, User updatedUser) {
         User existing = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
@@ -47,6 +47,12 @@ public class UserService {
         existing.setBirthyear(updatedUser.getBirthyear());
         existing.setBirthday(updatedUser.getBirthday());
 
-        // 저장은 생략해도 트랜잭션 범위 내에서 dirty checking에 의해 반영됨
+        return existing; // 트랜잭션 내에서 dirty checking + 반환
+    }
+
+    @Transactional
+    public User findById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다. ID: " + id));
     }
 }

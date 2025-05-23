@@ -4,7 +4,10 @@ import com.fishtripplanner.api.user.UserService;
 import com.fishtripplanner.domain.User;
 import com.fishtripplanner.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -15,33 +18,40 @@ public class UserController {
 
     private final UserService userService;
 
-    // 로그인 페이지
     @GetMapping("/login")
     public String loginPage() {
-        return "login"; // templates/login.html
+        return "login";
     }
 
-    // 내 정보 페이지
     @GetMapping("/profile")
     public String profilePage(Model model, @AuthenticationPrincipal CustomUserDetails userDetails) {
-        User user = userDetails.getUser();
+        Long userId = userDetails.getUser().getId();
+        User user = userService.findById(userId);
         model.addAttribute("user", user);
-        return "user/notification"; // templates/user/notification.html
+        return "user/notification";
     }
 
-    // 내 정보 수정 폼
     @GetMapping("/profile/edit")
     public String editProfilePage(Model model, @AuthenticationPrincipal CustomUserDetails userDetails) {
-        User user = userDetails.getUser();
+        Long userId = userDetails.getUser().getId();
+        User user = userService.findById(userId);
         model.addAttribute("user", user);
-        return "user/profile_edit"; // templates/user/profile_edit.html
+        return "user/profile_edit";
     }
 
-    // 내 정보 수정 처리
     @PostMapping("/profile/update")
     public String updateProfile(@ModelAttribute("user") User updatedUser,
                                 @AuthenticationPrincipal CustomUserDetails userDetails) {
-        userService.updateUser(userDetails.getUser().getId(), updatedUser);
+        Long userId = userDetails.getUser().getId();
+        User savedUser = userService.updateUser(userId, updatedUser);
+
+        Authentication newAuth = new UsernamePasswordAuthenticationToken(
+                new CustomUserDetails(savedUser),
+                null,
+                userDetails.getAuthorities()
+        );
+        SecurityContextHolder.getContext().setAuthentication(newAuth);
+
         return "redirect:/profile";
     }
 }
