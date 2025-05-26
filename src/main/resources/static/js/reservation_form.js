@@ -1,13 +1,15 @@
-import { getSelectedRegions, getSelectedFishTypes, closeModal } from "./modal_state.js";  // closeModal을 가져옵니다.
+import { getSelectedRegions, getSelectedFishTypes, closeModal } from "./modal_state.js";
 import { initRegionModalIfExist } from "./modal_region.js";
 import { initFishModalIfExist } from "./modal_fish.js";
 import { initDateModalIfExist } from "./modal_date.js";
-import { getCachedRegions } from "./modal_region.js"; // ✅ 추가: 지역 계층 정보 사용
+import { getCachedRegions } from "./modal_region.js";
 
-// ✅ 보기 좋은 지역 텍스트 출력 함수
+// ✅ flatpickr 전역 객체 사용 (CDN으로 이미 로드되어 있어야 함)
+flatpickr.localize(flatpickr.l10ns.ko);  // 한글 로케일 설정
+
+// ✅ 지역명 출력용 유틸
 function getCompactRegionText(selectedRegions, regionHierarchy) {
   const grouped = {};
-
   selectedRegions.forEach(r => {
     const parent = r.parent || "기타";
     if (!grouped[parent]) grouped[parent] = [];
@@ -23,7 +25,7 @@ function getCompactRegionText(selectedRegions, regionHierarchy) {
   }).join(", ");
 }
 
-// ✅ DOM 요소
+// ✅ DOM 요소 가져오기
 const regionApplyBtn = document.getElementById("regionApply");
 const fishApplyBtn = document.getElementById("fishApply");
 const regionIdInput = document.getElementById("regionIdInput");
@@ -34,14 +36,9 @@ const selectedFishOutput = document.getElementById("selectedFishText");
 // ✅ 지역 적용 버튼 클릭 시
 regionApplyBtn?.addEventListener("click", () => {
   const regions = getSelectedRegions();
-  console.log("🟡 selectedRegions:", regions);
-
   const cached = getCachedRegions();
-  console.log("🔵 getCachedRegions:", cached);
-
   const label = getCompactRegionText(regions, cached);
   selectedRegionOutput.textContent = label || "선택된 지역 없음";
-
   regionIdInput.value = regions.length > 0 ? regions[0].id : "";
 });
 
@@ -66,7 +63,7 @@ function initModalOutsideClose() {
     .forEach(modal => {
       modal?.addEventListener("click", (e) => {
         if (e.target.classList.contains("modal")) {
-          closeModal(modal);  // modal_state.js에서 가져온 closeModal을 사용
+          closeModal(modal);
         }
       });
     });
@@ -80,17 +77,31 @@ document.addEventListener("DOMContentLoaded", () => {
   initModalOutsideClose();
 });
 
+// ✅ flatpickr 달력 설정
 flatpickr("#datePicker", {
+  locale: "ko",
   mode: "multiple",
   dateFormat: "Y-m-d",
-  position: "auto left top", // 좌상단 정렬
-  positionElement: document.getElementById("datePicker"), // 기준 요소 명시
+  position: "auto left top",
+  positionElement: document.getElementById("datePicker"),
+
+  // ✅ 토요일/일요일 색상 지정 (CSS 필요함)
+  onDayCreate: function (_, __, ___, dayElem) {
+    const day = dayElem.dateObj.getDay();
+    if (day === 0) {
+      dayElem.classList.add("sunday");
+    } else if (day === 6) {
+      dayElem.classList.add("saturday");
+    }
+  },
+
+  // ✅ 날짜 선택 시 동적으로 정원 입력 필드 생성
   onChange: (selectedDates, dateStr, instance) => {
     const container = document.getElementById("dateContainer");
-    container.innerHTML = ""; // 이전 내용을 지우고 새로 생성
+    container.innerHTML = "";
 
     selectedDates.forEach((date, idx) => {
-      const formatted = date.toLocaleDateString("sv-SE");
+      const formatted = date.toISOString().split("T")[0];
       const div = document.createElement("div");
       div.className = "date-entry";
       div.innerHTML = `
@@ -102,18 +113,13 @@ flatpickr("#datePicker", {
       container.appendChild(div);
     });
 
-    // 각 삭제 버튼에 이벤트 핸들러 부착
     container.querySelectorAll(".remove-date").forEach(btn => {
       btn.addEventListener("click", () => {
         const dateToRemove = btn.dataset.date;
-
-        // 삭제 후 업데이트된 selectedDates 상태 반영
         const updatedDates = selectedDates.filter(date =>
-          date.toLocaleDateString("sv-SE") !== dateToRemove
+          date.toISOString().split("T")[0] !== dateToRemove
         );
-
-        // 삭제된 날짜로 setDate를 갱신하고, 화면을 다시 그리도록 처리
-        instance.setDate(updatedDates, true);  // true를 두 번째 인자로 전달하여, onChange를 트리거하도록 합니다.
+        instance.setDate(updatedDates, true);
       });
     });
   }
