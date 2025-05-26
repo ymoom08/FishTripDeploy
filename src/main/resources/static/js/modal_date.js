@@ -36,7 +36,7 @@ export function initDateModal({ onApply } = {}) {
 
   // 🔘 초기화 버튼
   dateReset.addEventListener("click", () => {
-    selectedDate.value = null;
+    selectedDate.value = []; // ✅ null → 빈 배열로 변경
     if (typeof onApply === "function") onApply();
   });
 
@@ -53,6 +53,7 @@ export function initDateModal({ onApply } = {}) {
     dateFormat: "Y-m-d",
     inline: true,
     locale: "ko",
+    mode: "multiple", // ✅ 날짜 다중 선택 가능하도록 설정
     onDayCreate: function (dObj, dStr, fp, dayElem) {
       const date = dayElem.dateObj;
       const day = date.getDay(); // 0: 일요일, 6: 토요일
@@ -64,7 +65,8 @@ export function initDateModal({ onApply } = {}) {
       }
     },
     onChange: (selectedDates, dateStr) => {
-      selectedDate.value = dateStr;
+      // ✅ 문자열 하나 → 날짜 배열로 저장
+      selectedDate.value = selectedDates.map(d => d.toISOString().split("T")[0]);
     },
     appendTo: document.getElementById("datePickerContainer")
   });

@@ -55,7 +55,7 @@ public class ReservationPostService {
     public Page<ReservationPost> filterPosts(
             ReservationType type,
             List<Long> regionIds,
-            LocalDate date,
+            List<LocalDate> dates,
             List<String> fishTypes,
             String keyword,
             String sortKey,
@@ -74,32 +74,32 @@ public class ReservationPostService {
         Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
 
         boolean hasRegion = safeRegionIds != null;
-        boolean hasDate = date != null;
+        boolean hasDate = dates != null;
         boolean hasFish = safeFishTypes != null;
 
         String conditionKey = String.format("%s-%s-%s", hasRegion, hasDate, hasFish);
 
         return switch (conditionKey) {
             case "true-true-true"   -> reservationPostRepository.findByFiltersStrict(
-                    type, safeRegionIds, date, safeFishTypes, sortedPageable);
+                    type, safeRegionIds, dates, safeFishTypes, sortedPageable);
             case "true-true-false"  -> reservationPostRepository.findByTypeAndRegionIdsAndDate(
-                    type, safeRegionIds, date, sortedPageable);
+                    type, safeRegionIds, dates, sortedPageable);
             case "false-true-true"  -> reservationPostRepository.findByDateAndFishTypes(
-                    type, date, safeFishTypes, sortedPageable);
+                    type, dates, safeFishTypes, sortedPageable);
             case "true-false-true"  -> reservationPostRepository.findByRegionIdsAndFishTypes(
                     type, safeRegionIds, safeFishTypes, sortedPageable);
             case "false-false-true" -> reservationPostRepository.findByFishTypes(
                     type, safeFishTypes, sortedPageable);
             case "false-true-false" -> reservationPostRepository.findByTypeAndDate(
-                    type, date, sortedPageable);
+                    type, dates, sortedPageable);
             case "true-false-false" -> reservationPostRepository.findByTypeAndRegionIds(
                     type, safeRegionIds, sortedPageable);
             default -> {
-                if (safeRegionIds == null && date == null && safeFishTypes == null && safeKeyword == null) {
+                if (safeRegionIds == null && dates == null && safeFishTypes == null && safeKeyword == null) {
                     yield reservationPostRepository.findByType(type, sortedPageable);
                 }
                 yield reservationPostRepository.findByFilters(
-                        type, safeRegionIds, date, safeFishTypes, safeKeyword, sortedPageable);
+                        type, safeRegionIds, dates, safeFishTypes, safeKeyword, sortedPageable);
             }
         };
     }

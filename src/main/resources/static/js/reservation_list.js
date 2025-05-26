@@ -36,7 +36,12 @@ export function fetchFilteredCards(sortKey = "latest") {
   const query = new URLSearchParams({ type, page: 0, sort: sortKey });
 
   getSelectedRegions().forEach(r => query.append("regionId", r.id));
-  if (selectedDate.value) query.append("date", selectedDate.value);
+  if (Array.isArray(selectedDate.value)) {
+    selectedDate.value.forEach(date => query.append("date", date));
+  } else if (selectedDate.value) {
+    query.append("date", selectedDate.value);
+  }
+
   getSelectedFishTypes().forEach(fish => query.append("fishType", fish));
 
   const keyword = document.querySelector(".search-input")?.value.trim();
@@ -119,7 +124,13 @@ export function updateSelectedRegionTextOnly() {
 export function updateSelectedDateTextOnly() {
   const modalDiv = document.querySelector("#dateModal .current-selection");
   const pageDiv = document.getElementById("selectedInfo");
-  const dateText = selectedDate.value ? `선택한 날짜: ${selectedDate.value}` : "선택된 날짜 없음";
+  let dateText = "선택된 날짜 없음";
+  if (Array.isArray(selectedDate.value)) {
+    dateText = `선택한 날짜: ${selectedDate.value.join(", ")}`;
+  } else if (selectedDate.value) {
+    dateText = `선택한 날짜: ${selectedDate.value}`;
+  }
+
   modalDiv.innerText = dateText;
 
   const regionText = getSelectedRegions().length > 0
