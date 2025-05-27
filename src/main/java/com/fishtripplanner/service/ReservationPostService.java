@@ -111,9 +111,27 @@ public class ReservationPostService {
     }
 
     public void saveReservation(ReservationCreateRequestDto dto) {
-        List<RegionEntity> regions = regionRepository.findAllById(dto.getRegionIds());
+        if (dto.getUserId() == null) {
+            throw new IllegalArgumentException("유저 ID는 필수입니다.");
+        }
+
+        if (dto.getRegionIds() == null || dto.getRegionIds().isEmpty()) {
+            throw new IllegalArgumentException("지역 ID 리스트는 비어 있을 수 없습니다.");
+        }
+
+        if (dto.getFishTypeNames() == null || dto.getFishTypeNames().isEmpty()) {
+            throw new IllegalArgumentException("어종 리스트는 비어 있을 수 없습니다.");
+        }
+
+        if (dto.getAvailableDates() == null || dto.getAvailableDates().isEmpty()) {
+            throw new IllegalArgumentException("예약 가능 날짜는 1개 이상 입력되어야 합니다.");
+        }
+
         User user = userRepository.findById(dto.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+
+        List<RegionEntity> regions = regionRepository.findAllById(dto.getRegionIds());
+        List<FishTypeEntity> fishTypes = fishTypeRepository.findByNameIn(dto.getFishTypeNames());
 
         for (RegionEntity region : regions) {
             ReservationPost post = new ReservationPost();
@@ -124,21 +142,19 @@ public class ReservationPostService {
             post.setPrice(dto.getPrice());
             post.setCompanyName(dto.getCompanyName());
             post.setOwner(user);
-
-            List<FishTypeEntity> fishTypes = fishTypeRepository.findByNameIn(dto.getFishTypeNames());
             post.setFishTypes(fishTypes);
 
-            // 이미지 저장 처리
+            // 이미지 저장
             if (dto.getImageFile() != null && !dto.getImageFile().isEmpty()) {
                 try {
                     String fileName = UUID.randomUUID() + "_" + dto.getImageFile().getOriginalFilename();
-                    String uploadDir = "src/main/resources/static/reservation_images/";
+                    String uploadDir = "uploads/reservation_images/";
                     Path savePath = Paths.get(uploadDir, fileName);
 
                     Files.createDirectories(savePath.getParent());
                     Files.write(savePath, dto.getImageFile().getBytes());
 
-                    post.setImageUrl("/reservation_images/" + fileName);
+                    post.setImageUrl("/uploads/reservation_images/" + fileName);
                 } catch (IOException e) {
                     throw new RuntimeException("이미지 저장 실패", e);
                 }
@@ -159,6 +175,7 @@ public class ReservationPostService {
             availableDateRepository.saveAll(dates);
         }
     }
+
 
 
     public ReservationDetailResponseDto getReservationDetail(Long postId) {

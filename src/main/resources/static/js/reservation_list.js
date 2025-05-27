@@ -1,48 +1,35 @@
-// reservation_list.js 맨 위에 추가
-fetch("/api/regions/hierarchy")
-  .then(res => res.json())
-  .then(data => setCachedRegions(data))
-  .catch(err => console.error("지역 데이터 초기화 실패:", err));
+// ✅ 공통 모듈 import
+import {
+  ModalState,
+  closeModal,
+  bindModalOutsideClick,
+  injectHiddenInputs
+} from "./modal_common.js";
 
-// 🔁 모듈 import
 import { initRegionModal } from "./modal_region.js";
 import { initDateModal } from "./modal_date.js";
 import { initFishModal } from "./modal_fish.js";
-import { getSelectedRegions, setSelectedRegions, getSelectedFishTypes, setSelectedFishTypes, selectedDate } from "./modal_state.js";
 
-// ✅ 지역 캐시 + getter/setter
+// ✅ 지역 캐시 로컬 저장
 let cachedRegions = null;
+
 export function getCachedRegions() {
   return cachedRegions;
 }
+
 export function setCachedRegions(data) {
   cachedRegions = data;
+  ModalState.setRegionCache?.(data); // modal_common에서 캐시 지원 시 호출
 }
 
-// ✅ 공통 모달 닫기 함수
-export function closeModal(modal) {
-  modal.classList.remove("show");
-  modal.classList.add("hidden");
-}
-
-// ✅ 필터 실행 함수
-export function applyFilters({ sortKey = "latest" }) {
-  fetchFilteredCards(sortKey);
-}
-
-// ✅ 서버로 필터링된 카드 요청
-export function fetchFilteredCards(sortKey = "latest") {
+// ✅ 카드 목록 fetch 및 렌더링
+export function applyFilters({ sortKey = "latest" } = {}) {
   const type = location.pathname.split("/").at(-1);
   const query = new URLSearchParams({ type, page: 0, sort: sortKey });
 
-  getSelectedRegions().forEach(r => query.append("regionId", r.id));
-  if (Array.isArray(selectedDate.value)) {
-    selectedDate.value.forEach(date => query.append("date", date));
-  } else if (selectedDate.value) {
-    query.append("date", selectedDate.value);
-  }
-
-  getSelectedFishTypes().forEach(fish => query.append("fishType", fish));
+  ModalState.getRegions().forEach(r => query.append("regionId", r.id));
+  ModalState.getDates().forEach(d => query.append("date", d));
+  ModalState.getFishTypes().forEach(f => query.append("fishType", f));
 
   const keyword = document.querySelector(".search-input")?.value.trim();
   if (keyword) query.append("keyword", keyword);
@@ -53,36 +40,53 @@ export function fetchFilteredCards(sortKey = "latest") {
     .catch(err => {
       console.error("카드 불러오기 실패:", err);
       const container = document.getElementById("cardContainer");
-      container.innerHTML = '<p style="text-align:center; color:red;">카드 데이터를 불러오지 못했습니다.</p>';
+      if (container) {
+        container.innerHTML = '<p style="text-align:center; color:red;">카드 데이터를 불러오지 못했습니다.</p>';
+      }
     });
 }
 
-// ✅ 카드 DOM 업데이트
+// ✅ 카드 DOM 구성
 function updateCards(cards) {
   const container = document.getElementById("cardContainer");
+  if (!container) return;
+
+  const typeToExtension = {
+    boat: "jpg",
+    float: "png",
+    island: "jpg",
+    rock: "jpg",
+    stay: "png"
+  };
+
   container.innerHTML = cards.length === 0
     ? '<p style="text-align:center;">조건에 맞는 예약이 없습니다.</p>'
-    : cards.map(card => `
-      <div class="ad-card">
-        <a href="/reservation/detail/${card.id}" class="ad-card-link">
-          <div class="ad-image">
-            <img src="${card.imageUrl || "/images/boat.jpg"}" alt="예약 이미지" class="card-image">
+    : cards.map(card => {
+        const ext = typeToExtension[card.typeLower] || "jpg";
+        const imageSrc = card.imageUrl || `/images/${card.typeLower || 'boat'}.${ext}`;
+
+        return `
+          <div class="ad-card">
+            <a href="/reservation/detail/${card.id}" class="ad-card-link">
+              <div class="ad-image">
+                <img src="${imageSrc}" alt="예약 이미지" class="card-image">
+              </div>
+              <div class="ad-desc">${card.title}</div>
+              <div class="ad-detail">
+                <p>지역: ${card.region ?? "없음"}</p>
+                <p>회사명: ${card.companyName ?? "알 수 없음"}</p>
+                <p>어종: ${card.fishTypes?.join(", ") ?? "정보 없음"}</p>
+                <p>${card.content}</p>
+              </div>
+            </a>
           </div>
-          <div class="ad-desc">${card.title}</div>
-          <div class="ad-detail">
-            <p>지역: ${card.region ?? "없음"}</p>
-            <p>회사명: ${card.companyName ?? "알 수 없음"}</p>
-            <p>어종: ${card.fishTypes?.join(", ") ?? "정보 없음"}</p>
-            <p>${card.content}</p>
-          </div>
-        </a>
-      </div>
-    `).join('');
+        `;
+      }).join('');
 }
 
-// 🔧 지역 텍스트 조합 유틸 함수
+// ✅ 선택된 지역 텍스트 포맷 생성
 function getCompactRegionText() {
-  const regions = getSelectedRegions();
+  const regions = ModalState.getRegions();
   const cached = getCachedRegions();
   if (!cached) return "선택된 지역 없음";
 
@@ -92,81 +96,89 @@ function getCompactRegionText() {
   }, {});
 
   return Object.entries(grouped)
-    .flatMap(([parentName, selectedChildren]) => {
-      const parentRegion = cached.find(r => r.name === parentName);
-      const totalChildren = parentRegion?.children?.length || 0;
-
-      return selectedChildren.length === totalChildren
-        ? [`(${parentName}) 전체`]
-        : selectedChildren.map(c => `(${parentName}) ${c.name}`);
+    .flatMap(([parent, selected]) => {
+      const total = cached.find(r => r.name === parent)?.children?.length || 0;
+      return selected.length === total
+        ? [`(${parent}) 전체`]
+        : selected.map(c => `(${parent}) ${c.name}`);
     })
     .join(", ");
 }
 
+// ✅ 전체 선택 정보 UI에 표시
+function updateSelectedInfo() {
+  const region = ModalState.getRegions();
+  const fish = ModalState.getFishTypes();
+  const date = ModalState.getDates();
 
-// ✅ 선택된 지역 텍스트 갱신
-export function updateSelectedRegionTextOnly() {
-  const modalDiv = document.querySelector("#regionModal .current-selection");
-  const pageDiv = document.getElementById("selectedInfo");
-  const regions = getSelectedRegions();
-  let text = "선택된 지역 없음";
+  const label = document.getElementById("selectedInfo");
+  if (!label) return;
 
-  if (regions.length > 0) {
-    text = `현재 선택 지역: ${getCompactRegionText()}`;
-  }
+  const parts = [];
 
-  modalDiv.innerText = text;
-  const dateText = selectedDate.value ? `선택한 날짜: ${selectedDate.value}` : "";
-  pageDiv.innerText = [text, dateText].filter(Boolean).join("\n");
-}
-
-// ✅ 선택된 날짜 텍스트 갱신
-export function updateSelectedDateTextOnly() {
-  const modalDiv = document.querySelector("#dateModal .current-selection");
-  const pageDiv = document.getElementById("selectedInfo");
-  let dateText = "선택된 날짜 없음";
-  if (Array.isArray(selectedDate.value)) {
-    dateText = `선택한 날짜: ${selectedDate.value.join(", ")}`;
-  } else if (selectedDate.value) {
-    dateText = `선택한 날짜: ${selectedDate.value}`;
-  }
-
-  modalDiv.innerText = dateText;
-
-  const regionText = getSelectedRegions().length > 0
+  const regionText = region.length > 0
     ? `현재 선택 지역: ${getCompactRegionText()}`
-    : "";
-  pageDiv.innerText = [regionText, dateText].filter(Boolean).join("\n");
+    : "선택된 지역 없음";
+  const regionModalLabel = document.querySelector("#regionModal .current-selection");
+  if (regionModalLabel) regionModalLabel.innerText = regionText;
+  parts.push(regionText);
+
+  const dateText = date.length > 0
+    ? `선택한 날짜: ${date.join(", ")}`
+    : "선택된 날짜 없음";
+  const dateModalLabel = document.querySelector("#dateModal .current-selection");
+  if (dateModalLabel) dateModalLabel.innerText = dateText;
+  parts.push(dateText);
+
+  const fishText = fish.length > 0
+    ? `선택한 어종: ${fish.join(", ")}`
+    : "선택된 어종 없음";
+  const fishModalLabel = document.querySelector("#fishModal .current-selection");
+  if (fishModalLabel) fishModalLabel.innerText = fishText;
+  parts.push(fishText);
+
+  label.innerText = parts.filter(Boolean).join("\n");
 }
 
-// ✅ 선택된 어종 텍스트 갱신
-export function updateSelectedFishText() {
-  const modalDiv = document.querySelector("#fishModal .current-selection");
-  const pageDiv = document.getElementById("selectedInfo");
-  const fish = getSelectedFishTypes();
-  const fishText = fish.length > 0 ? `선택한 어종: ${fish.join(", ")}` : "선택된 어종 없음";
-  modalDiv.innerText = fishText;
+// ✅ 선택된 지역 텍스트만 갱신 (export)
+export function updateSelectedRegionTextOnly(selector = "#regionModal .current-selection") {
+  const label = document.querySelector(selector);
+  if (!label) return;
 
-  const regionText = getSelectedRegions().length > 0
+  const region = ModalState.getRegions();
+  const text = region.length > 0
     ? `현재 선택 지역: ${getCompactRegionText()}`
-    : "";
-  const dateText = selectedDate.value ? `선택한 날짜: ${selectedDate.value}` : "";
-  pageDiv.innerText = [regionText, dateText, fishText].filter(Boolean).join("\n");
+    : "선택된 지역 없음";
+
+  label.innerText = text;
 }
 
-// ✅ 정렬 컨트롤 초기화
+// ✅ 선택된 어종 텍스트만 갱신 (export)
+export function updateSelectedFishText(selector = "#fishModal .current-selection") {
+  const label = document.querySelector(selector);
+  if (!label) return;
+
+  const fish = ModalState.getFishTypes();
+  const text = fish.length > 0
+    ? `선택한 어종: ${fish.join(", ")}`
+    : "선택된 어종 없음";
+
+  label.innerText = text;
+}
+
+// ✅ 정렬 버튼 초기화
 function initSortControl() {
   const sortBtn = document.getElementById("sortBtn");
   const sortOptions = document.getElementById("sortOptions");
 
-  sortBtn?.addEventListener("click", () => {
-    sortOptions.classList.toggle("hidden");
-  });
+  if (!sortBtn || !sortOptions) return; // 가능성 확인
+
+  sortBtn.addEventListener("click", () => sortOptions.classList.toggle("hidden"));
 
   document.querySelectorAll("#sortOptions button").forEach(btn => {
     btn.addEventListener("click", () => {
-      const selectedSort = btn.getAttribute("data-sort");
-      applyFilters({ sortKey: selectedSort });
+      const selected = btn.getAttribute("data-sort");
+      applyFilters({ sortKey: selected });
       sortOptions.classList.add("hidden");
     });
   });
@@ -178,35 +190,32 @@ function initSortControl() {
   });
 }
 
-// ✅ 검색 컨트롤 초기화
+// ✅ 검색창 초기화
 function initSearchControl() {
-  const searchInput = document.querySelector(".search-input");
-  const searchButton = document.querySelector(".search-button");
+  const input = document.querySelector(".search-input");
+  const btn = document.querySelector(".search-button");
 
-  searchButton?.addEventListener("click", () => {
-    applyFilters({});
-  });
-
-  searchInput?.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      applyFilters({});
-    }
+  btn?.addEventListener("click", () => applyFilters({}));
+  input?.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") applyFilters({});
   });
 }
 
-// ✅ 모달 외부 클릭 시 닫기
+// ✅ 모달 외 클릭 시 닫기
 function initModalOutsideClose() {
-  [document.getElementById("regionModal"), document.getElementById("dateModal"), document.getElementById("fishModal")]
-    .forEach(modal => {
-      modal?.addEventListener("click", (e) => {
-        if (e.target.classList.contains("modal")) {
-          closeModal(modal);
-        }
-      });
-    });
+  ["regionModal", "dateModal", "fishModal"].forEach(id => {
+    bindModalOutsideClick(document.getElementById(id));
+  });
 }
 
-// ✅ 초기화
+// ✅ 지역 데이터 초기화 (1 (1\uud68c)
+fetch("/api/regions/hierarchy")
+  .then(res => res.json())
+  .then(setCachedRegions)
+  .catch(err => console.error("지역 데이터 초기화 실패:", err));
+
+// ✅ DOMContentLoaded 시 초기화
+
 document.addEventListener("DOMContentLoaded", () => {
   initSortControl();
   initSearchControl();
@@ -214,22 +223,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
   initRegionModal({
     onApply: () => {
-      updateSelectedRegionTextOnly();
-      fetchFilteredCards();
+      updateSelectedInfo();
+      applyFilters({});
     }
   });
 
   initFishModal({
     onApply: () => {
-      updateSelectedFishText();
-      fetchFilteredCards();
+      updateSelectedInfo();
+      applyFilters({});
     }
   });
 
   initDateModal({
     onApply: () => {
-      updateSelectedDateTextOnly();
-      fetchFilteredCards();
+      updateSelectedInfo();
+      applyFilters({});
     }
   });
 });

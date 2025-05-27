@@ -1,4 +1,11 @@
-import { selectedDate } from "./modal_state.js";
+import {
+  ModalState,
+  injectHiddenInputs,
+  openModal,
+  closeModal,
+  bindModalOutsideClick,
+  getRequiredElements
+} from "./modal_common.js";
 
 /**
  * ✅ 날짜 모달 초기화
@@ -6,86 +13,76 @@ import { selectedDate } from "./modal_state.js";
  * @param {Function} options.onApply - 날짜 적용 시 실행할 외부 콜백 함수
  */
 export function initDateModal({ onApply } = {}) {
-  const dateBtn = document.getElementById("dateBtn");
-  const dateModal = document.getElementById("dateModal");
-  const dateApply = document.getElementById("dateApply");
-  const dateCancel = document.getElementById("dateCancel");
-  const dateReset = document.getElementById("dateReset");
+  const ids = {
+    btn: "dateBtn",
+    modal: "dateModal",
+    apply: "dateApply",
+    cancel: "dateCancel",
+    reset: "dateReset",
+    picker: "datePickerContainer",
+    hiddenInput: "dateContainer"
+  };
 
-  if (!dateBtn || !dateModal || !dateApply || !dateCancel || !dateReset) {
-    console.warn("⚠️ [initDateModal] 필수 요소가 없음. HTML 확인 필요.");
-    return;
-  }
+  const el = getRequiredElements(ids);
+  if (!el) return;
 
-  // 🔘 버튼 클릭 시 모달 열기
-  dateBtn.addEventListener("click", () => {
-    dateModal.classList.remove("hidden");
-    dateModal.classList.add("show");
+  // 🔘 모달 열기
+  el.btn.addEventListener("click", () => {
+    openModal(el.modal);
   });
 
-  // 🔘 날짜 적용 버튼
-  dateApply.addEventListener("click", () => {
-    closeModal(dateModal);
-    if (typeof onApply === "function") onApply();
+  // 🔘 적용
+  el.apply.addEventListener("click", () => {
+    injectHiddenInputs(ids.hiddenInput, "availableDates", ModalState.getDates());
+    closeModal(el.modal);
+    onApply?.();
   });
 
-  // 🔘 닫기 버튼
-  dateCancel.addEventListener("click", () => {
-    closeModal(dateModal);
+  // 🔘 닫기
+  el.cancel.addEventListener("click", () => {
+    closeModal(el.modal);
   });
 
-  // 🔘 초기화 버튼
-  dateReset.addEventListener("click", () => {
-    selectedDate.value = []; // ✅ null → 빈 배열로 변경
-    if (typeof onApply === "function") onApply();
+  // 🔘 초기화
+  el.reset.addEventListener("click", () => {
+    ModalState.setDates([]);
+    onApply?.();
   });
 
-  // ✅ 외부 클릭 시 모달 닫기
-  dateModal.addEventListener("click", (e) => {
-    if (e.target.classList.contains("modal")) {
-      closeModal(dateModal);
-    }
-  });
+  // 🔘 외부 클릭 시 닫기
+  bindModalOutsideClick(el.modal);
 
-  // ✅ 달력 위젯 초기화
+  // 🔘 달력 초기화
   flatpickr.localize(flatpickr.l10ns.ko);
-  flatpickr("#datePickerContainer", {
+  flatpickr(`#${ids.picker}`, {
     dateFormat: "Y-m-d",
     inline: true,
     locale: "ko",
-    mode: "multiple", // ✅ 날짜 다중 선택 가능하도록 설정
-    onDayCreate: function (dObj, dStr, fp, dayElem) {
-      const date = dayElem.dateObj;
-      const day = date.getDay(); // 0: 일요일, 6: 토요일
-
-      if (day === 0) {
-        dayElem.classList.add("sunday");
-      } else if (day === 6) {
-        dayElem.classList.add("saturday");
-      }
+    mode: "multiple",
+    onDayCreate: (_, __, ___, dayElem) => {
+      const day = dayElem.dateObj.getDay();
+      if (day === 0) dayElem.classList.add("sunday");
+      else if (day === 6) dayElem.classList.add("saturday");
     },
-    onChange: (selectedDates, dateStr) => {
-      // ✅ 문자열 하나 → 날짜 배열로 저장
-      selectedDate.value = selectedDates.map(d => {
-        const local = new Date(d.getTime() - (d.getTimezoneOffset() * 60000)); // 로컬시간 보정
+    onChange: (selectedDates) => {
+      const formatted = selectedDates.map(d => {
+        const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
         return local.toISOString().split("T")[0];
       });
-    },
-    appendTo: document.getElementById("datePickerContainer")
+      ModalState.setDates(formatted);
+    }
   });
 }
 
-// ✅ 모달 닫기 함수
-function closeModal(modal) {
-  modal.classList.remove("show");
-  modal.classList.add("hidden");
-}
-
 /**
- * ✅ 조건부 초기화 (버튼 존재 시만)
- * 기본 초기화만 필요할 경우 사용
+ * ✅ 조건부 초기화
  */
-export function initDateModalIfExist() {
-  const dateBtn = document.getElementById("dateBtn");
-  if (dateBtn) initDateModal();
+export function initDateModalIfExist({ onApply } = {}) {
+  const requiredIds = ["dateBtn", "dateModal", "dateApply", "dateCancel", "dateReset", "datePickerContainer"];
+  const allExist = requiredIds.every(id => document.getElementById(id));
+  if (allExist) {
+    initDateModal({ onApply });
+  } else {
+    console.warn("⚠️ [initDateModalIfExist] 일부 요소가 없어서 초기화 생략됨");
+  }
 }

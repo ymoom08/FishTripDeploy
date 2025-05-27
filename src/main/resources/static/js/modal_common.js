@@ -1,0 +1,123 @@
+// modal_common.js
+
+// ----------------------------------------
+// [1] 상태 관리 모듈 (ModalState)
+// ----------------------------------------
+
+let selectedFishTypes = [];
+let selectedRegions = [];
+let selectedDates = [];
+
+export const ModalState = {
+  // 어종
+  getFishTypes: () => [...selectedFishTypes],
+  setFishTypes: (types) => {
+    selectedFishTypes = Array.isArray(types) ? [...types] : [];
+  },
+
+  // 지역
+  getRegions: () => [...selectedRegions],
+  setRegions: (regions) => {
+    selectedRegions = Array.isArray(regions) ? [...regions] : [];
+  },
+
+  // 날짜
+  getDates: () => [...selectedDates],
+  setDates: (dates) => {
+    selectedDates = Array.isArray(dates) ? [...dates] : [];
+  },
+
+  // 전체 초기화
+  reset: () => {
+    selectedFishTypes = [];
+    selectedRegions = [];
+    selectedDates = [];
+  }
+};
+
+// ----------------------------------------
+// [2] Hidden Input 삽입 유틸
+// ----------------------------------------
+
+/**
+ * ✅ 지정된 컨테이너에 name=value 형식의 hidden input을 삽입
+ * @param {string} containerId
+ * @param {string} name
+ * @param {Array<string|number>} values
+ */
+export function injectHiddenInputs(containerId, name, values) {
+  const container = document.getElementById(containerId);
+  if (!container) {
+    console.warn(`[injectHiddenInputs] 컨테이너 ID '${containerId}' 없음`);
+    return;
+  }
+
+  container.innerHTML = "";
+
+  if (!Array.isArray(values)) return;
+
+  values.forEach(value => {
+    if (value !== null && value !== undefined && value !== "") {
+      const input = document.createElement("input");
+      input.type = "hidden";
+      input.name = name;
+      input.value = value;
+      container.appendChild(input);
+    }
+  });
+}
+
+// ----------------------------------------
+// [3] 공통 모달 유틸
+// ----------------------------------------
+
+/**
+ * ✅ 모달 열기
+ */
+export function openModal(modal) {
+  if (!modal) return;
+  modal.classList.remove("hidden");
+  modal.classList.add("show");
+}
+
+/**
+ * ✅ 모달 닫기
+ */
+export function closeModal(modal) {
+  if (!modal) return;
+  modal.classList.remove("show");
+  modal.classList.add("hidden");
+}
+
+/**
+ * ✅ 외부 클릭 시 모달 닫기
+ * @param {HTMLElement} modal
+ * @param {Function} [onClose]
+ */
+export function bindModalOutsideClick(modal, onClose) {
+  if (!modal) return;
+  modal.addEventListener("click", (e) => {
+    if (e.target.classList.contains("modal")) {
+      closeModal(modal);
+      onClose?.();
+    }
+  });
+}
+
+/**
+ * ✅ ID 맵 기준으로 요소 가져오기 (모두 존재하면 반환, 아니면 null)
+ * @param {Object} idMap
+ * @returns {Object|null}
+ */
+export function getRequiredElements(idMap) {
+  const elements = {};
+  for (const key in idMap) {
+    const el = document.getElementById(idMap[key]);
+    if (!el) {
+      console.warn(`⚠️ [modal_common] 필수 요소 누락: ${idMap[key]}`);
+      return null;
+    }
+    elements[key] = el;
+  }
+  return elements;
+}

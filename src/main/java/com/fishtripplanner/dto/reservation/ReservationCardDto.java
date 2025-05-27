@@ -37,7 +37,6 @@ public class ReservationCardDto {
         // ✅ 이미지 경로 처리
         String imageUrl = post.getImageUrl();
         if (imageUrl == null || imageUrl.isBlank()) {
-            // 타입에 따라 기본 이미지 설정
             switch (post.getType()) {
                 case BOAT -> imageUrl = "/images/boat.jpg";
                 case FLOAT -> imageUrl = "/images/float.png";
@@ -46,8 +45,9 @@ public class ReservationCardDto {
                 case STAY -> imageUrl = "/images/stay.png";
                 default -> imageUrl = "/images/default.jpg";
             }
-        } else if (!imageUrl.startsWith("/images/")) {
-            imageUrl = "/images/" + imageUrl;
+        } else if (!imageUrl.startsWith("/uploads/") && !imageUrl.startsWith("/images/")) {
+            // 예외 케이스 대비 (예: 파일명만 저장됐을 때)
+            imageUrl = "/uploads/reservation_images/" + imageUrl;
         }
 
         return new ReservationCardDto(
