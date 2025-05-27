@@ -26,12 +26,13 @@ public class ReservationController {
 
     // 예약글 등록 API
     @PostMapping("/register")
-    public ResponseEntity<ReservationPostResponse> register(
+    public ResponseEntity<List<ReservationPostResponse>> register(
             @RequestBody ReservationPostRequest request,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
-        ReservationPostResponse response = reservationService.createReservationPost(request, userDetails.getUser());
-        return ResponseEntity.ok(response);
+        List<ReservationPostResponse> responses = reservationService.createReservationPosts(request, userDetails.getUser());
+
+        return ResponseEntity.ok(responses);
     }
 
     // 전체 예약글 조회 API

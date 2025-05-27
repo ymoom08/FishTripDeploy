@@ -19,16 +19,16 @@ public class ReservationPostRequest {
     private List<Long> fishTypeIds;
     private int price;
     private String imageUrl;
-    private Long regionId; // ✅ FK용
+    private List<Long> regionIds;  // ✅ 여러 지역을 지원하도록 변경
 
-    // ✅ DTO → Entity 변환 메서드 (클래스 내부에 위치해야 함)
+    // ✅ 서비스에서 루프 돌려서 사용해야 함 (Entity 1개 생성용)
     public ReservationPost toEntity(RegionEntity region) {
         return ReservationPost.builder()
                 .title(this.title)
                 .content(this.content)
                 .price(this.price)
                 .imageUrl(this.imageUrl)
-                .type(ReservationType.valueOf(this.type))  // String → Enum
+                .type(ReservationType.valueOf(this.type))
                 .region(region)
                 .build();
     }

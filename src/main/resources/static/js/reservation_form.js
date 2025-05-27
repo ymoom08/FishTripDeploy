@@ -5,7 +5,7 @@ import { initDateModalIfExist } from "./modal_date.js";
 import { getCachedRegions } from "./modal_region.js";
 
 // ✅ flatpickr 전역 객체 사용 (CDN으로 이미 로드되어 있어야 함)
-flatpickr.localize(flatpickr.l10ns.ko);  // 한글 로케일 설정
+flatpickr.localize(flatpickr.l10ns.ko); // 한글 로케일 설정
 
 // ✅ 지역명 출력용 유틸
 function getCompactRegionText(selectedRegions, regionHierarchy) {
@@ -25,10 +25,10 @@ function getCompactRegionText(selectedRegions, regionHierarchy) {
   }).join(", ");
 }
 
-// ✅ DOM 요소 가져오기
+// ✅ DOM 요소
 const regionApplyBtn = document.getElementById("regionApply");
 const fishApplyBtn = document.getElementById("fishApply");
-const regionIdInput = document.getElementById("regionIdInput");
+const regionIdInputContainer = document.getElementById("regionIdInput"); // div로 바꾼 부분
 const fishTypeInputGroup = document.getElementById("fishTypeInputGroup");
 const selectedRegionOutput = document.getElementById("selectedRegionText");
 const selectedFishOutput = document.getElementById("selectedFishText");
@@ -39,7 +39,16 @@ regionApplyBtn?.addEventListener("click", () => {
   const cached = getCachedRegions();
   const label = getCompactRegionText(regions, cached);
   selectedRegionOutput.textContent = label || "선택된 지역 없음";
-  regionIdInput.value = regions.length > 0 ? regions[0].id : "";
+
+  // ✅ input 비우고 다시 생성
+  regionIdInputContainer.innerHTML = "";
+  regions.forEach(region => {
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.name = "regionIds"; // DTO에 맞게 name 설정
+    input.value = region.id;
+    regionIdInputContainer.appendChild(input);
+  });
 });
 
 // ✅ 어종 적용 버튼 클릭 시
@@ -85,17 +94,13 @@ flatpickr("#datePicker", {
   position: "auto left top",
   positionElement: document.getElementById("datePicker"),
 
-  // ✅ 토요일/일요일 색상 지정 (CSS 필요함)
   onDayCreate: function (_, __, ___, dayElem) {
     const day = dayElem.dateObj.getDay();
-    if (day === 0) {
-      dayElem.classList.add("sunday");
-    } else if (day === 6) {
-      dayElem.classList.add("saturday");
-    }
+    if (day === 0) dayElem.classList.add("sunday");
+    else if (day === 6) dayElem.classList.add("saturday");
   },
 
-  // ✅ 날짜 선택 시 동적으로 정원 입력 필드 생성
+  // ✅ 날짜 선택 시 정원/시간 입력 필드 생성
   onChange: (selectedDates, dateStr, instance) => {
     const container = document.getElementById("dateContainer");
     container.innerHTML = "";

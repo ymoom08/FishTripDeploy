@@ -16,6 +16,12 @@
     <div th:replace="fragments/header :: headerFragment"></div>
 
     <main class="mainContent">
+
+        <!-- ✅ 메시지 출력 블럭 -->
+        <div th:if="${successMessage}" class="alert alert-success" style="background-color: #d4edda; color: #155724; padding: 12px; border-radius: 5px; margin: 16px;">
+            <p th:text="${successMessage}"></p>
+        </div>
+
         <div class="videoWrapper">
             <video class="backgroundVideo" src="/videos/beach.mp4" autoplay muted loop playsinline></video>
             <div class="overlayText">

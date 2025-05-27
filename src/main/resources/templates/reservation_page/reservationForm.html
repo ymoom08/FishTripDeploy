@@ -46,7 +46,7 @@
       <label>지역</label><br>
       <button type="button" id="regionBtn">지역 선택하기</button>
       <div id="selectedRegionText">선택된 지역 없음</div>
-      <input type="hidden" name="regionId" id="regionIdInput">
+      <div id="regionIdsInput"></div>
     </div>
 
     <!-- 어종 -->
@@ -68,6 +68,14 @@
       <label for="image">대표 이미지</label>
       <input type="file" id="image" name="imageFile">
     </div>
+
+    <!-- 회사명 -->
+    <div>
+      <label for="companyName">회사명</label>
+      <input type="text" id="companyName" name="companyName"
+             th:value="${companyName}" readonly required>
+    </div>
+
 
     <!-- 상세 설명 -->
     <div>

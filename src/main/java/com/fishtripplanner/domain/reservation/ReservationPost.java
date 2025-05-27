@@ -10,9 +10,9 @@ import org.hibernate.annotations.BatchSize;
 import java.time.LocalDateTime;
 import java.util.List;
 
-
 @Entity
-@Getter @Setter
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -40,6 +40,8 @@ public class ReservationPost {
 
     private LocalDateTime createdAt;
 
+    @Setter
+    @Column(name = "company_name")
     private String companyName;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -60,15 +62,7 @@ public class ReservationPost {
     )
     private List<FishTypeEntity> fishTypes;
 
-
     @OneToMany(mappedBy = "reservationPost")
     @BatchSize(size = 20)
     private List<ReservationPostAvailableDate> availableDates;
-
-
-
-
 }
-
-
-
