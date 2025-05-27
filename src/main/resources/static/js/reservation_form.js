@@ -101,14 +101,16 @@ flatpickr("#datePicker", {
     container.innerHTML = "";
 
     selectedDates.forEach((date, idx) => {
-      const koreaOffset = 9 * 60 * 60000; // 9시간 밀리세컨드
+      const koreaOffset = 9 * 60 * 60000;
       const koreaDate = new Date(date.getTime() + koreaOffset);
       const formatted = koreaDate.toISOString().split("T")[0];
+
       const div = document.createElement("div");
       div.className = "date-entry";
       div.innerHTML = `
         <label>${formatted}</label>
         <input type="hidden" name="availableDates[${idx}].date" value="${formatted}">
+        <input type="text" name="availableDates[${idx}].time" placeholder="예: 06:00~14:00" pattern="^\\d{2}:\\d{2}~\\d{2}:\\d{2}$" required>
         <input type="number" name="availableDates[${idx}].capacity" placeholder="정원" min="1" required>
         <button type="button" class="remove-date" data-date="${formatted}">❌</button>
       `;
