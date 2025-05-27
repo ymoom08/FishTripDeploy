@@ -22,6 +22,35 @@ body, html {
 .catchLogSection {
   scroll-snap-align: start;
 }
+/* ===== 검색창 ===== */
+.searchBoxWrapper {
+  position: relative;
+  width: 300px;
+  margin: 0 auto;
+}
+
+.searchBoxWrapper form {
+  width: 100%;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 10px 40px 10px 15px; /* 오른쪽 공간 확보 */
+  border-radius: 30px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+
+.searchButton {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+}
 
 /* ===== VIDEO BACKGROUND WITH OVERLAY TEXT ===== */
 .videoWrapper {

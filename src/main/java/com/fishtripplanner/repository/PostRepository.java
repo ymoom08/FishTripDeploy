@@ -13,4 +13,5 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     List<Post> findTop9ByOrderByViewCountDesc();      // 인기 게시글 상위 9개
     List<Post> findTop10ByOrderByCreatedAtDesc();     // 최신 게시글 상위 10개
+    List<Post> findByTitleContainingIgnoreCaseOrContentContainingIgnoreCase(String titleKeyword, String contentKeyword);
 }
