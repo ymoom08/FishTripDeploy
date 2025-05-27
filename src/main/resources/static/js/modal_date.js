@@ -66,7 +66,10 @@ export function initDateModal({ onApply } = {}) {
     },
     onChange: (selectedDates, dateStr) => {
       // ✅ 문자열 하나 → 날짜 배열로 저장
-      selectedDate.value = selectedDates.map(d => d.toISOString().split("T")[0]);
+      selectedDate.value = selectedDates.map(d => {
+        const local = new Date(d.getTime() - (d.getTimezoneOffset() * 60000)); // 로컬시간 보정
+        return local.toISOString().split("T")[0];
+      });
     },
     appendTo: document.getElementById("datePickerContainer")
   });

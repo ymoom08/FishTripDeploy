@@ -101,7 +101,9 @@ flatpickr("#datePicker", {
     container.innerHTML = "";
 
     selectedDates.forEach((date, idx) => {
-      const formatted = date.toISOString().split("T")[0];
+      const koreaOffset = 9 * 60 * 60000; // 9시간 밀리세컨드
+      const koreaDate = new Date(date.getTime() + koreaOffset);
+      const formatted = koreaDate.toISOString().split("T")[0];
       const div = document.createElement("div");
       div.className = "date-entry";
       div.innerHTML = `
@@ -116,9 +118,10 @@ flatpickr("#datePicker", {
     container.querySelectorAll(".remove-date").forEach(btn => {
       btn.addEventListener("click", () => {
         const dateToRemove = btn.dataset.date;
-        const updatedDates = selectedDates.filter(date =>
-          date.toISOString().split("T")[0] !== dateToRemove
-        );
+        const updatedDates = selectedDates.filter(date => {
+          const koreaDate = new Date(date.getTime() + 9 * 60 * 60000);
+          return koreaDate.toISOString().split("T")[0] !== dateToRemove;
+        });
         instance.setDate(updatedDates, true);
       });
     });
