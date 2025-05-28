@@ -1,28 +1,15 @@
-// ✅ MainPage 전용 스크립트
-
-function selectRegion(regionName) {
-    alert(`선택된 해역: ${regionName}`);
+// 페이지 이동 버튼 처리
+function navigatePage(url) {
+  window.location.href = url;
 }
 
-// ✅ 비디오 슬라이더
-document.addEventListener('DOMContentLoaded', () => {
-    const videos = document.querySelectorAll('.videoSlider .video');
-    let current = 0;
-
-    function showVideo(index) {
-        videos.forEach((video, i) => {
-            video.classList.remove('active');
-            if (i === index) {
-                video.classList.add('active');
-            }
-        });
-    }
-
-    if (videos.length > 0) {
-        showVideo(current);
-        setInterval(() => {
-            current = (current + 1) % videos.length;
-            showVideo(current);
-        }, 4000);
-    }
+// Lottie 애니메이션 로딩
+document.addEventListener("DOMContentLoaded", function () {
+  lottie.loadAnimation({
+    container: document.getElementById('lottiePopularPosts'),
+    renderer: 'svg',
+    loop: true,
+    autoplay: true,
+    path: '/json/mascot.json'  // ← 반드시 이 경로로 수정
+  });
 });

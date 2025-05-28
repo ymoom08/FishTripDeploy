@@ -6,8 +6,9 @@
     <title>FishTrip</title>
 
     <link rel="stylesheet" href="/css/MainPage.css">
-    <link rel="stylesheet" href="/css/header.css">
+    <link rel="stylesheet" th:href="@{/css/header.css}" />
     <link rel="stylesheet" href="/css/footer.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.10.2/lottie.min.js"></script>
     <script src="/js/common.js" defer></script>
     <script src="/js/mainpage.js" defer></script>
 </head>
@@ -21,26 +22,29 @@
             <div class="overlayText">
                 <h1>혼자서도,<br>함께도,<br>낚시 계획의<br>모든것<br><strong>Finder</strong></h1>
                 <button class="button" onclick="navigatePage('/party/create')">🐟 일정 짜기</button>
-
             </div>
         </div>
-
     </main>
 
-    <div class="eventSection">
-        <h2 class="sectionTitle">🔥 인기 게시글</h2>
-        <ul class="sectionList">
-            <li th:each="post : ${popularPosts}" style="display: flex; align-items: center; background-color: #e0f7fa; border-radius: 10px; padding: 10px; margin-bottom: 10px;">
-                <a th:href="@{'/posts/' + ${post.id}}" style="display: flex; align-items: center; text-decoration: none; color: #222; font-weight: 500;">
-                    <span th:if="${post.profileImagePath == null}" style="font-size: 20px; margin-right: 10px;">🧍</span>
-                    <img th:if="${post.profileImagePath != null}" th:src="@{${post.profileImagePath}}"
-                         alt="프로필" style="width: 32px; height: 32px; border-radius: 50%; margin-right: 10px;">
-                    <span th:text="${post.title}">제목</span>
-                </a>
-            </li>
-        </ul>
+    <!-- 🔥 인기 게시글 + 애니메이션 -->
+    <div class="eventSectionWrapper">
+        <div class="eventSection">
+            <div id="lottiePopularPosts" class="lottie-background"></div>
+            <h2 class="sectionTitle">🔥 인기 게시글</h2>
+            <ul class="sectionList">
+                <li th:each="post : ${popularPosts}">
+                    <a th:href="@{'/posts/' + ${post.id}}">
+                        <span th:if="${post.profileImagePath == null}">🧍</span>
+                        <img th:if="${post.profileImagePath != null}" th:src="@{${post.profileImagePath}}"
+                             alt="프로필" style="width: 32px; height: 32px; border-radius: 50%; margin-right: 10px;">
+                        <span th:text="${post.title}">제목</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
     </div>
 
+    <!-- 🎣 예약 섹션 -->
     <section class="catchLogSection">
         <div class="catchTextBlock">
             <h2>🎣 예약하기</h2>
