@@ -3,7 +3,6 @@ function navigatePage(url) {
   window.location.href = url;
 }
 
-// Lottie 애니메이션 로딩
 document.addEventListener("DOMContentLoaded", function () {
   lottie.loadAnimation({
     container: document.getElementById('lottiePopularPosts'),

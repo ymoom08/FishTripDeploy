@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>FishTrip</title>
 
-    <link rel="stylesheet" href="/css/MainPage.css">
+    <link rel="stylesheet" href="/css/MainPage.css" />
     <link rel="stylesheet" th:href="@{/css/header.css}" />
-    <link rel="stylesheet" href="/css/footer.css">
+    <link rel="stylesheet" href="/css/footer.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.10.2/lottie.min.js"></script>
     <script src="/js/common.js" defer></script>
     <script src="/js/mainpage.js" defer></script>
@@ -34,9 +34,9 @@
             <ul class="sectionList">
                 <li th:each="post : ${popularPosts}">
                     <a th:href="@{'/posts/' + ${post.id}}">
-                        <span th:if="${post.profileImagePath == null}">🧍</span>
-                        <img th:if="${post.profileImagePath != null}" th:src="@{${post.profileImagePath}}"
-                             alt="프로필" style="width: 32px; height: 32px; border-radius: 50%; margin-right: 10px;">
+                        <span th:if="${post.profileImagePath == null}">🧝</span>
+                        <img th:if="${post.profileImagePath != null}" th:src="@{${post.profileImagePath}}" alt="프로필"
+                             style="width: 32px; height: 32px; border-radius: 50%; margin-right: 10px;">
                         <span th:text="${post.title}">제목</span>
                     </a>
                 </li>
@@ -44,11 +44,14 @@
         </div>
     </div>
 
+    <!-- 🌊 파도 애니메이션 - 별도 배치 -->
+    <div class="wave"></div>
+
     <!-- 🎣 예약 섹션 -->
     <section class="catchLogSection">
         <div class="catchTextBlock">
             <h2>🎣 예약하기</h2>
-            <p>언제 어디서든 예약이 가능해요<br/>여러 선택지로 익사이팅한 낚시</p>
+            <p>어느 것이든 예약이 가능해요<br/>여러 선택지로 익사이팅한 낚시</p>
             <a href="/reservation" class="button">예약하러 가기</a>
         </div>
         <div class="catchPhoneMockup">
