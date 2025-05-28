@@ -37,7 +37,7 @@ public class ReservationFormController {
 
         model.addAttribute("companyName", companyName);
 
-        return "reservation_page/reservationForm";
+        return "reservation_page/reservation_form";
     }
 
 

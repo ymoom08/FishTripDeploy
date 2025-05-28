@@ -56,11 +56,11 @@ export function injectHiddenInputs(containerId, name, values) {
 
   if (!Array.isArray(values)) return;
 
-  values.forEach(value => {
+  values.forEach((value, index) => {
     if (value !== null && value !== undefined && value !== "") {
       const input = document.createElement("input");
       input.type = "hidden";
-      input.name = name;
+      input.name = `${name}[${index}]`; // 배열 인덱스 기반 이름 부여
       input.value = value;
       container.appendChild(input);
     }

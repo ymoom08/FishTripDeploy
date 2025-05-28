@@ -1,6 +1,5 @@
 import {
   ModalState,
-  injectHiddenInputs,
   openModal,
   closeModal,
   bindModalOutsideClick,
@@ -33,7 +32,30 @@ export function initDateModal({ onApply } = {}) {
 
   // 🔘 적용
   el.apply.addEventListener("click", () => {
-    injectHiddenInputs(ids.hiddenInput, "availableDates", ModalState.getDates());
+    const container = document.getElementById(ids.hiddenInput);
+    const dates = ModalState.getDates();
+    if (!container) return;
+
+    const isFormMode = container.dataset.formMode === "true";
+    container.innerHTML = "";
+
+    dates.forEach((date, idx) => {
+      const div = document.createElement("div");
+      div.className = "date-entry";
+
+      div.innerHTML = isFormMode
+        ? `
+          <label>${date}</label>
+          <input type="hidden" name="availableDates[${idx}].date" value="${date}">
+          <input type="text" name="availableDates[${idx}].time" placeholder="예: 06:00~14:00" pattern="^\\d{2}:\\d{2}~\\d{2}:\\d{2}$" required>
+          <input type="number" name="availableDates[${idx}].capacity" placeholder="정원" min="1" required>
+          <button type="button" class="remove-date" data-date="${date}">❌</button>
+        `
+        : `<div class="date-label">${date} <button type="button" class="remove-date" data-date="${date}">❌</button></div>`;
+
+      container.appendChild(div);
+    });
+
     closeModal(el.modal);
     onApply?.();
   });
@@ -46,6 +68,8 @@ export function initDateModal({ onApply } = {}) {
   // 🔘 초기화
   el.reset.addEventListener("click", () => {
     ModalState.setDates([]);
+    const container = document.getElementById(ids.hiddenInput);
+    if (container) container.innerHTML = "";
     onApply?.();
   });
 
@@ -78,7 +102,10 @@ export function initDateModal({ onApply } = {}) {
  * ✅ 조건부 초기화
  */
 export function initDateModalIfExist({ onApply } = {}) {
-  const requiredIds = ["dateBtn", "dateModal", "dateApply", "dateCancel", "dateReset", "datePickerContainer"];
+  const requiredIds = [
+    "dateBtn", "dateModal", "dateApply", "dateCancel",
+    "dateReset", "datePickerContainer"
+  ];
   const allExist = requiredIds.every(id => document.getElementById(id));
   if (allExist) {
     initDateModal({ onApply });

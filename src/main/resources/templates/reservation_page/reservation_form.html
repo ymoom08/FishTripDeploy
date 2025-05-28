@@ -57,6 +57,14 @@
       <div id="fishTypeInputGroup"></div>
     </div>
 
+    <!-- 날짜 선택 -->
+    <div>
+      <label>예약 가능 날짜(시간) + 정원</label><br>
+      <button type="button" id="dateBtn">날짜 선택하기</button> <!-- ✅ dateModal 트리거 버튼 -->
+      <input type="text" id="datePicker" placeholder="날짜를 선택하세요" readonly>
+      <div id="dateContainer" data-form-mode="true"></div>
+    </div>
+
     <!-- 가격 -->
     <div>
       <label for="price">가격</label>
@@ -79,13 +87,6 @@
     <div>
       <label for="content">상세 설명</label>
       <textarea id="content" name="content" rows="5" required></textarea>
-    </div>
-
-    <!-- 날짜 선택 -->
-    <div>
-      <label for="datePicker">예약 가능 날짜(시간) + 정원</label><br>
-      <input type="text" id="datePicker" placeholder="날짜를 선택하세요" readonly>
-      <div id="dateContainer"></div>
     </div>
 
     <!-- 제출 -->
@@ -119,6 +120,21 @@
       </div>
     </div>
   </div>
+
+  <!-- ✅ 날짜 모달 -->
+  <div id="dateModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <h2>날짜 선택</h2>
+      <div id="datePickerContainer"></div>
+      <div class="current-selection">선택된 날짜 없음</div>
+      <div class="modal-actions">
+        <button id="dateApply">적용</button>
+        <button id="dateCancel">취소</button>
+        <button id="dateReset">초기화</button>
+      </div>
+    </div>
+  </div>
+
 </main>
 
 <!-- ✅ JS -->

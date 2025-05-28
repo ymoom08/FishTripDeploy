@@ -6,7 +6,6 @@ import {
   bindModalOutsideClick,
   getRequiredElements
 } from "./modal_common.js";
-import { updateSelectedRegionTextOnly } from "./reservation_list.js";
 
 // ✅ 지역 캐싱
 let cachedRegions = null;
@@ -34,28 +33,28 @@ export function initRegionModal({ onApply } = {}) {
   if (!el) return;
 
   // 🔘 모달 열기
-  el.btn.addEventListener("click", () => {
-    openModal(el.modal);
+    el.btn.addEventListener("click", () => {
+      openModal(el.modal);
 
-    const cached = getCachedRegions();
-    if (cached) {
-      renderFilteredRegions(cached, el.list, el.modal);
-    } else {
-      fetch("/api/regions/hierarchy")
-        .then(res => {
-          if (!res.ok) throw new Error("지역 데이터 응답 실패");
-          return res.json();
-        })
-        .then(data => {
-          setCachedRegions(data);
-          renderFilteredRegions(data, el.list, el.modal);
-        })
-        .catch(err => {
-          console.error("지역 데이터 로딩 실패:", err);
-          el.list.innerHTML = '<p style="color:red;">지역 데이터를 불러오는 데 실패했습니다.</p>';
-        });
-    }
-  });
+      const cached = getCachedRegions();
+      if (cached) {
+        renderFilteredRegions(cached, el.list, el.modal);
+      } else {
+        fetch("/api/regions/hierarchy")
+          .then(res => {
+            if (!res.ok) throw new Error("지역 데이터 응답 실패");
+            return res.json();
+          })
+          .then(data => {
+            setCachedRegions(data);
+            renderFilteredRegions(data, el.list, el.modal);
+          })
+          .catch(err => {
+            console.error("지역 데이터 로딩 실패:", err);
+            el.list.innerHTML = '<p style="color:red;">지역 데이터를 불러오는 데 실패했습니다.</p>';
+          });
+      }
+    });
 
   // 🔘 적용
   el.apply.addEventListener("click", () => {
@@ -63,7 +62,6 @@ export function initRegionModal({ onApply } = {}) {
     injectHiddenInputs(ids.container, "regionIds", selected);
     closeModal(el.modal);
     onApply?.();
-    updateSelectedRegionTextOnly();
   });
 
   // 🔘 초기화
@@ -73,7 +71,6 @@ export function initRegionModal({ onApply } = {}) {
     const label = el.modal.querySelector(".current-selection");
     if (label) label.textContent = "선택된 지역 없음";
     onApply?.();
-    updateSelectedRegionTextOnly();
   });
 
   // 🔘 외부 클릭 닫기

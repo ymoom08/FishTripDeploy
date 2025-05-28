@@ -140,6 +140,22 @@ function updateSelectedInfo() {
   label.innerText = parts.filter(Boolean).join("\n");
 }
 
+// ✅ 리스트 필터용 날짜만 출력 (❌ 버튼 없이)
+function updateDateLabel() {
+  const selected = ModalState.getDates();
+  const container = document.getElementById("dateContainer");
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  selected.forEach(date => {
+    const span = document.createElement("span");
+    span.className = "date-label";
+    span.textContent = date;
+    container.appendChild(span);
+  });
+}
+
 // ✅ 선택된 지역 텍스트만 갱신 (export)
 export function updateSelectedRegionTextOnly(selector = "#regionModal .current-selection") {
   const label = document.querySelector(selector);
@@ -171,7 +187,7 @@ function initSortControl() {
   const sortBtn = document.getElementById("sortBtn");
   const sortOptions = document.getElementById("sortOptions");
 
-  if (!sortBtn || !sortOptions) return; // 가능성 확인
+  if (!sortBtn || !sortOptions) return;
 
   sortBtn.addEventListener("click", () => sortOptions.classList.toggle("hidden"));
 
@@ -208,14 +224,16 @@ function initModalOutsideClose() {
   });
 }
 
-// ✅ 지역 데이터 초기화 (1 (1\uud68c)
+// ✅ 지역 데이터 초기화
 fetch("/api/regions/hierarchy")
   .then(res => res.json())
   .then(setCachedRegions)
   .catch(err => console.error("지역 데이터 초기화 실패:", err));
 
-// ✅ DOMContentLoaded 시 초기화
+// ✅ 페이지 종류 판별
+const isListPage = location.pathname.includes("/reservation/list");
 
+// ✅ 페이지 초기화
 document.addEventListener("DOMContentLoaded", () => {
   initSortControl();
   initSearchControl();
@@ -224,21 +242,25 @@ document.addEventListener("DOMContentLoaded", () => {
   initRegionModal({
     onApply: () => {
       updateSelectedInfo();
-      applyFilters({});
+      if (isListPage) applyFilters({});
     }
   });
 
   initFishModal({
     onApply: () => {
       updateSelectedInfo();
-      applyFilters({});
+      if (isListPage) applyFilters({});
     }
   });
 
+  // ✅ 날짜 모달 적용 시 리스트용 날짜 라벨 갱신 추가
   initDateModal({
     onApply: () => {
       updateSelectedInfo();
-      applyFilters({});
+      updateDateLabel(); // ❌ 버튼 없는 날짜 렌더링 추가
+      if (isListPage) applyFilters({});
     }
   });
+
+  if (isListPage) applyFilters();
 });

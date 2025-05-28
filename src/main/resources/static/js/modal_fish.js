@@ -6,7 +6,6 @@ import {
   bindModalOutsideClick,
   getRequiredElements
 } from "./modal_common.js";
-import { updateSelectedFishText } from "./reservation_list.js";
 
 /**
  * ✅ 어종 모달 초기화
@@ -51,14 +50,12 @@ export function initFishModal({ onApply } = {}) {
     injectHiddenInputs(ids.container, "fishTypeNames", ModalState.getFishTypes());
     closeModal(el.modal);
     onApply?.();
-    updateSelectedFishText();
   });
 
   // 🔘 초기화
   el.reset.addEventListener("click", () => {
     ModalState.setFishTypes([]);
     el.modal.querySelectorAll(".fish-type-btn.selected").forEach(btn => btn.classList.remove("selected"));
-    updateSelectedFishText();
     onApply?.();
   });
 
