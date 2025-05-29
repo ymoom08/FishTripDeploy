@@ -80,9 +80,10 @@ export function initDateModal({ onApply } = {}) {
   flatpickr.localize(flatpickr.l10ns.ko);
   flatpickr(`#${ids.picker}`, {
     dateFormat: "Y-m-d",
-    inline: true,
     locale: "ko",
     mode: "multiple",
+    inline: true,
+    appendTo: document.getElementById(ids.picker), // ⬅️ 추가!
     onDayCreate: (_, __, ___, dayElem) => {
       const day = dayElem.dateObj.getDay();
       if (day === 0) dayElem.classList.add("sunday");
@@ -96,6 +97,7 @@ export function initDateModal({ onApply } = {}) {
       ModalState.setDates(formatted);
     }
   });
+
 }
 
 /**
