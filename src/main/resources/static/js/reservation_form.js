@@ -53,7 +53,15 @@ function updateRegionLabel() {
   }).join(", ");
 
   const regionTextEl = document.getElementById("selectedRegionText");
-  if (regionTextEl) regionTextEl.textContent = text || "선택된 지역 없음";
+  if (regionTextEl) {
+    if (text) {
+      regionTextEl.textContent = text;
+      regionTextEl.className = "selection-result";
+    } else {
+      regionTextEl.textContent = "";
+      regionTextEl.className = "";
+    }
+  }
 
   const modalLabel = document.querySelector("#regionModal .current-selection");
   if (modalLabel) modalLabel.textContent = text || "선택된 지역 없음";
@@ -65,13 +73,21 @@ function updateRegionLabel() {
 // ✅ [5] 어종 UI 갱신
 function updateFishLabel() {
   const selected = ModalState.getFishTypes();
-  const text = selected.length > 0 ? selected.join(", ") : "선택된 어종 없음";
+  const text = selected.length > 0 ? selected.join(", ") : "";
 
   const fishTextEl = document.getElementById("selectedFishText");
-  if (fishTextEl) fishTextEl.textContent = text;
+  if (fishTextEl) {
+    if (text) {
+      fishTextEl.textContent = text;
+      fishTextEl.className = "selection-result";
+    } else {
+      fishTextEl.textContent = "";
+      fishTextEl.className = "";
+    }
+  }
 
   const modalLabel = document.querySelector("#fishModal .current-selection");
-  if (modalLabel) modalLabel.textContent = text;
+  if (modalLabel) modalLabel.textContent = text || "선택된 어종 없음";
 
   injectHiddenInputs("fishTypeInputGroup", "fishTypeNames", selected);
 }
@@ -102,7 +118,7 @@ function updateDateLabel() {
   container.querySelectorAll(".remove-date").forEach(btn => {
     btn.addEventListener("click", () => {
       const dateToRemove = btn.getAttribute("data-date");
-      ModalState.removeDate(dateToRemove); // removeDate 함수가 정의돼 있어야 함
+      ModalState.removeDate(dateToRemove); // 이 함수는 ModalState에 정의돼 있어야 합니다.
       updateDateLabel(); // 다시 그리기
     });
   });
