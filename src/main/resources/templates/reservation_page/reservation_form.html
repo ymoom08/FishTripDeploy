@@ -60,7 +60,7 @@
     <!-- 날짜 선택 -->
     <div>
       <label>예약 가능 날짜(시간) + 정원</label><br>
-      <button type="button" id="dateBtn">날짜 선택하기</button> <!-- ✅ dateModal 트리거 버튼 -->
+      <button type="button" id="dateBtn">날짜 선택하기</button>
       <input type="text" id="datePicker" placeholder="날짜를 선택하세요" readonly>
       <div id="dateContainer" data-form-mode="true"></div>
     </div>
@@ -95,45 +95,8 @@
     </div>
   </form>
 
-  <!-- ✅ 지역 모달 -->
-  <div id="regionModal" class="modal hidden" role="dialog" aria-modal="true">
-    <div class="modal-content">
-      <h2>지역 선택</h2>
-      <div id="regionList" class="region-modal-body"></div>
-      <div class="current-selection">선택된 지역 없음</div>
-      <div class="modal-actions">
-        <button id="regionApply">적용</button>
-        <button id="regionReset">초기화</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ✅ 어종 모달 -->
-  <div id="fishModal" class="modal hidden" role="dialog" aria-modal="true">
-    <div class="modal-content">
-      <h2>어종 선택</h2>
-      <div id="fishList" class="fish-modal-body"></div>
-      <div class="current-selection">선택된 어종 없음</div>
-      <div class="modal-actions">
-        <button id="fishApply">적용</button>
-        <button id="fishReset">초기화</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ✅ 날짜 모달 -->
-  <div id="dateModal" class="modal hidden" role="dialog" aria-modal="true">
-    <div class="modal-content">
-      <h2>날짜 선택</h2>
-      <div id="datePickerContainer"></div>
-      <div class="current-selection">선택된 날짜 없음</div>
-      <div class="modal-actions">
-        <button id="dateApply">적용</button>
-        <button id="dateCancel">취소</button>
-        <button id="dateReset">초기화</button>
-      </div>
-    </div>
-  </div>
+  <!-- ✅ 공통 모달 프래그먼트 삽입 -->
+  <div th:replace="fragments/modals :: regionFishDateModals"></div>
 
 </main>
 

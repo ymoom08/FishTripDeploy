@@ -17,14 +17,9 @@ fetch("/api/regions/hierarchy")
   .then(setCachedRegions)
   .catch(err => console.error("지역 데이터 초기화 실패:", err));
 
-// ✅ [2] 페이지 로드 시 모달 및 달력 초기화
+// ✅ [2] 페이지 로드 시 모달 초기화만 진행
 window.addEventListener("DOMContentLoaded", () => {
   initAllModals();
-
-  const isFormPage = location.pathname.includes("/reservation/form");
-  if (isFormPage) {
-    setupFlatpickrEntry();
-  }
 });
 
 // ✅ [3] 모든 모달 초기화
@@ -85,67 +80,4 @@ function updateFishLabel() {
 function updateDateLabel() {
   const selected = ModalState.getDates();
   console.log("선택된 날짜:", selected);
-}
-
-// ✅ [7] Flatpickr 날짜 선택 처리
-function setupFlatpickrEntry() {
-  const container = document.getElementById("dateContainer");
-  const pickerEl = document.getElementById("datePicker");
-
-  if (!pickerEl || !container) return;
-
-  const isFormMode = container.dataset.formMode === "true";
-
-  const fp = flatpickr(pickerEl, {
-    locale: "ko",
-    mode: "multiple",
-    dateFormat: "Y-m-d",
-    position: "auto left top",
-    positionElement: pickerEl,
-
-    onDayCreate(_, __, ___, dayElem) {
-      const day = dayElem.dateObj.getDay();
-      if (day === 0) dayElem.classList.add("sunday");
-      else if (day === 6) dayElem.classList.add("saturday");
-    },
-
-    onChange(selectedDates) {
-      const formattedDates = selectedDates.map(d => {
-        const local = new Date(d.getTime() + 9 * 60 * 60000);
-        return local.toISOString().split("T")[0];
-      });
-
-      ModalState.setDates(formattedDates);
-      container.innerHTML = "";
-
-      formattedDates.forEach((date, idx) => {
-        const div = document.createElement("div");
-        div.className = "date-entry";
-
-        if (isFormMode) {
-          div.innerHTML = `
-            <label>${date}</label>
-            <input type="hidden" name="availableDates[${idx}].date" value="${date}">
-            <input type="text" name="availableDates[${idx}].time" placeholder="예: 06:00~14:00" pattern="^\\d{2}:\\d{2}~\\d{2}:\\d{2}$" required>
-            <input type="number" name="availableDates[${idx}].capacity" placeholder="정원" min="1" required>
-            <button type="button" class="remove-date" data-date="${date}">❌</button>
-          `;
-        } else {
-          div.innerHTML = `<span class="date-label">${date}</span>`;
-        }
-
-        container.appendChild(div);
-      });
-    }
-  });
-
-  container.addEventListener("click", (e) => {
-    const btn = e.target.closest(".remove-date");
-    if (!btn) return;
-
-    const dateToRemove = btn.dataset.date;
-    const updated = ModalState.getDates().filter(date => date !== dateToRemove);
-    ModalState.setDates(updated);
-    fp.setDate(updated, true);
-  });
 }

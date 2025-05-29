@@ -1,30 +1,55 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <body>
-<div th:fragment="regionAndFishModals">
+<div th:fragment="regionFishDateModals">
+
+  <!-- ✅ 지역 선택 모달 -->
   <div id="regionModal" class="modal hidden">
     <div class="modal-content">
       <h2>지역 선택</h2>
       <div id="regionList" class="region-modal-body"></div>
       <div class="current-selection">선택된 지역 없음</div>
-      <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
+      <div class="button-row">
         <button id="regionApply" class="modal-btn">적용</button>
         <button id="regionReset" class="modal-btn">초기화</button>
       </div>
     </div>
   </div>
 
+  <!-- ✅ 어종 선택 모달 -->
   <div id="fishModal" class="modal hidden">
     <div class="modal-content">
       <h2>어종 선택</h2>
       <div id="fishList" class="fish-modal-body"></div>
       <div class="current-selection">선택된 어종 없음</div>
-      <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
+      <div class="button-row">
         <button id="fishApply" class="modal-btn">적용</button>
         <button id="fishReset" class="modal-btn">초기화</button>
       </div>
     </div>
   </div>
+
+  <!-- ✅ 날짜 선택 모달 (공통 구조로 통일) -->
+  <div id="dateModal" class="modal hidden" data-mode="list">
+    <div class="modal-content">
+      <h2>날짜 선택</h2>
+      <div id="datePickerContainer">
+        <!-- ✅ flatpickr용 숨김 input 추가 -->
+        <input type="text" id="flatpickrInput" style="display: none;" />
+      </div>
+      <div class="current-selection">선택된 날짜 없음</div>
+
+      <!-- 용도에 따라 다르게 보이는 영역 (예: form용 입력 확장 등) -->
+      <div class="date-extra-fields" style="display: none;"></div>
+
+      <div class="button-row">
+        <button id="dateApply" class="modal-btn">적용</button>
+        <button id="dateCancel" class="modal-btn">취소</button>
+        <button id="dateReset" class="modal-btn">초기화</button>
+      </div>
+    </div>
+  </div>
+
 </div>
 </body>
 </html>

@@ -19,7 +19,9 @@ export function getCachedRegions() {
 
 export function setCachedRegions(data) {
   cachedRegions = data;
-  ModalState.setRegionCache?.(data); // modal_common에서 캐시 지원 시 호출
+  if (ModalState.setRegionCache) {
+    ModalState.setRegionCache(data);
+  }
 }
 
 // ✅ 카드 목록 fetch 및 렌더링
@@ -31,7 +33,8 @@ export function applyFilters({ sortKey = "latest" } = {}) {
   ModalState.getDates().forEach(d => query.append("date", d));
   ModalState.getFishTypes().forEach(f => query.append("fishType", f));
 
-  const keyword = document.querySelector(".search-input")?.value.trim();
+  const keywordEl = document.querySelector(".search-input");
+  const keyword = keywordEl ? keywordEl.value.trim() : "";
   if (keyword) query.append("keyword", keyword);
 
   fetch(`/api/reservation?${query.toString()}`)
@@ -73,9 +76,9 @@ function updateCards(cards) {
               </div>
               <div class="ad-desc">${card.title}</div>
               <div class="ad-detail">
-                <p>지역: ${card.region ?? "없음"}</p>
-                <p>회사명: ${card.companyName ?? "알 수 없음"}</p>
-                <p>어종: ${card.fishTypes?.join(", ") ?? "정보 없음"}</p>
+                <p>지역: ${card.region || "없음"}</p>
+                <p>회사명: ${card.companyName || "알 수 없음"}</p>
+                <p>어종: ${(card.fishTypes && card.fishTypes.join(", ")) || "정보 없음"}</p>
                 <p>${card.content}</p>
               </div>
             </a>
@@ -97,7 +100,7 @@ function getCompactRegionText() {
 
   return Object.entries(grouped)
     .flatMap(([parent, selected]) => {
-      const total = cached.find(r => r.name === parent)?.children?.length || 0;
+      const total = (cached.find(r => r.name === parent) || {}).children?.length || 0;
       return selected.length === total
         ? [`(${parent}) 전체`]
         : selected.map(c => `(${parent}) ${c.name}`);
@@ -119,35 +122,32 @@ function updateSelectedInfo() {
   const regionText = region.length > 0
     ? `현재 선택 지역: ${getCompactRegionText()}`
     : "선택된 지역 없음";
-  const regionModalLabel = document.querySelector("#regionModal .current-selection");
-  if (regionModalLabel) regionModalLabel.innerText = regionText;
+  const regionLabel = document.querySelector("#regionModal .current-selection");
+  if (regionLabel) regionLabel.innerText = regionText;
   parts.push(regionText);
 
   const dateText = date.length > 0
     ? `선택한 날짜: ${date.join(", ")}`
     : "선택된 날짜 없음";
-  const dateModalLabel = document.querySelector("#dateModal .current-selection");
-  if (dateModalLabel) dateModalLabel.innerText = dateText;
+  const dateLabel = document.querySelector("#dateModal .current-selection");
+  if (dateLabel) dateLabel.innerText = dateText;
   parts.push(dateText);
 
   const fishText = fish.length > 0
     ? `선택한 어종: ${fish.join(", ")}`
     : "선택된 어종 없음";
-  const fishModalLabel = document.querySelector("#fishModal .current-selection");
-  if (fishModalLabel) fishModalLabel.innerText = fishText;
+  const fishLabel = document.querySelector("#fishModal .current-selection");
+  if (fishLabel) fishLabel.innerText = fishText;
   parts.push(fishText);
 
   label.innerText = parts.filter(Boolean).join("\n");
 }
 
-// ✅ 리스트 필터용 날짜만 출력 (❌ 버튼 없이)
 function updateDateLabel() {
   const selected = ModalState.getDates();
   const container = document.getElementById("dateContainer");
   if (!container) return;
-
   container.innerHTML = "";
-
   selected.forEach(date => {
     const span = document.createElement("span");
     span.className = "date-label";
@@ -156,41 +156,27 @@ function updateDateLabel() {
   });
 }
 
-// ✅ 선택된 지역 텍스트만 갱신 (export)
 export function updateSelectedRegionTextOnly(selector = "#regionModal .current-selection") {
   const label = document.querySelector(selector);
   if (!label) return;
-
   const region = ModalState.getRegions();
-  const text = region.length > 0
-    ? `현재 선택 지역: ${getCompactRegionText()}`
-    : "선택된 지역 없음";
-
+  const text = region.length > 0 ? `현재 선택 지역: ${getCompactRegionText()}` : "선택된 지역 없음";
   label.innerText = text;
 }
 
-// ✅ 선택된 어종 텍스트만 갱신 (export)
 export function updateSelectedFishText(selector = "#fishModal .current-selection") {
   const label = document.querySelector(selector);
   if (!label) return;
-
   const fish = ModalState.getFishTypes();
-  const text = fish.length > 0
-    ? `선택한 어종: ${fish.join(", ")}`
-    : "선택된 어종 없음";
-
+  const text = fish.length > 0 ? `선택한 어종: ${fish.join(", ")}` : "선택된 어종 없음";
   label.innerText = text;
 }
 
-// ✅ 정렬 버튼 초기화
 function initSortControl() {
   const sortBtn = document.getElementById("sortBtn");
   const sortOptions = document.getElementById("sortOptions");
-
   if (!sortBtn || !sortOptions) return;
-
   sortBtn.addEventListener("click", () => sortOptions.classList.toggle("hidden"));
-
   document.querySelectorAll("#sortOptions button").forEach(btn => {
     btn.addEventListener("click", () => {
       const selected = btn.getAttribute("data-sort");
@@ -198,7 +184,6 @@ function initSortControl() {
       sortOptions.classList.add("hidden");
     });
   });
-
   document.addEventListener("click", (e) => {
     if (!sortBtn.contains(e.target) && !sortOptions.contains(e.target)) {
       sortOptions.classList.add("hidden");
@@ -206,34 +191,29 @@ function initSortControl() {
   });
 }
 
-// ✅ 검색창 초기화
 function initSearchControl() {
   const input = document.querySelector(".search-input");
   const btn = document.querySelector(".search-button");
-
-  btn?.addEventListener("click", () => applyFilters({}));
-  input?.addEventListener("keydown", (e) => {
+  if (btn) btn.addEventListener("click", () => applyFilters({}));
+  if (input) input.addEventListener("keydown", (e) => {
     if (e.key === "Enter") applyFilters({});
   });
 }
 
-// ✅ 모달 외 클릭 시 닫기
 function initModalOutsideClose() {
   ["regionModal", "dateModal", "fishModal"].forEach(id => {
-    bindModalOutsideClick(document.getElementById(id));
+    const modal = document.getElementById(id);
+    if (modal) bindModalOutsideClick(modal);
   });
 }
 
-// ✅ 지역 데이터 초기화
 fetch("/api/regions/hierarchy")
   .then(res => res.json())
   .then(setCachedRegions)
   .catch(err => console.error("지역 데이터 초기화 실패:", err));
 
-// ✅ 페이지 종류 판별
 const isListPage = location.pathname.includes("/reservation/list");
 
-// ✅ 페이지 초기화
 document.addEventListener("DOMContentLoaded", () => {
   initSortControl();
   initSearchControl();
@@ -253,11 +233,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // ✅ 날짜 모달 적용 시 리스트용 날짜 라벨 갱신 추가
   initDateModal({
     onApply: () => {
       updateSelectedInfo();
-      updateDateLabel(); // ❌ 버튼 없는 날짜 렌더링 추가
+      updateDateLabel();
       if (isListPage) applyFilters({});
     }
   });
