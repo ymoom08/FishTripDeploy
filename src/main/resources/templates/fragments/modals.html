@@ -8,7 +8,6 @@
     <div class="modal-content">
       <h2>지역 선택</h2>
       <div id="regionList" class="region-modal-body"></div>
-      <div class="current-selection">선택된 지역 없음</div>
       <div class="modal-actions">
         <button id="regionApply" class="modal-btn">적용</button>
         <button id="regionReset" class="modal-btn">초기화</button>
@@ -22,7 +21,6 @@
     <div class="modal-content">
       <h2>어종 선택</h2>
       <div id="fishList" class="fish-modal-body"></div>
-      <div class="current-selection">선택된 어종 없음</div>
       <div class="modal-actions">
         <button id="fishApply" class="modal-btn">적용</button>
         <button id="fishReset" class="modal-btn">초기화</button>
@@ -31,18 +29,14 @@
     </div>
   </div>
 
-  <!-- ✅ 날짜 선택 모달 -->
+  <!-- 날짜 선택 모달 -->
   <div id="dateModal" class="modal hidden">
     <div class="modal-content">
       <h2>날짜 선택</h2>
 
-      <!-- ✅ flatpickr가 이 안에 생성됨 -->
       <div id="datePickerContainer"></div>
 
-      <!-- ✅ 선택 날짜 요약 표시 -->
-      <div class="current-selection">선택된 날짜 없음</div>
-
-      <!-- ✅ form에서만 필요한 추가 입력 필드 -->
+      <!-- id 통일 & data-form-mode로 분기 -->
       <div id="dateContainer" data-form-mode="false" class="date-extra-fields"></div>
 
       <div class="modal-actions">

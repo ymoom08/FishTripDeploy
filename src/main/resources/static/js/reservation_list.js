@@ -8,7 +8,7 @@ import {
 
 import { initRegionModal } from "./modal_region.js";
 import { initFishModal } from "./modal_fish.js";
-import { initDateModalIfExist } from "./modal_date.js"; // ✅ 통일된 방식 사용
+import { initDateModal } from "./modal_date.js"; // ✅ 이 파일 안에 export된 함수로
 
 // ✅ 지역 캐시 로컬 저장
 let cachedRegions = null;
@@ -119,43 +119,21 @@ function updateSelectedInfo() {
 
   const parts = [];
 
-  const regionText = region.length > 0
-    ? `현재 선택 지역: ${getCompactRegionText()}`
-    : "선택된 지역 없음";
-  const regionLabel = document.querySelector("#regionModal .current-selection");
-  if (regionLabel) regionLabel.innerText = regionText;
-  parts.push(regionText);
+  if (region.length > 0) {
+    parts.push(`선택 지역: ${getCompactRegionText()}`);
+  }
 
-  const dateText = date.length > 0
-    ? `선택한 날짜: ${date.join(", ")}`
-    : "선택된 날짜 없음";
-  const dateLabel = document.querySelector("#dateModal .current-selection");
-  if (dateLabel) dateLabel.innerText = dateText;
-  parts.push(dateText);
+  if (date.length > 0) {
+    parts.push(`선택 날짜: ${date.join(", ")}`);
+  }
 
-  const fishText = fish.length > 0
-    ? `선택한 어종: ${fish.join(", ")}`
-    : "선택된 어종 없음";
-  const fishLabel = document.querySelector("#fishModal .current-selection");
-  if (fishLabel) fishLabel.innerText = fishText;
-  parts.push(fishText);
+  if (fish.length > 0) {
+    parts.push(`선택 어종: ${fish.join(", ")}`);
+  }
 
-  label.innerText = parts.filter(Boolean).join("\n");
+  label.innerText = parts.join("\n");
 }
 
-// ✅ 날짜 텍스트 라벨 표시
-function updateDateLabel() {
-  const selected = ModalState.getDates();
-  const container = document.getElementById("dateContainer");
-  if (!container) return;
-  container.innerHTML = "";
-  selected.forEach(date => {
-    const span = document.createElement("span");
-    span.className = "date-label";
-    span.textContent = date;
-    container.appendChild(span);
-  });
-}
 
 function initSortControl() {
   const sortBtn = document.getElementById("sortBtn");
@@ -214,7 +192,6 @@ function handleFishApply() {
 
 function handleDateApply() {
   updateSelectedInfo();
-  updateDateLabel();
   if (isListPage) applyFilters();
 }
 
@@ -232,3 +209,23 @@ document.addEventListener("DOMContentLoaded", () => {
   initAllModals();
   if (isListPage) applyFilters();
 });
+
+/**
+ * ✅ 조건부 초기화 (존재하는 경우만 적용)
+ */
+export function initDateModalIfExist({ onApply } = {}) {
+  const requiredIds = [
+    "dateBtn",
+    "dateModal",
+    "dateApply",
+    "dateCancel",
+    "dateReset",
+    "dateContainer",
+    "datePickerContainer"
+  ];
+
+  const allExist = requiredIds.every(id => document.getElementById(id));
+  if (allExist) {
+    initDateModal({ onApply });
+  }
+}

@@ -79,5 +79,31 @@ function updateFishLabel() {
 // ✅ [6] 날짜 UI 갱신
 function updateDateLabel() {
   const selected = ModalState.getDates();
-  console.log("선택된 날짜:", selected);
+  const container = document.querySelector('#dateContainer[data-form-mode="true"]');
+  if (!container) return;
+
+  container.innerHTML = ""; // 기존 입력란 초기화
+
+  selected.forEach((date, idx) => {
+    const wrapper = document.createElement("div");
+    wrapper.className = "date-entry";
+
+    wrapper.innerHTML = `
+      <span>${date}</span>
+      <input type="time" name="times[${idx}]" required placeholder="시간" />
+      <input type="number" name="capacities[${idx}]" required placeholder="정원" min="1" />
+      <button type="button" class="remove-date" data-date="${date}">&times;</button>
+    `;
+
+    container.appendChild(wrapper);
+  });
+
+  // 삭제 버튼 이벤트 추가
+  container.querySelectorAll(".remove-date").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const dateToRemove = btn.getAttribute("data-date");
+      ModalState.removeDate(dateToRemove); // removeDate 함수가 정의돼 있어야 함
+      updateDateLabel(); // 다시 그리기
+    });
+  });
 }

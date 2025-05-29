@@ -9,31 +9,32 @@ let selectedRegions = [];
 let selectedDates = [];
 
 export const ModalState = {
-  // 어종
   getFishTypes: () => [...selectedFishTypes],
   setFishTypes: (types) => {
     selectedFishTypes = Array.isArray(types) ? [...types] : [];
   },
 
-  // 지역
   getRegions: () => [...selectedRegions],
   setRegions: (regions) => {
     selectedRegions = Array.isArray(regions) ? [...regions] : [];
   },
 
-  // 날짜
   getDates: () => [...selectedDates],
   setDates: (dates) => {
     selectedDates = Array.isArray(dates) ? [...dates] : [];
   },
 
-  // 전체 초기화
+  removeDate: (date) => {
+    selectedDates = selectedDates.filter(d => d !== date);
+  },
+
   reset: () => {
     selectedFishTypes = [];
     selectedRegions = [];
     selectedDates = [];
   }
 };
+
 
 // ----------------------------------------
 // [2] Hidden Input 삽입 유틸

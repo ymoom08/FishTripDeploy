@@ -26,13 +26,13 @@ export function initDateModal({ onApply } = {}) {
   const container = document.getElementById(ids.hiddenInput);
   const pickerContainer = document.getElementById(ids.container);
 
-  // 🔘 임시 input 요소 생성 (flatpickr가 직접 타겟으로 사용)
+  // 🔘 flatpickr용 임시 input 생성
   const tempInput = document.createElement("input");
   tempInput.type = "text";
   tempInput.style.display = "none";
   pickerContainer.appendChild(tempInput);
 
-  // 🔘 달력 인스턴스 생성
+  // 🔘 flatpickr 인스턴스 생성
   flatpickr.localize(flatpickr.l10ns.ko);
   const fp = flatpickr(tempInput, {
     dateFormat: "Y-m-d",
@@ -101,8 +101,8 @@ export function initDateModal({ onApply } = {}) {
 
 /**
  * ✅ 날짜 입력 필드 렌더링
- * - form.html → 입력 필드 모드
- * - list.html → 단순 라벨 모드
+ * - form.html → 날짜 입력 필드들 렌더링
+ * - list.html → 출력 생략 (외부에서 렌더링)
  */
 function renderDateEntries(dates, container) {
   if (!container) return;
@@ -110,11 +110,11 @@ function renderDateEntries(dates, container) {
   const isFormMode = container.dataset.formMode?.toLowerCase() === "true";
   container.innerHTML = "";
 
-  dates.forEach((date, idx) => {
-    const wrapper = document.createElement("div");
-    wrapper.className = "date-entry";
+  if (isFormMode) {
+    dates.forEach((date, idx) => {
+      const wrapper = document.createElement("div");
+      wrapper.className = "date-entry";
 
-    if (isFormMode) {
       wrapper.innerHTML = `
         <div class="date-label">${date}</div>
         <input type="hidden" name="availableDates[${idx}].date" value="${date}">
@@ -123,21 +123,16 @@ function renderDateEntries(dates, container) {
         <input type="number" name="availableDates[${idx}].capacity" placeholder="정원" min="1" required>
         <button type="button" class="remove-date" data-date="${date}">❌</button>
       `;
-    } else {
-      wrapper.innerHTML = `
-        <div class="date-label">
-          ${date}
-          <button type="button" class="remove-date" data-date="${date}">❌</button>
-        </div>
-      `;
-    }
 
-    container.appendChild(wrapper);
-  });
+      container.appendChild(wrapper);
+    });
+  }
+
+  // ❌ list 모드는 외부 템플릿에서 처리하므로 아무 출력도 하지 않음
 }
 
 /**
- * ✅ 조건부 초기화 (존재하는 경우만 적용)
+ * ✅ 조건부 초기화 (요소가 존재하는 경우에만)
  */
 export function initDateModalIfExist({ onApply } = {}) {
   const requiredIds = [
@@ -153,7 +148,5 @@ export function initDateModalIfExist({ onApply } = {}) {
   const allExist = requiredIds.every(id => document.getElementById(id));
   if (allExist) {
     initDateModal({ onApply });
-  } else {
-    console.warn("⚠️ [initDateModalIfExist] 일부 요소가 없어 초기화 생략됨");
   }
 }

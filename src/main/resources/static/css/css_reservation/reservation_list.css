@@ -190,9 +190,3 @@ h1 {
   display: none;
 }
 
-/* ✅ 달력 크기 맞춤 */
-.flatpickr-calendar {
-  transform: scale(1.25);
-  transform-origin: center;
-  z-index: 1001;
-}
