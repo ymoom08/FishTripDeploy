@@ -33,10 +33,10 @@
   <div id="dateModal" class="modal hidden" data-mode="list">
     <div class="modal-content">
       <h2>날짜 선택</h2>
-      <div id="datePickerContainer">
-        <!-- ✅ flatpickr용 숨김 input 추가 -->
-        <input type="text" id="flatpickrInput" style="display: none;" />
-      </div>
+
+      <!-- ✅ flatpickr가 직접 렌더링될 div -->
+      <div id="datePickerContainer"></div>
+
       <div class="current-selection">선택된 날짜 없음</div>
 
       <!-- 용도에 따라 다르게 보이는 영역 (예: form용 입력 확장 등) -->

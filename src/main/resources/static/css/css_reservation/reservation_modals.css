@@ -1,4 +1,4 @@
-/* ✅ 공통 모달 배경 */
+/* ✅ 모달 배경 */
 .modal {
   position: fixed;
   top: 0;
@@ -21,33 +21,33 @@
   pointer-events: auto;
 }
 
-/* ✅ 공통 모달 콘텐츠 (날짜/지역/어종 모두) */
+/* ✅ 모달 컨텐츠 */
 .modal-content {
-  background: white;
-  padding: 24px 20px;
-  border-radius: 12px;
-  width: 80vh;
-  min-height: 400px;
-  max-height: 600px;
+  background: #fff;
+  padding: 32px 28px;
+  border-radius: 16px;
+  width: 95%;
+  max-width: 700px;
+  max-height: 90vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  gap: 20px;
+  gap: 24px;
   overflow-y: auto;
   box-sizing: border-box;
 }
 
-/* ✅ 공통 버튼 스타일 */
+/* ✅ 버튼 공통 */
 .modal-btn {
-  background: #eee;
+  background: #f0f0f0;
   color: #333;
-  padding: 6px 14px;
+  padding: 10px 20px;
   border: 1px solid #aaa;
   cursor: pointer;
-  border-radius: 4px;
-  font-size: 14px;
-  min-width: 80px;
+  border-radius: 6px;
+  font-size: 15px;
+  min-width: 100px;
   text-align: center;
 }
 
@@ -55,57 +55,56 @@
   background-color: #ddd;
 }
 
-/* ✅ 날짜 선택 전용 컨테이너 */
+/* ✅ 날짜 컨테이너 */
 #datePickerContainer {
+  width: 100%;
   display: flex;
   justify-content: center;
-  align-items: flex-start;
-  width: 100%;
-  max-width: 460px;
-  min-height: 320px;
-  padding-bottom: 10px;
+  align-items: center;
+  min-height: 360px;
 }
 
-/* ✅ flatpickr 기본 달력 스타일 */
+/* ✅ flatpickr 달력 */
 .flatpickr-calendar {
-  margin: 0 auto;
-  transform: scale(1.15);
-  transform-origin: top center;
+  transform: scale(1.25);
+  transform-origin: center;
+  z-index: 1001;
 }
 
-/* ✅ 요일 컬러 강조 */
+/* ✅ 요일 강조 */
 .flatpickr-day.sunday {
   color: #e74c3c;
-  font-weight: 500;
+  font-weight: bold;
 }
 
 .flatpickr-day.saturday {
   color: #3498db;
-  font-weight: 500;
+  font-weight: bold;
 }
 
-/* ✅ 지역 선택 구조 */
+/* ✅ 지역 선택 */
 .region-group {
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 .region-title {
   font-weight: bold;
   margin-bottom: 10px;
+  font-size: 16px;
 }
 
 .region-children {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 8px;
   margin-bottom: 10px;
 }
 
 .region-child-btn {
-  padding: 6px 10px;
+  padding: 8px 12px;
   border: 2px solid #aaa;
-  background-color: #f2f2f2;
-  border-radius: 5px;
+  background-color: #f9f9f9;
+  border-radius: 6px;
   cursor: pointer;
 }
 
@@ -120,14 +119,14 @@
   border: 2px solid #0056b3;
 }
 
-/* ✅ 어종 선택 구조 */
+/* ✅ 어종 선택 */
 .fish-type-btn {
-  padding: 6px 10px;
+  padding: 8px 12px;
   border: 2px solid #aaa;
   background-color: #f9f9f9;
-  border-radius: 5px;
+  border-radius: 6px;
   cursor: pointer;
-  margin: 4px;
+  margin: 5px;
   font-size: 15px;
 }
 
@@ -142,26 +141,24 @@
   border: 2px solid #0056b3;
 }
 
-/* ✅ 어종 그룹 구조 */
+/* ✅ 어종 그룹 */
 .fish-group {
-  display: block;
-  margin-bottom: 25px;
+  margin-bottom: 30px;
 }
 
 .fish-group-title {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: bold;
   font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
 }
 
 .fish-group-body {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
 }
 
 .fish-modal-body {
-  display: block;
-  padding: 10px;
+  padding: 12px;
 }
+

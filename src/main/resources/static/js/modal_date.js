@@ -8,8 +8,6 @@ import {
 
 /**
  * ✅ 날짜 모달 초기화
- * @param {Object} options - 설정 객체
- * @param {Function} options.onApply - 날짜 적용 시 실행할 외부 콜백 함수
  */
 export function initDateModal({ onApply } = {}) {
   const ids = {
@@ -18,7 +16,6 @@ export function initDateModal({ onApply } = {}) {
     apply: "dateApply",
     cancel: "dateCancel",
     reset: "dateReset",
-    input: "flatpickrInput",
     hiddenInput: "dateContainer",
     container: "datePickerContainer"
   };
@@ -26,13 +23,17 @@ export function initDateModal({ onApply } = {}) {
   const el = getRequiredElements(ids);
   if (!el) return;
 
-  const fpInput = document.getElementById(ids.input);
   const container = document.getElementById(ids.hiddenInput);
   const pickerContainer = document.getElementById(ids.container);
 
+  // 🔘 input을 JS에서 직접 생성
+  const tempInput = document.createElement("input");
+  tempInput.style.display = "none"; // ✅ 화면에서 안 보이게 처리
+  pickerContainer.appendChild(tempInput);
+
   // 🔘 달력 인스턴스 생성
   flatpickr.localize(flatpickr.l10ns.ko);
-  const fp = flatpickr(fpInput, {
+  const fp = flatpickr(tempInput, {
     dateFormat: "Y-m-d",
     locale: "ko",
     mode: "multiple",
@@ -130,7 +131,7 @@ function renderDateEntries(dates, container) {
 export function initDateModalIfExist({ onApply } = {}) {
   const requiredIds = [
     "dateBtn", "dateModal", "dateApply", "dateCancel",
-    "dateReset", "flatpickrInput", "dateContainer", "datePickerContainer"
+    "dateReset", "dateContainer", "datePickerContainer"
   ];
   const allExist = requiredIds.every(id => document.getElementById(id));
   if (allExist) {
