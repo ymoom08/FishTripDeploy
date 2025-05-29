@@ -7,8 +7,8 @@ import {
 } from "./modal_common.js";
 
 import { initRegionModal } from "./modal_region.js";
-import { initDateModal } from "./modal_date.js";
 import { initFishModal } from "./modal_fish.js";
+import { initDateModalIfExist } from "./modal_date.js"; // ✅ 통일된 방식 사용
 
 // ✅ 지역 캐시 로컬 저장
 let cachedRegions = null;
@@ -143,6 +143,7 @@ function updateSelectedInfo() {
   label.innerText = parts.filter(Boolean).join("\n");
 }
 
+// ✅ 날짜 텍스트 라벨 표시
 function updateDateLabel() {
   const selected = ModalState.getDates();
   const container = document.getElementById("dateContainer");
@@ -156,27 +157,13 @@ function updateDateLabel() {
   });
 }
 
-export function updateSelectedRegionTextOnly(selector = "#regionModal .current-selection") {
-  const label = document.querySelector(selector);
-  if (!label) return;
-  const region = ModalState.getRegions();
-  const text = region.length > 0 ? `현재 선택 지역: ${getCompactRegionText()}` : "선택된 지역 없음";
-  label.innerText = text;
-}
-
-export function updateSelectedFishText(selector = "#fishModal .current-selection") {
-  const label = document.querySelector(selector);
-  if (!label) return;
-  const fish = ModalState.getFishTypes();
-  const text = fish.length > 0 ? `선택한 어종: ${fish.join(", ")}` : "선택된 어종 없음";
-  label.innerText = text;
-}
-
 function initSortControl() {
   const sortBtn = document.getElementById("sortBtn");
   const sortOptions = document.getElementById("sortOptions");
   if (!sortBtn || !sortOptions) return;
+
   sortBtn.addEventListener("click", () => sortOptions.classList.toggle("hidden"));
+
   document.querySelectorAll("#sortOptions button").forEach(btn => {
     btn.addEventListener("click", () => {
       const selected = btn.getAttribute("data-sort");
@@ -184,6 +171,7 @@ function initSortControl() {
       sortOptions.classList.add("hidden");
     });
   });
+
   document.addEventListener("click", (e) => {
     if (!sortBtn.contains(e.target) && !sortOptions.contains(e.target)) {
       sortOptions.classList.add("hidden");
@@ -207,39 +195,40 @@ function initModalOutsideClose() {
   });
 }
 
+function initAllModals() {
+  initRegionModal({ onApply: handleRegionApply });
+  initFishModal({ onApply: handleFishApply });
+  initDateModalIfExist({ onApply: handleDateApply });
+  initModalOutsideClose();
+}
+
+function handleRegionApply() {
+  updateSelectedInfo();
+  if (isListPage) applyFilters();
+}
+
+function handleFishApply() {
+  updateSelectedInfo();
+  if (isListPage) applyFilters();
+}
+
+function handleDateApply() {
+  updateSelectedInfo();
+  updateDateLabel();
+  if (isListPage) applyFilters();
+}
+
+// ✅ 초기화 실행
+const isListPage = location.pathname.includes("/reservation/list");
+
 fetch("/api/regions/hierarchy")
   .then(res => res.json())
   .then(setCachedRegions)
   .catch(err => console.error("지역 데이터 초기화 실패:", err));
 
-const isListPage = location.pathname.includes("/reservation/list");
-
 document.addEventListener("DOMContentLoaded", () => {
   initSortControl();
   initSearchControl();
-  initModalOutsideClose();
-
-  initRegionModal({
-    onApply: () => {
-      updateSelectedInfo();
-      if (isListPage) applyFilters({});
-    }
-  });
-
-  initFishModal({
-    onApply: () => {
-      updateSelectedInfo();
-      if (isListPage) applyFilters({});
-    }
-  });
-
-  initDateModal({
-    onApply: () => {
-      updateSelectedInfo();
-      updateDateLabel();
-      if (isListPage) applyFilters({});
-    }
-  });
-
+  initAllModals();
   if (isListPage) applyFilters();
 });

@@ -26,9 +26,10 @@ export function initDateModal({ onApply } = {}) {
   const container = document.getElementById(ids.hiddenInput);
   const pickerContainer = document.getElementById(ids.container);
 
-  // 🔘 input을 JS에서 직접 생성
+  // 🔘 임시 input 요소 생성 (flatpickr가 직접 타겟으로 사용)
   const tempInput = document.createElement("input");
-  tempInput.style.display = "none"; // ✅ 화면에서 안 보이게 처리
+  tempInput.type = "text";
+  tempInput.style.display = "none";
   pickerContainer.appendChild(tempInput);
 
   // 🔘 달력 인스턴스 생성
@@ -83,7 +84,7 @@ export function initDateModal({ onApply } = {}) {
     onApply?.();
   });
 
-  // 🔘 삭제 버튼 처리
+  // 🔘 날짜 개별 삭제
   container.addEventListener("click", e => {
     const btn = e.target.closest(".remove-date");
     if (!btn) return;
@@ -100,43 +101,59 @@ export function initDateModal({ onApply } = {}) {
 
 /**
  * ✅ 날짜 입력 필드 렌더링
+ * - form.html → 입력 필드 모드
+ * - list.html → 단순 라벨 모드
  */
 function renderDateEntries(dates, container) {
   if (!container) return;
 
-  const isFormMode = container.dataset.formMode === "true";
+  const isFormMode = container.dataset.formMode?.toLowerCase() === "true";
   container.innerHTML = "";
 
   dates.forEach((date, idx) => {
-    const div = document.createElement("div");
-    div.className = "date-entry";
+    const wrapper = document.createElement("div");
+    wrapper.className = "date-entry";
 
-    div.innerHTML = isFormMode
-      ? `
-        <label>${date}</label>
+    if (isFormMode) {
+      wrapper.innerHTML = `
+        <div class="date-label">${date}</div>
         <input type="hidden" name="availableDates[${idx}].date" value="${date}">
-        <input type="text" name="availableDates[${idx}].time" placeholder="예: 06:00~14:00" pattern="^\\d{2}:\\d{2}~\\d{2}:\\d{2}$" required>
+        <input type="text" name="availableDates[${idx}].time" placeholder="예: 06:00~14:00"
+               pattern="^\\d{2}:\\d{2}~\\d{2}:\\d{2}$" required>
         <input type="number" name="availableDates[${idx}].capacity" placeholder="정원" min="1" required>
         <button type="button" class="remove-date" data-date="${date}">❌</button>
-      `
-      : `<div class="date-label">${date} <button type="button" class="remove-date" data-date="${date}">❌</button></div>`;
+      `;
+    } else {
+      wrapper.innerHTML = `
+        <div class="date-label">
+          ${date}
+          <button type="button" class="remove-date" data-date="${date}">❌</button>
+        </div>
+      `;
+    }
 
-    container.appendChild(div);
+    container.appendChild(wrapper);
   });
 }
 
 /**
- * ✅ 조건부 초기화
+ * ✅ 조건부 초기화 (존재하는 경우만 적용)
  */
 export function initDateModalIfExist({ onApply } = {}) {
   const requiredIds = [
-    "dateBtn", "dateModal", "dateApply", "dateCancel",
-    "dateReset", "dateContainer", "datePickerContainer"
+    "dateBtn",
+    "dateModal",
+    "dateApply",
+    "dateCancel",
+    "dateReset",
+    "dateContainer",
+    "datePickerContainer"
   ];
+
   const allExist = requiredIds.every(id => document.getElementById(id));
   if (allExist) {
     initDateModal({ onApply });
   } else {
-    console.warn("⚠️ [initDateModalIfExist] 일부 요소가 없어서 초기화 생략됨");
+    console.warn("⚠️ [initDateModalIfExist] 일부 요소가 없어 초기화 생략됨");
   }
 }

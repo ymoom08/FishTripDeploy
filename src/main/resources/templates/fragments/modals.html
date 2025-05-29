@@ -9,9 +9,10 @@
       <h2>지역 선택</h2>
       <div id="regionList" class="region-modal-body"></div>
       <div class="current-selection">선택된 지역 없음</div>
-      <div class="button-row">
+      <div class="modal-actions">
         <button id="regionApply" class="modal-btn">적용</button>
         <button id="regionReset" class="modal-btn">초기화</button>
+        <button id="regionCancel" class="modal-btn">취소</button>
       </div>
     </div>
   </div>
@@ -22,30 +23,32 @@
       <h2>어종 선택</h2>
       <div id="fishList" class="fish-modal-body"></div>
       <div class="current-selection">선택된 어종 없음</div>
-      <div class="button-row">
+      <div class="modal-actions">
         <button id="fishApply" class="modal-btn">적용</button>
         <button id="fishReset" class="modal-btn">초기화</button>
+        <button id="fishCancel" class="modal-btn">취소</button>
       </div>
     </div>
   </div>
 
-  <!-- ✅ 날짜 선택 모달 (공통 구조로 통일) -->
-  <div id="dateModal" class="modal hidden" data-mode="list">
+  <!-- ✅ 날짜 선택 모달 -->
+  <div id="dateModal" class="modal hidden">
     <div class="modal-content">
       <h2>날짜 선택</h2>
 
-      <!-- ✅ flatpickr가 직접 렌더링될 div -->
+      <!-- ✅ flatpickr가 이 안에 생성됨 -->
       <div id="datePickerContainer"></div>
 
+      <!-- ✅ 선택 날짜 요약 표시 -->
       <div class="current-selection">선택된 날짜 없음</div>
 
-      <!-- 용도에 따라 다르게 보이는 영역 (예: form용 입력 확장 등) -->
-      <div class="date-extra-fields" style="display: none;"></div>
+      <!-- ✅ form에서만 필요한 추가 입력 필드 -->
+      <div id="dateContainer" data-form-mode="false" class="date-extra-fields"></div>
 
-      <div class="button-row">
+      <div class="modal-actions">
         <button id="dateApply" class="modal-btn">적용</button>
-        <button id="dateCancel" class="modal-btn">취소</button>
         <button id="dateReset" class="modal-btn">초기화</button>
+        <button id="dateCancel" class="modal-btn">취소</button>
       </div>
     </div>
   </div>
