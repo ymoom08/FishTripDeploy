@@ -23,7 +23,6 @@ body, html {
   scroll-snap-align: start;
 }
 
-/* ===== VIDEO BACKGROUND WITH OVERLAY TEXT ===== */
 .videoWrapper {
   position: relative;
   width: 100%;
@@ -82,7 +81,6 @@ body, html {
   animation: fadeInButton 1.6s ease forwards;
 }
 
-/* ===== BUTTON STYLE ===== */
 .button, a.button {
   margin: 2rem auto;
   padding: 0.8rem 3rem;
@@ -105,7 +103,7 @@ body, html {
   box-shadow: 0 4px 20px rgba(0,0,0,0.2);
 }
 
-/* ===== 인기 게시글 섹션 ===== */
+/* ===== 게시판 ===== */
 .eventSectionWrapper {
   display: flex;
   justify-content: center;
@@ -190,16 +188,40 @@ body, html {
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
 }
 
-/* ===== 예약 안내 ===== */
+/* ===== 카드 섹션 ===== */
 .catchLogSection {
   min-height: 100vh;
-  background-color: #fdf6f0;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 6rem 2rem;
   flex-wrap: wrap;
   gap: 3rem;
+  background: linear-gradient(to right, #ffffff 50%, #b2f0f6 50%);
+  position: relative;
+  color: white;
+  z-index: 0;
+}
+
+.catchLogSection::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  background-image: url('/images/FishTrip.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: left bottom;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.catchTextBlock,
+.catchPhoneMockup {
+  position: relative;
+  z-index: 2;
 }
 
 .catchTextBlock {
@@ -210,14 +232,14 @@ body, html {
 
 .catchTextBlock h2 {
   font-size: 3rem;
-  color: #007db9;
+  color: #ffffff;
   margin-bottom: 1.5rem;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
 }
 
 .catchTextBlock p {
   font-size: 1.4rem;
-  color: #444;
+  color: #f0f0f0;
   margin-bottom: 2.5rem;
   line-height: 1.6;
 }
@@ -229,110 +251,146 @@ body, html {
   animation: float 3s ease-in-out infinite;
 }
 
-.catchPhoneMockup img {
-  height: 650px;
-  max-height: 750px;
-  width: auto;
-  margin-top: -30px;
-  background: none;
-  box-shadow: none;
-  border: none;
-}
-
-.deviceContainer {
+.posterCardGrid {
   display: flex;
-  gap: 2rem;
-  justify-content: center;
-  align-items: center;
   flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+  width: 100%;
+  max-width: 700px;
 }
 
-.mockup {
-  border-radius: 1.5rem;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  background: none;
+.card {
+  position: relative;
+  flex: 1 1 calc(50% - 2rem);
+  max-width: 320px;
+  height: 480px;
+  background: #000;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
 }
 
-.mockup:hover {
-  transform: scale(1.03);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
+.poster {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
 }
 
-.mockup.phone {
-  height: 500px;
+.poster img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: .3s;
 }
 
-.mockup.pc {
-  height: 300px;
+.card:hover .poster img {
+  transform: scale(1.1);
 }
 
-/* ===== Animation ===== */
+.details {
+  position: absolute;
+  bottom: -100%;
+  width: 100%;
+  padding: 1.5em;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(16px);
+  color: white;
+  transition: bottom 0.3s ease;
+  z-index: 2;
+}
+
+.card:hover .details {
+  bottom: 0;
+}
+
+.details h1 {
+  font-size: 1.4rem;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+}
+
+.details h2 {
+  font-size: 1rem;
+  opacity: 0.7;
+  margin-bottom: 0.5rem;
+}
+
+.rating {
+  display: flex;
+  gap: 0.3rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.rating i {
+  color: #fdd835;
+}
+
+.rating span {
+  margin-left: 0.4rem;
+}
+
+.tags {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.tag {
+  background: #444;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+}
+
+.desc {
+  font-size: 0.9rem;
+  line-height: 1.4;
+  margin-bottom: 1.2rem;
+}
+
+.cast ul {
+  display: flex;
+  gap: 0.5rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.cast ul li img {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* ===== 애니메이션 ===== */
 @keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(70px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(70px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes fadeInText {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes fadeInButton {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes float {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
 }
 
-/* ===== Media Queries ===== */
+/* ===== 반응형 ===== */
 @media (max-width: 768px) {
-  .overlayText h1 {
-    font-size: 2rem;
-  }
-
-  .overlayText .button {
-    padding: 0.8rem 1.5rem;
-    font-size: 1rem;
-  }
-
-  .catchPhoneMockup img {
-    height: 350px;
-  }
-
-  .mockup.phone {
-    height: 300px;
-  }
-}
-
-@media (max-width: 480px) {
-  .overlayText h1 {
-    font-size: 1.5rem;
-  }
-
-  .overlayText .button {
-    font-size: 0.95rem;
-    padding: 0.6rem 1.5rem;
-  }
-
-  .catchPhoneMockup img {
-    height: 280px;
-  }
+  .overlayText h1 { font-size: 2rem; }
+  .overlayText .button { padding: 0.8rem 1.5rem; font-size: 1rem; }
+  .posterCardGrid .card { flex: 1 1 100%; max-width: 100%; }
 }
