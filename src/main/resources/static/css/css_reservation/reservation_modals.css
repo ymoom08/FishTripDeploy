@@ -64,15 +64,23 @@
   border: 2px solid #0056b3;
 }
 
-/* 초기화 버튼 스타일 */
-#regionReset {
+/* ✅ 모달 공통 버튼 스타일 */
+.modal-btn {
   background: #eee;
   color: #333;
   padding: 6px 14px;
   border: 1px solid #aaa;
   cursor: pointer;
   border-radius: 4px;
+  font-size: 14px;
+  min-width: 80px; /* 버튼 폭 균일화 */
+  text-align: center;
 }
+
+.modal-btn:hover {
+  background-color: #ddd;
+}
+
 
 /* ✅ 달력 관련 */
 #datePickerContainer {
