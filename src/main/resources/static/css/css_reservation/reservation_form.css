@@ -1,3 +1,4 @@
+/* 메인 컨테이너 스타일 */
 .reservation-form-container {
   max-width: 800px;
   margin: 0 auto;
@@ -8,6 +9,7 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+/* 제목 */
 .reservation-form-container h1 {
   font-size: 32px;
   font-weight: bold;
@@ -16,16 +18,17 @@
   color: #333;
 }
 
-/* form 그룹 간 여백 */
+/* 폼 그룹 간 여백 */
 .form-group {
   margin-bottom: 24px;
 }
 
-/* 버튼과 텍스트 간 여백 */
+/* 버튼과 텍스트 사이 여백 */
 button + .selection-placeholder {
   margin-top: 8px;
 }
 
+/* 라벨 공통 */
 .reservation-form-container label {
   display: block;
   font-weight: bold;
@@ -33,6 +36,7 @@ button + .selection-placeholder {
   color: #555;
 }
 
+/* 기본 입력 요소 스타일 */
 .reservation-form-container input[type="text"],
 .reservation-form-container input[type="number"],
 .reservation-form-container textarea,
@@ -47,6 +51,7 @@ button + .selection-placeholder {
   transition: border-color 0.3s ease;
 }
 
+/* 포커스 스타일 */
 .reservation-form-container input[type="text"]:focus,
 .reservation-form-container input[type="number"]:focus,
 .reservation-form-container select:focus,
@@ -55,6 +60,7 @@ button + .selection-placeholder {
   outline: none;
 }
 
+/* 제출 버튼 */
 .reservation-form-container button[type="submit"] {
   background-color: #0088cc;
   color: white;
@@ -71,10 +77,11 @@ button + .selection-placeholder {
   background-color: #007bb5;
 }
 
+/* 날짜+시간+정원 한 줄 */
 .date-entry {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   margin-right: 10px;
   margin-bottom: 12px;
   background-color: #e9f5ff;
@@ -83,6 +90,7 @@ button + .selection-placeholder {
   border: 1px solid #b0d6f3;
 }
 
+/* 날짜 항목 삭제 버튼 */
 .remove-date {
   background: transparent;
   border: none;
@@ -93,4 +101,42 @@ button + .selection-placeholder {
 
 .remove-date:hover {
   opacity: 0.7;
+}
+
+/* 가격 표시 (숫자 포맷용, 숨김 아님) */
+.price-display {
+  margin-top: 8px;
+  color: #555;
+  font-weight: bold;
+}
+
+/* 가격 입력창 (₩ 및 숫자 정렬 전용) */
+.price-input {
+  text-align: right;
+  font-family: monospace, "Noto Sans KR", sans-serif;
+}
+
+/* 선택 텍스트 (지역/어종) 공통 스타일 */
+.selection-placeholder,
+.selection-result {
+  margin-top: 8px;
+  font-weight: bold;
+  color: #333;
+}
+
+/* 반응형 대응 (600px 이하) */
+@media (max-width: 600px) {
+  .reservation-form-container {
+    padding: 20px;
+  }
+
+  .reservation-form-container h1 {
+    font-size: 24px;
+  }
+
+  .date-entry {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
 }

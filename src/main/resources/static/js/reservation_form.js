@@ -1,5 +1,3 @@
-// reservation_form.js
-
 import {
   ModalState,
   injectHiddenInputs,
@@ -17,12 +15,13 @@ fetch("/api/regions/hierarchy")
   .then(setCachedRegions)
   .catch(err => console.error("지역 데이터 초기화 실패:", err));
 
-// ✅ [2] 페이지 로드 시 모달 초기화만 진행
+// ✅ [2] 초기 진입 시 동작
 window.addEventListener("DOMContentLoaded", () => {
   initAllModals();
+  bindCurrencyInputField();
 });
 
-// ✅ [3] 모든 모달 초기화
+// ✅ [3] 모달 초기화
 function initAllModals() {
   initRegionModalIfExist({ onApply: updateRegionLabel });
   initFishModalIfExist({ onApply: updateFishLabel });
@@ -54,13 +53,8 @@ function updateRegionLabel() {
 
   const regionTextEl = document.getElementById("selectedRegionText");
   if (regionTextEl) {
-    if (text) {
-      regionTextEl.textContent = text;
-      regionTextEl.className = "selection-result";
-    } else {
-      regionTextEl.textContent = "";
-      regionTextEl.className = "";
-    }
+    regionTextEl.textContent = text ? `선택 지역: ${text}` : "선택 지역: 없음";
+    regionTextEl.className = "selection-result";
   }
 
   const modalLabel = document.querySelector("#regionModal .current-selection");
@@ -77,13 +71,8 @@ function updateFishLabel() {
 
   const fishTextEl = document.getElementById("selectedFishText");
   if (fishTextEl) {
-    if (text) {
-      fishTextEl.textContent = text;
-      fishTextEl.className = "selection-result";
-    } else {
-      fishTextEl.textContent = "";
-      fishTextEl.className = "";
-    }
+    fishTextEl.textContent = text ? `선택 어종: ${text}` : "선택 어종: 없음";
+    fishTextEl.className = "selection-result";
   }
 
   const modalLabel = document.querySelector("#fishModal .current-selection");
@@ -92,13 +81,13 @@ function updateFishLabel() {
   injectHiddenInputs("fishTypeInputGroup", "fishTypeNames", selected);
 }
 
-// ✅ [6] 날짜 UI 갱신
+// ✅ [6] 날짜 + 시간 + 정원
 function updateDateLabel() {
   const selected = ModalState.getDates();
   const container = document.querySelector('#dateContainer[data-form-mode="true"]');
   if (!container) return;
 
-  container.innerHTML = ""; // 기존 입력란 초기화
+  container.innerHTML = "";
 
   selected.forEach((date, idx) => {
     const wrapper = document.createElement("div");
@@ -106,7 +95,7 @@ function updateDateLabel() {
 
     wrapper.innerHTML = `
       <span>${date}</span>
-      <input type="time" name="times[${idx}]" required placeholder="시간" />
+      <input type="text" class="timepicker" name="times[${idx}]" required placeholder="시간" />
       <input type="number" name="capacities[${idx}]" required placeholder="정원" min="1" />
       <button type="button" class="remove-date" data-date="${date}">&times;</button>
     `;
@@ -114,12 +103,47 @@ function updateDateLabel() {
     container.appendChild(wrapper);
   });
 
-  // 삭제 버튼 이벤트 추가
+  // ✅ flatpickr 시간 선택 적용
+  container.querySelectorAll(".timepicker").forEach(el => {
+    flatpickr(el, {
+      enableTime: true,
+      noCalendar: true,
+      dateFormat: "H:i",
+      time_24hr: true,
+      locale: 'ko'
+    });
+  });
+
   container.querySelectorAll(".remove-date").forEach(btn => {
     btn.addEventListener("click", () => {
       const dateToRemove = btn.getAttribute("data-date");
-      ModalState.removeDate(dateToRemove); // 이 함수는 ModalState에 정의돼 있어야 합니다.
-      updateDateLabel(); // 다시 그리기
+      ModalState.removeDate(dateToRemove);
+      updateDateLabel();
     });
   });
+}
+
+// ✅ [7] 가격 포맷 적용
+function formatCurrencyInput(value) {
+  const number = Number(value.replace(/[^\d]/g, ''));
+  if (isNaN(number)) return '';
+  return '₩' + number.toLocaleString("ko-KR");
+}
+
+function bindCurrencyInputField() {
+  const input = document.getElementById("price");
+  const hidden = document.getElementById("priceRaw");
+
+  if (!input || !hidden) return;
+
+  input.addEventListener("input", () => {
+    const raw = input.value.replace(/[^\d]/g, '');
+    const num = Number(raw);
+    input.value = formatCurrencyInput(raw);
+    hidden.value = isNaN(num) ? '' : num;
+  });
+
+  const initRaw = input.value.replace(/[^\d]/g, '');
+  input.value = formatCurrencyInput(initRaw);
+  hidden.value = initRaw;
 }

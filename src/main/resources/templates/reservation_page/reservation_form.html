@@ -22,13 +22,13 @@
 
   <form th:action="@{/reservation/new}" method="post" enctype="multipart/form-data">
 
-    <!-- ✅ 제목 -->
+    <!-- 제목 -->
     <div class="form-group">
       <label for="title">제목</label>
       <input type="text" id="title" name="title" required>
     </div>
 
-    <!-- ✅ 예약 타입 -->
+    <!-- 예약 타입 -->
     <div class="form-group">
       <label for="type">예약 타입</label>
       <select id="type" name="type" required>
@@ -41,68 +41,68 @@
       </select>
     </div>
 
-    <!-- ✅ 지역 선택 -->
+    <!-- 지역 선택 -->
     <div class="form-group">
       <label for="regionBtn">지역</label>
       <button type="button" id="regionBtn">지역 선택</button>
-      <div id="selectedRegionText" class="selection-placeholder">선택 지역 없음</div>
+      <div id="selectedRegionText" class="selection-placeholder">선택 지역: 없음</div>
       <div id="regionIdsInput"></div>
     </div>
 
-    <!-- ✅ 어종 선택 -->
+    <!-- 어종 선택 -->
     <div class="form-group">
       <label for="fishBtn">대상 어종</label>
       <button type="button" id="fishBtn">어종 선택</button>
-      <div id="selectedFishText" class="selection-placeholder">선택 어종 없음</div>
+      <div id="selectedFishText" class="selection-placeholder">선택 어종: 없음</div>
       <div id="fishTypeInputGroup"></div>
     </div>
 
-    <!-- ✅ 날짜 + 시간 + 정원 -->
+    <!-- 날짜 + 시간 + 정원 -->
     <div class="form-group">
       <label for="dateBtn">예약 가능 날짜(시간) + 정원</label>
       <button type="button" id="dateBtn">날짜 선택</button>
       <div id="dateContainer" data-form-mode="true"></div>
     </div>
 
-    <!-- ✅ 가격 -->
+    <!-- 가격 -->
     <div class="form-group">
       <label for="price">가격</label>
-      <input type="number" id="price" name="price" required min="0">
+      <input type="text" id="price" name="priceFormatted" class="price-input" required>
+      <input type="hidden" id="priceRaw" name="price">
     </div>
 
-    <!-- ✅ 이미지 업로드 -->
+    <!-- 대표 이미지 -->
     <div class="form-group">
       <label for="image">대표 이미지</label>
       <input type="file" id="image" name="imageFile" accept="image/*">
     </div>
 
-    <!-- ✅ 회사명 -->
+    <!-- 회사명 -->
     <div class="form-group">
       <label for="companyName">회사명</label>
       <input type="text" id="companyName" name="companyName" th:value="${companyName}" readonly required>
     </div>
 
-    <!-- ✅ 상세 설명 -->
+    <!-- 상세 설명 -->
     <div class="form-group">
       <label for="content">상세 설명</label>
       <textarea id="content" name="content" rows="5" required></textarea>
     </div>
 
-    <!-- ✅ 제출 버튼 -->
+    <!-- 제출 -->
     <div class="form-group">
       <button type="submit">등록하기</button>
     </div>
-
   </form>
 
-  <!-- ✅ 공통 모달 프래그먼트 삽입 -->
+  <!-- 모달 프래그먼트 -->
   <div th:replace="fragments/modals :: regionFishDateModals"></div>
 </main>
 
-<!-- ✅ JS -->
+<!-- ✅ JS: flatpickr를 먼저 로드해야 함 -->
 <th:block layout:fragment="add-js">
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
   <script type="module" src="/js/reservation_form.js"></script>
 </th:block>
 
