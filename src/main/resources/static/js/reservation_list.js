@@ -1,4 +1,3 @@
-// ✅ 공통 모듈 import
 import {
   ModalState,
   closeModal,
@@ -8,7 +7,7 @@ import {
 
 import { initRegionModal } from "./modal_region.js";
 import { initFishModal } from "./modal_fish.js";
-import { initDateModal } from "./modal_date.js"; // ✅ 이 파일 안에 export된 함수로
+import { initDateModal } from "./modal_date.js";
 
 // ✅ 지역 캐시 로컬 저장
 let cachedRegions = null;
@@ -30,7 +29,7 @@ export function applyFilters({ sortKey = "latest" } = {}) {
   const query = new URLSearchParams({ type, page: 0, sort: sortKey });
 
   ModalState.getRegions().forEach(r => query.append("regionId", r.id));
-  ModalState.getDates().forEach(d => query.append("date", d));
+  ModalState.getDates().forEach(d => query.append("date", d.date)); // ✅ d → d.date 로 수정
   ModalState.getFishTypes().forEach(f => query.append("fishType", f));
 
   const keywordEl = document.querySelector(".search-input");
@@ -124,7 +123,8 @@ function updateSelectedInfo() {
   }
 
   if (date.length > 0) {
-    parts.push(`선택 날짜: ${date.join(", ")}`);
+    const formattedDates = date.map(d => d.date).join(", "); // ✅ 수정된 부분
+    parts.push(`선택 날짜: ${formattedDates}`);
   }
 
   if (fish.length > 0) {
@@ -133,7 +133,6 @@ function updateSelectedInfo() {
 
   label.innerText = parts.join("\n");
 }
-
 
 function initSortControl() {
   const sortBtn = document.getElementById("sortBtn");
@@ -210,9 +209,6 @@ document.addEventListener("DOMContentLoaded", () => {
   if (isListPage) applyFilters();
 });
 
-/**
- * ✅ 조건부 초기화 (존재하는 경우만 적용)
- */
 export function initDateModalIfExist({ onApply } = {}) {
   const requiredIds = [
     "dateBtn",

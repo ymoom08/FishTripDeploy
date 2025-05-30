@@ -1,3 +1,4 @@
+// ✅ 공통 모듈 import
 import {
   ModalState,
   injectHiddenInputs,
@@ -82,7 +83,7 @@ function updateFishLabel() {
   injectHiddenInputs("fishTypeInputGroup", "fishTypeNames", selected);
 }
 
-// ✅ [6] 날짜 + 시작/종료 시간(flatpickr) + 정원
+// ✅ [6] 날짜 + 시간 + 정원
 function updateDateLabel() {
   const selected = ModalState.getDates();
   const container = document.querySelector('#dateContainer[data-form-mode="true"]');
@@ -90,15 +91,16 @@ function updateDateLabel() {
 
   container.innerHTML = "";
 
-  selected.forEach((date, idx) => {
+  selected.forEach((entry, idx) => {
     const wrapper = document.createElement("div");
     wrapper.className = "date-entry";
 
     wrapper.innerHTML = `
-      <span>${date}</span>
-      <input type="text" class="timepicker" name="startEndTimes[${idx}]" required placeholder="예: 06:00 ~ 14:00" />
-      <input type="number" name="capacities[${idx}]" required placeholder="정원" min="1" />
-      <button type="button" class="remove-date" data-date="${date}">×</button>
+      <span>${entry.date}</span>
+      <input type="text" class="timepicker start" name="startTimes[${idx}]" placeholder="시작 시간" required />
+      <input type="text" class="timepicker end" name="endTimes[${idx}]" placeholder="종료 시간" required />
+      <input type="number" name="capacities[${idx}]" placeholder="정원" min="1" required />
+      <button type="button" class="remove-date" data-date="${entry.date}">&times;</button>
     `;
 
     container.appendChild(wrapper);
@@ -108,7 +110,6 @@ function updateDateLabel() {
     flatpickr(el, {
       enableTime: true,
       noCalendar: true,
-      mode: "range",
       dateFormat: "H:i",
       time_24hr: true,
       locale: 'ko'
@@ -124,7 +125,7 @@ function updateDateLabel() {
   });
 }
 
-// ✅ [7] 가격 ₩포맷 + 서버 전달용 hidden input
+// ✅ [7] 가격 ₩ 포맷 처리
 function formatCurrencyInput(value) {
   const number = Number(value.replace(/[^\d]/g, ''));
   if (isNaN(number)) return '';
@@ -149,7 +150,7 @@ function bindCurrencyInputField() {
   hidden.value = initRaw;
 }
 
-// ✅ [8] 시간 문자열 병합해서 form에 넣기 ("06:00~14:00")
+// ✅ [8] 시작/종료 시간 병합하여 hidden 필드로 추가
 function bindMergedTimeBeforeSubmit() {
   const form = document.querySelector("form");
   if (!form) return;
@@ -158,22 +159,23 @@ function bindMergedTimeBeforeSubmit() {
     const dateEntries = document.querySelectorAll(".date-entry");
 
     dateEntries.forEach((entry, idx) => {
-      const timeRange = entry.querySelector(`[name="startEndTimes[${idx}]"]`)?.value || "";
+      const start = entry.querySelector(`[name="startTimes[${idx}]"]`)?.value || "";
+      const end = entry.querySelector(`[name="endTimes[${idx}]"]`)?.value || "";
       const date = entry.querySelector("span")?.textContent || "";
 
-      entry.querySelector(`[name="startEndTimes[${idx}]"]`)?.remove();
+      entry.querySelectorAll(`[name^="startTimes"], [name^="endTimes"]`).forEach(el => el.remove());
 
-      const timeInput = document.createElement("input");
-      timeInput.type = "hidden";
-      timeInput.name = `times[${idx}]`;
-      timeInput.value = timeRange;
+      const mergedInput = document.createElement("input");
+      mergedInput.type = "hidden";
+      mergedInput.name = `times[${idx}]`;
+      mergedInput.value = `${start}~${end}`;
 
       const dateInput = document.createElement("input");
       dateInput.type = "hidden";
       dateInput.name = `dates[${idx}]`;
       dateInput.value = date;
 
-      entry.appendChild(timeInput);
+      entry.appendChild(mergedInput);
       entry.appendChild(dateInput);
     });
   });
