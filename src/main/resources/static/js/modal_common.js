@@ -6,7 +6,7 @@
 
 let selectedFishTypes = [];
 let selectedRegions = [];
-let selectedDates = [];
+let selectedDates = [];  // ✅ [{ date, start, end, capacity }] 구조로 변경
 
 export const ModalState = {
   getFishTypes: () => [...selectedFishTypes],
@@ -24,8 +24,12 @@ export const ModalState = {
     selectedDates = Array.isArray(dates) ? [...dates] : [];
   },
 
+  /**
+   * ✅ 특정 날짜를 기준으로 해당 항목 제거
+   * @param {string} date
+   */
   removeDate: (date) => {
-    selectedDates = selectedDates.filter(d => d !== date);
+    selectedDates = selectedDates.filter(d => d.date !== date);
   },
 
   reset: () => {
@@ -34,6 +38,7 @@ export const ModalState = {
     selectedDates = [];
   }
 };
+
 
 
 // ----------------------------------------

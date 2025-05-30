@@ -19,6 +19,7 @@ fetch("/api/regions/hierarchy")
 window.addEventListener("DOMContentLoaded", () => {
   initAllModals();
   bindCurrencyInputField();
+  bindMergedTimeBeforeSubmit();
 });
 
 // ✅ [3] 모달 초기화
@@ -81,7 +82,7 @@ function updateFishLabel() {
   injectHiddenInputs("fishTypeInputGroup", "fishTypeNames", selected);
 }
 
-// ✅ [6] 날짜 + 시간 + 정원
+// ✅ [6] 날짜 + 시작/종료 시간(flatpickr) + 정원
 function updateDateLabel() {
   const selected = ModalState.getDates();
   const container = document.querySelector('#dateContainer[data-form-mode="true"]');
@@ -95,19 +96,19 @@ function updateDateLabel() {
 
     wrapper.innerHTML = `
       <span>${date}</span>
-      <input type="text" class="timepicker" name="times[${idx}]" required placeholder="시간" />
+      <input type="text" class="timepicker" name="startEndTimes[${idx}]" required placeholder="예: 06:00 ~ 14:00" />
       <input type="number" name="capacities[${idx}]" required placeholder="정원" min="1" />
-      <button type="button" class="remove-date" data-date="${date}">&times;</button>
+      <button type="button" class="remove-date" data-date="${date}">×</button>
     `;
 
     container.appendChild(wrapper);
   });
 
-  // ✅ flatpickr 시간 선택 적용
   container.querySelectorAll(".timepicker").forEach(el => {
     flatpickr(el, {
       enableTime: true,
       noCalendar: true,
+      mode: "range",
       dateFormat: "H:i",
       time_24hr: true,
       locale: 'ko'
@@ -123,7 +124,7 @@ function updateDateLabel() {
   });
 }
 
-// ✅ [7] 가격 포맷 적용
+// ✅ [7] 가격 ₩포맷 + 서버 전달용 hidden input
 function formatCurrencyInput(value) {
   const number = Number(value.replace(/[^\d]/g, ''));
   if (isNaN(number)) return '';
@@ -146,4 +147,34 @@ function bindCurrencyInputField() {
   const initRaw = input.value.replace(/[^\d]/g, '');
   input.value = formatCurrencyInput(initRaw);
   hidden.value = initRaw;
+}
+
+// ✅ [8] 시간 문자열 병합해서 form에 넣기 ("06:00~14:00")
+function bindMergedTimeBeforeSubmit() {
+  const form = document.querySelector("form");
+  if (!form) return;
+
+  form.addEventListener("submit", () => {
+    const dateEntries = document.querySelectorAll(".date-entry");
+
+    dateEntries.forEach((entry, idx) => {
+      const timeRange = entry.querySelector(`[name="startEndTimes[${idx}]"]`)?.value || "";
+      const date = entry.querySelector("span")?.textContent || "";
+
+      entry.querySelector(`[name="startEndTimes[${idx}]"]`)?.remove();
+
+      const timeInput = document.createElement("input");
+      timeInput.type = "hidden";
+      timeInput.name = `times[${idx}]`;
+      timeInput.value = timeRange;
+
+      const dateInput = document.createElement("input");
+      dateInput.type = "hidden";
+      dateInput.name = `dates[${idx}]`;
+      dateInput.value = date;
+
+      entry.appendChild(timeInput);
+      entry.appendChild(dateInput);
+    });
+  });
 }

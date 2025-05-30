@@ -7,7 +7,7 @@ import {
 } from "./modal_common.js";
 
 /**
- * ✅ 날짜 모달 초기화
+ * ✅ 날짜 모달 초기화 (flatpickr + 시간 + 정원)
  */
 export function initDateModal({ onApply } = {}) {
   const ids = {
@@ -26,13 +26,11 @@ export function initDateModal({ onApply } = {}) {
   const container = document.getElementById(ids.hiddenInput);
   const pickerContainer = document.getElementById(ids.container);
 
-  // 🔘 flatpickr용 임시 input 생성
   const tempInput = document.createElement("input");
   tempInput.type = "text";
   tempInput.style.display = "none";
   pickerContainer.appendChild(tempInput);
 
-  // 🔘 flatpickr 인스턴스 생성
   flatpickr.localize(flatpickr.l10ns.ko);
   const fp = flatpickr(tempInput, {
     dateFormat: "Y-m-d",
@@ -49,34 +47,32 @@ export function initDateModal({ onApply } = {}) {
     },
 
     onChange(selectedDates) {
-      const formatted = selectedDates.map(d => {
-        const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
-        return local.toISOString().split("T")[0];
+      const prevDates = ModalState.getDates();
+      const updated = selectedDates.map(d => {
+        const dateStr = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().split("T")[0];
+        const existing = prevDates.find(p => p.date === dateStr);
+        return existing || { date: dateStr, start: "", end: "", capacity: 1 };
       });
-
-      ModalState.setDates(formatted);
-      renderDateEntries(formatted, container);
+      ModalState.setDates(updated);
+      renderDateEntries(updated, container);
     }
   });
 
-  // 🔘 모달 열기
   el.btn.addEventListener("click", () => {
     openModal(el.modal);
     fp.open();
   });
 
-  // 🔘 적용
   el.apply.addEventListener("click", () => {
+    updateModalStateFromInputs(container);
     closeModal(el.modal);
     onApply?.();
   });
 
-  // 🔘 취소
   el.cancel.addEventListener("click", () => {
     closeModal(el.modal);
   });
 
-  // 🔘 초기화
   el.reset.addEventListener("click", () => {
     ModalState.setDates([]);
     fp.clear();
@@ -84,56 +80,62 @@ export function initDateModal({ onApply } = {}) {
     onApply?.();
   });
 
-  // 🔘 날짜 개별 삭제
   container.addEventListener("click", e => {
     const btn = e.target.closest(".remove-date");
     if (!btn) return;
 
     const dateToRemove = btn.dataset.date;
-    const updated = ModalState.getDates().filter(d => d !== dateToRemove);
+    const updated = ModalState.getDates().filter(d => d.date !== dateToRemove);
     ModalState.setDates(updated);
-    fp.setDate(updated, true);
+    fp.setDate(updated.map(d => d.date), true);
     renderDateEntries(updated, container);
   });
 
   bindModalOutsideClick(el.modal);
 }
 
-/**
- * ✅ 날짜 입력 필드 렌더링
- * - form.html → 날짜 입력 필드들 렌더링
- * - list.html → 출력 생략 (외부에서 렌더링)
- */
-function renderDateEntries(dates, container) {
+function renderDateEntries(dateEntries, container) {
   if (!container) return;
-
-  const isFormMode = container.dataset.formMode?.toLowerCase() === "true";
   container.innerHTML = "";
 
-  if (isFormMode) {
-    dates.forEach((date, idx) => {
-      const wrapper = document.createElement("div");
-      wrapper.className = "date-entry";
+  dateEntries.forEach((entry, idx) => {
+    const wrapper = document.createElement("div");
+    wrapper.className = "date-entry";
 
-      wrapper.innerHTML = `
-        <div class="date-label">${date}</div>
-        <input type="hidden" name="availableDates[${idx}].date" value="${date}">
-        <input type="text" name="availableDates[${idx}].time" placeholder="예: 06:00~14:00"
-               pattern="^\\d{2}:\\d{2}~\\d{2}:\\d{2}$" required>
-        <input type="number" name="availableDates[${idx}].capacity" placeholder="정원" min="1" required>
-        <button type="button" class="remove-date" data-date="${date}">❌</button>
-      `;
+    wrapper.innerHTML = `
+      <div class="date-label">${entry.date}</div>
+      <input type="text" class="timepicker start" data-index="${idx}" placeholder="시작 시간" value="${entry.start}" required>
+      <input type="text" class="timepicker end" data-index="${idx}" placeholder="종료 시간" value="${entry.end}" required>
+      <input type="number" class="capacity" data-index="${idx}" placeholder="정원" value="${entry.capacity}" min="1" required>
+      <button type="button" class="remove-date" data-date="${entry.date}">&times;</button>
+    `;
 
-      container.appendChild(wrapper);
+    container.appendChild(wrapper);
+  });
+
+  container.querySelectorAll(".timepicker").forEach(el => {
+    flatpickr(el, {
+      enableTime: true,
+      noCalendar: true,
+      dateFormat: "H:i",
+      time_24hr: true,
+      locale: 'ko'
     });
-  }
-
-  // ❌ list 모드는 외부 템플릿에서 처리하므로 아무 출력도 하지 않음
+  });
 }
 
-/**
- * ✅ 조건부 초기화 (요소가 존재하는 경우에만)
- */
+function updateModalStateFromInputs(container) {
+  const entries = Array.from(container.querySelectorAll(".date-entry"));
+  const updated = entries.map(entry => {
+    const date = entry.querySelector(".date-label").textContent;
+    const start = entry.querySelector(".timepicker.start").value;
+    const end = entry.querySelector(".timepicker.end").value;
+    const capacity = Number(entry.querySelector(".capacity").value);
+    return { date, start, end, capacity };
+  });
+  ModalState.setDates(updated);
+}
+
 export function initDateModalIfExist({ onApply } = {}) {
   const requiredIds = [
     "dateBtn",
