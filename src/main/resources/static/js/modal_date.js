@@ -99,15 +99,13 @@ export function initDateModal({ onApply } = {}) {
   bindModalOutsideClick(el.modal);
 }
 
-
 /**
- * ✅ 날짜 항목 렌더링 (모드에 따라 다르게 구성)
+ * ✅ 날짜 항목 렌더링 (mode에 따라 다른 구성)
  */
 function renderDateEntries(dateEntries, container, isFormMode) {
   if (!container) return;
   container.innerHTML = "";
-
-  if (!isFormMode) return; // 필터 모드에서는 렌더링하지 않음
+  if (!isFormMode) return;
 
   dateEntries.forEach((entry, idx) => {
     const wrapper = document.createElement("div");
@@ -115,9 +113,9 @@ function renderDateEntries(dateEntries, container, isFormMode) {
 
     wrapper.innerHTML = `
       <div class="date-label">${entry.date}</div>
-      <input type="text" class="timepicker start" data-index="${idx}" placeholder="시작 시간" value="${entry.start}" required>
-      <input type="text" class="timepicker end" data-index="${idx}" placeholder="종료 시간" value="${entry.end}" required>
-      <input type="number" class="capacity" data-index="${idx}" placeholder="정원" value="${entry.capacity}" min="1" required>
+      <input type="text" class="timepicker start" name="startTimes[${idx}]" data-index="${idx}" placeholder="시작 시간" value="${entry.start}" required>
+      <input type="text" class="timepicker end" name="endTimes[${idx}]" data-index="${idx}" placeholder="종료 시간" value="${entry.end}" required>
+      <input type="number" class="capacity" name="capacities[${idx}]" data-index="${idx}" placeholder="정원" value="${entry.capacity}" min="1" required>
       <button type="button" class="remove-date" data-date="${entry.date}">&times;</button>
     `;
 
@@ -135,7 +133,6 @@ function renderDateEntries(dateEntries, container, isFormMode) {
   });
 }
 
-
 /**
  * ✅ form 모드일 때 입력값 -> 상태로 반영
  */
@@ -150,7 +147,6 @@ function updateModalStateFromInputs(container) {
   });
   ModalState.setDates(updated);
 }
-
 
 /**
  * ✅ 존재하는 경우에만 초기화
