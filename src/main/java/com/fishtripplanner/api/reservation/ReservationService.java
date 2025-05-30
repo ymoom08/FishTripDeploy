@@ -143,7 +143,7 @@ public class ReservationService {
                 .fishTypes(post.getFishTypes().stream().map(FishTypeEntity::getName).toList())
                 .availableDates(post.getAvailableDates().stream()
                         .map(date -> {
-                            int reserved = reservationOrderRepository.countByAvailableDate(date.getAvailableDate());
+                            int reserved = reservationOrderRepository.countByReservationPostAndAvailableDate(post, date.getAvailableDate());
                             return ReservationDetailResponseDto.AvailableDateDto.builder()
                                     .date(date.getAvailableDate().toString())
                                     .time(date.getTime())

@@ -184,7 +184,7 @@ public class ReservationPostService {
 
         List<ReservationDetailResponseDto.AvailableDateDto> dateDtos =
                 post.getAvailableDates().stream().map(ad -> {
-                    int reserved = reservationOrderRepository.countByAvailableDate(ad.getAvailableDate());
+                    int reserved = reservationOrderRepository.countByReservationPostAndAvailableDate(post, ad.getAvailableDate());  // 여기 수정됨
                     return ReservationDetailResponseDto.AvailableDateDto.builder()
                             .date(ad.getAvailableDate().toString())
                             .time(ad.getTime())
@@ -192,6 +192,7 @@ public class ReservationPostService {
                             .remaining(ad.getCapacity() - reserved)
                             .build();
                 }).toList();
+
 
         return ReservationDetailResponseDto.builder()
                 .id(post.getId())
