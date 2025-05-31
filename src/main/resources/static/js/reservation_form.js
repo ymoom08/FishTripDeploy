@@ -20,7 +20,7 @@ fetch("/api/regions/hierarchy")
 window.addEventListener("DOMContentLoaded", () => {
   initAllModals();
   bindCurrencyInputField();
-  bindMergedTimeBeforeSubmit();
+  bindMergedTimeBeforeSubmit(); // 폼 제출 시 시간/날짜/정원 데이터 합쳐서 hidden 필드로 만들어줌
 });
 
 // ✅ [3] 모달 초기화
@@ -83,7 +83,7 @@ function updateFishLabel() {
   injectHiddenInputs("fishTypeInputGroup", "fishTypeNames", selected);
 }
 
-// ✅ [6] 날짜 + 시간 + 정원
+// ✅ [6] 날짜 + 시간 + 정원 UI 갱신
 function updateDateLabel() {
   const selected = ModalState.getDates();
   const container = document.querySelector('#dateContainer[data-form-mode="true"]');
@@ -96,16 +96,17 @@ function updateDateLabel() {
     wrapper.className = "date-entry";
 
     wrapper.innerHTML = `
-      <span>${entry.date}</span>
+      <span class="date-label">${entry.date}</span> <!-- ✅ 수정: 날짜에 클래스 추가 -->
       <input type="text" class="timepicker start" name="startTimes[${idx}]" placeholder="시작 시간" required />
       <input type="text" class="timepicker end" name="endTimes[${idx}]" placeholder="종료 시간" required />
-      <input type="number" name="capacities[${idx}]" placeholder="정원" min="1" required />
+      <input type="number" class="capacity" name="capacities[${idx}]" placeholder="정원" min="1" required />
       <button type="button" class="remove-date" data-date="${entry.date}">&times;</button>
     `;
 
     container.appendChild(wrapper);
   });
 
+  // ✅ flatpickr 초기화
   container.querySelectorAll(".timepicker").forEach(el => {
     flatpickr(el, {
       enableTime: true,
@@ -116,6 +117,7 @@ function updateDateLabel() {
     });
   });
 
+  // ✅ 날짜 삭제 버튼 처리
   container.querySelectorAll(".remove-date").forEach(btn => {
     btn.addEventListener("click", () => {
       const dateToRemove = btn.getAttribute("data-date");
@@ -150,33 +152,42 @@ function bindCurrencyInputField() {
   hidden.value = initRaw;
 }
 
-// ✅ [8] 시작/종료 시간 병합하여 hidden 필드로 추가
+// ✅ [8] 시작/종료 시간 병합해서 서버로 전송될 hidden input 생성
 function bindMergedTimeBeforeSubmit() {
-  const form = document.querySelector("form");
+  const form = document.getElementById("reservationForm"); // ✅ 이걸로 수정
   if (!form) return;
 
   form.addEventListener("submit", () => {
     const dateEntries = document.querySelectorAll(".date-entry");
 
     dateEntries.forEach((entry, idx) => {
-      const start = entry.querySelector(`[name="startTimes[${idx}]"]`)?.value || "";
-      const end = entry.querySelector(`[name="endTimes[${idx}]"]`)?.value || "";
-      const date = entry.querySelector("span")?.textContent || "";
+      const date = entry.querySelector(".date-label")?.textContent || "";
+      const start = entry.querySelector(".timepicker.start")?.value || "";
+      const end = entry.querySelector(".timepicker.end")?.value || "";
+      const capacity = entry.querySelector(".capacity")?.value || "";
 
-      entry.querySelectorAll(`[name^="startTimes"], [name^="endTimes"]`).forEach(el => el.remove());
-
-      const mergedInput = document.createElement("input");
-      mergedInput.type = "hidden";
-      mergedInput.name = `times[${idx}]`;
-      mergedInput.value = `${start}~${end}`;
+      // ✅ 콘솔 확인
+      console.log(`📅 ${date} - 🕐 ${start}~${end}, 👤 ${capacity}`);
 
       const dateInput = document.createElement("input");
       dateInput.type = "hidden";
-      dateInput.name = `dates[${idx}]`;
+      dateInput.name = `availableDates[${idx}].date`;
       dateInput.value = date;
+      form.appendChild(dateInput);
 
-      entry.appendChild(mergedInput);
-      entry.appendChild(dateInput);
+      const timeInput = document.createElement("input");
+      timeInput.type = "hidden";
+      timeInput.name = `availableDates[${idx}].time`;
+      timeInput.value = `${start}~${end}`;
+      form.appendChild(timeInput);
+
+      const capacityInput = document.createElement("input");
+      capacityInput.type = "hidden";
+      capacityInput.name = `availableDates[${idx}].capacity`;
+      capacityInput.value = capacity;
+      form.appendChild(capacityInput);
     });
   });
 }
+
+  window.ModalState = ModalState;

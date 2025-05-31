@@ -7,7 +7,7 @@ import {
 } from "./modal_common.js";
 
 /**
- * ✅ 날짜 모달 초기화 (flatpickr + 시간 + 정원 - form 모드만 적용)
+ * ✅ 날짜 모달 초기화 (flatpickr + 시간 + 정원 - form 모드에만 동작)
  */
 export function initDateModal({ onApply } = {}) {
   const ids = {
@@ -27,6 +27,7 @@ export function initDateModal({ onApply } = {}) {
   const pickerContainer = document.getElementById(ids.container);
   const isFormMode = container.dataset.formMode === "true";
 
+  // 임시 input을 만들어 flatpickr 초기화
   const tempInput = document.createElement("input");
   tempInput.type = "text";
   tempInput.style.display = "none";
@@ -54,6 +55,7 @@ export function initDateModal({ onApply } = {}) {
         const existing = prevDates.find(p => p.date === dateStr);
         return existing || { date: dateStr, start: "", end: "", capacity: 1 };
       });
+
       ModalState.setDates(updated);
       renderDateEntries(updated, container, isFormMode);
     }
@@ -66,7 +68,7 @@ export function initDateModal({ onApply } = {}) {
 
   el.apply.addEventListener("click", () => {
     if (isFormMode) {
-      updateModalStateFromInputs(container);
+      updateModalStateFromInputs(container); // 🛠️ 적용 버튼 누를 때 상태에 반영
     }
     closeModal(el.modal);
     onApply?.();
@@ -83,6 +85,7 @@ export function initDateModal({ onApply } = {}) {
     onApply?.();
   });
 
+  // 🧹 삭제 버튼 동작 연결
   if (isFormMode) {
     container.addEventListener("click", e => {
       const btn = e.target.closest(".remove-date");
@@ -100,7 +103,7 @@ export function initDateModal({ onApply } = {}) {
 }
 
 /**
- * ✅ 날짜 항목 렌더링 (mode에 따라 다른 구성)
+ * ✅ 날짜 항목 렌더링 (form 모드에서만 UI 생성됨)
  */
 function renderDateEntries(dateEntries, container, isFormMode) {
   if (!container) return;
@@ -122,6 +125,7 @@ function renderDateEntries(dateEntries, container, isFormMode) {
     container.appendChild(wrapper);
   });
 
+  // 🕐 flatpickr 적용
   container.querySelectorAll(".timepicker").forEach(el => {
     flatpickr(el, {
       enableTime: true,
@@ -131,25 +135,49 @@ function renderDateEntries(dateEntries, container, isFormMode) {
       locale: 'ko'
     });
   });
+
+  // 🧠 실시간 ModalState 동기화
+  container.querySelectorAll(".date-entry").forEach(entry => {
+    const idx = Number(entry.querySelector(".capacity")?.dataset.index);
+
+    ["start", "end", "capacity"].forEach(field => {
+      entry.querySelector(`.${field}`).addEventListener("change", () => {
+        const updated = ModalState.getDates();
+        updated[idx] = {
+          ...updated[idx],
+          start: entry.querySelector(".start")?.value || "",
+          end: entry.querySelector(".end")?.value || "",
+          capacity: Number(entry.querySelector(".capacity")?.value || 1)
+        };
+        ModalState.setDates(updated);
+      });
+    });
+  });
 }
 
 /**
- * ✅ form 모드일 때 입력값 -> 상태로 반영
+ * ✅ 적용 버튼 누를 때 form 입력 → 상태로 수동 반영
  */
 function updateModalStateFromInputs(container) {
   const entries = Array.from(container.querySelectorAll(".date-entry"));
+
   const updated = entries.map(entry => {
-    const date = entry.querySelector(".date-label").textContent;
-    const start = entry.querySelector(".timepicker.start")?.value || "";
-    const end = entry.querySelector(".timepicker.end")?.value || "";
+    const dateLabel = entry.querySelector(".date-label");
+    if (!dateLabel) return null;
+
+    const date = dateLabel.textContent;
+    const start = entry.querySelector(".start")?.value || "";
+    const end = entry.querySelector(".end")?.value || "";
     const capacity = Number(entry.querySelector(".capacity")?.value || 1);
+
     return { date, start, end, capacity };
-  });
+  }).filter(e => e !== null);
+
   ModalState.setDates(updated);
 }
 
 /**
- * ✅ 존재하는 경우에만 초기화
+ * ✅ 페이지 내 요소가 전부 있을 경우에만 모달 초기화
  */
 export function initDateModalIfExist({ onApply } = {}) {
   const requiredIds = [

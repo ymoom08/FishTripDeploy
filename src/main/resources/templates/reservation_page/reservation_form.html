@@ -20,9 +20,9 @@
 <main layout:fragment="content" class="reservation-form-container">
   <h1>예약글 작성</h1>
 
-  <form th:action="@{/reservation/new}" method="post" enctype="multipart/form-data">
+  <form id="reservationForm" th:action="@{/reservation/new}" method="post" enctype="multipart/form-data">
 
-    <!-- 제목 -->
+  <!-- 제목 -->
     <div class="form-group">
       <label for="title">제목</label>
       <input type="text" id="title" name="title" required>

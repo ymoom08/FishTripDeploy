@@ -127,3 +127,5 @@ export function getRequiredElements(idMap) {
   }
   return elements;
 }
+
+window.ModalState = ModalState;
