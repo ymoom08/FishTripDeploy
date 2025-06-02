@@ -13,12 +13,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -127,8 +129,10 @@ public class PostController {
 
     @Transactional
     @GetMapping("/{id}")
-    public String view(@PathVariable("id") Long id, Model model,
-                       @AuthenticationPrincipal Object principal) {
+    public String view(@PathVariable("id") Long id,
+                       Model model,
+                       @AuthenticationPrincipal Object principal,
+                       HttpServletRequest request) {
 
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("글을 찾을 수 없습니다."));
@@ -138,6 +142,12 @@ public class PostController {
         List<Comment> comments = commentRepository.findByPostIdOrderByCreatedAtAsc(id);
         model.addAttribute("post", post);
         model.addAttribute("comments", comments);
+
+        // ✅ CSRF 토큰 명시적 주입
+        CsrfToken csrfToken = (CsrfToken) request.getAttribute("_csrf");
+        if (csrfToken != null) {
+            model.addAttribute("_csrf", csrfToken);
+        }
 
         return "board/view";
     }

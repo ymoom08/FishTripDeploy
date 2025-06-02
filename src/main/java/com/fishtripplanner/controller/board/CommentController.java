@@ -1,4 +1,4 @@
-package com.fishtripplanner.controller.comment;
+package com.fishtripplanner.controller.board;
 
 import com.fishtripplanner.domain.User;
 import com.fishtripplanner.domain.board.Post;
@@ -42,5 +42,15 @@ public class CommentController {
         commentRepository.save(comment);
 
         return "redirect:/posts/" + postId;
+    }
+
+    @PostMapping("/like/{commentId}")
+    @ResponseBody
+    public String likeComment(@PathVariable Long commentId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 댓글이 없습니다."));
+        comment.increaseLikeCount();
+        commentRepository.save(comment);
+        return String.valueOf(comment.getLikeCount());
     }
 }
