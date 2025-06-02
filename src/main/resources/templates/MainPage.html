@@ -25,7 +25,7 @@
         <div class="videoWrapper">
             <video class="backgroundVideo" src="/videos/beach.mp4" autoplay muted loop playsinline></video>
             <div class="overlayText">
-                <h1>혼자서도,<br>함께도,<br>낚시 계획의<br>모든것<br><strong>Finder</strong></h1>
+                <h1>혼자서도, 함께도,<br>낚시 계획의 모든것<br><br><strong>FishTrip</strong></h1>
                 <button class="button" onclick="navigatePage('/party/create')">🐟 일정 짧기</button>
             </div>
         </div>
@@ -34,11 +34,11 @@
     <div class="eventSectionWrapper">
         <div class="eventSection">
             <div id="lottiePopularPosts" class="lottie-background"></div>
-            <h2 class="sectionTitle">🔥 인기 게시글</h2>
+            <h2 class="sectionTitle">🐟 인기 게시글</h2>
             <ul class="sectionList">
                 <li th:each="post : ${popularPosts}">
                     <a th:href="@{'/posts/' + ${post.id}}">
-                        <span th:if="${post.profileImagePath == null}">🧙</span>
+                        <span th:if="${post.profileImagePath == null}">🙋‍♂️</span>
                         <img th:if="${post.profileImagePath != null}" th:src="@{${post.profileImagePath}}" alt="프로필"
                              style="width: 32px; height: 32px; border-radius: 50%; margin-right: 10px;">
                         <span th:text="${post.title}">제목</span>
@@ -58,22 +58,25 @@
         </div>
         <div class="catchPhoneMockup">
             <div class="posterCardGrid">
+
+                <!-- 1번째 카드 -->
                 <div class="card">
-                    <div class="poster"><img src="https://i.postimg.cc/jjBSrfnQ/poster1-img.jpg" alt=""></div>
+                    <div class="poster"><img src="/images/posters/autumn.jpg" alt="autumn"></div>
                     <div class="details">
-                        <h1>가을 감성도머</h1>
-                        <h2>2024 • 여수 • 연립지</h2>
+                        <h1>포항낚초크루</h1>
+                        <h2>2025 • 포항 • 삼정리</h2>
                         <div class="rating">
                             <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i>
                             <span>4.2/5</span>
                         </div>
                         <div class="tags">
-                            <span class="tag">연립</span><span class="tag">감성도머</span>
+                            <span class="tag">갯바위</span><span class="tag">농어</span>
                         </div>
-                        <p class="desc">강화된 연립내 종종의 입지 보상 가능 시설입니다.
+                        <p class="desc">파티원 모집으로 이제는 친구로!! 농어 스팟!<br>
+                            파티원 모집중!! 30~40
                         </p>
                         <div class="cast">
-                            <h3>Cast</h3>
+                            <h3>instagram: real_fish01</h3>
                             <ul>
                                 <li><img src="https://i.postimg.cc/jqgkqhSb/cast-11.jpg" title="박낭시"></li>
                                 <li><img src="https://i.postimg.cc/8P7X7r7r/cast-12.jpg" title="김조황"></li>
@@ -82,78 +85,84 @@
                         </div>
                     </div>
                 </div>
-                <!-- 몇장 같은 구조로 더 복잡 -->
+
+                <!-- 2번째 카드 (수정된 이미지 적용) -->
                 <div class="card">
-                    <div class="poster"><img src="https://i.postimg.cc/yxH6DzPD/poster3-img.jpg" alt=""></div>
+                    <div class="poster"><img src="/images/posters/autumn1.png" alt="도다리낚시"></div>
                     <div class="details">
-                        <h1>동해 도다리</h1>
-                        <h2>2024 • 울진 • 개바위</h2>
+                        <h1>창성호모임</h1>
+                        <h2>2025 • 여수 • 삼산면</h2>
                         <div class="rating">
                             <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i><i class="far fa-star"></i>
                             <span>3.8/5</span>
                         </div>
                         <div class="tags">
-                            <span class="tag">개바위</span><span class="tag">중급자</span>
+                            <span class="tag">갯바위</span><span class="tag">참동</span>
                         </div>
-                        <p class="desc">너무 만족 스러웠어요 혼자 보단 파티로!!</p>
+                        <p class="desc">거문도,선상,갯바위 패키지 출조 <br>
+                            기상만 허락하면 출조합니다~~</p>
                         <div class="cast">
-                            <h3>Cast</h3>
+                            <h3>창성호  010-5814-0486 </h3>
                             <ul>
-                                <li><img src="https://i.postimg.cc/WbdgcwMq/cast-21.jpg" title="이경봉"></li>
-                                <li><img src="https://i.postimg.cc/43kzj5b0/cast-22.jpg" title="김봉민"></li>
-                                <li><img src="https://i.postimg.cc/VNDd8zpj/cast-23.jpg" title="이한우"></li>
+                                <li><img src="/images/profiles/man.png" alt="이경봉" title="이경봉"></li>
+                                <li><img src="/images/profiles/man1.png" alt="김봉민" title="김봉민"></li>
                             </ul>
                         </div>
                     </div>
                 </div>
-                <!-- 제3장 -->
+
+
+                <!-- 3번째 카드 -->
                 <div class="card">
-                    <div class="poster"><img src="https://i.postimg.cc/GtxLYS7q/poster2-img.jpg" alt=""></div>
+                    <div class="poster"><img src="/images/posters/autumn2.png" alt="세부케 사우로"></div>
                     <div class="details">
-                        <h1>세부케 사우로</h1>
-                        <h2>2025 • 가포 • 섬</h2>
+                        <h1>물반고기X</h1>
+                        <h2>2025 • 인천 • 영종도</h2>
                         <div class="rating">
                             <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i>
-                            <span>3.0/5</span>
+                            <span>4.0/5</span>
                         </div>
                         <div class="tags">
-                            <span class="tag">섬</span><span class="tag">수앙</span>
+                            <span class="tag">좌대 낚시</span><span class="tag">우럭</span>
                         </div>
-                        <p class="desc">가까운 섬 점도의 수앙무엇을 가만 겪을 수 있습니다.</p>
+                        <p class="desc">여성크루입니다!!! 편하게 들어오세요!!!!</p>
                         <div class="cast">
-                            <h3>Cast</h3>
+                            <h3>instagram: fish_yum</h3>
                             <ul>
-                                <li><img src="https://i.postimg.cc/k4MvWRL8/cast-31.jpg" title="김이름"></li>
-                                <li><img src="https://i.postimg.cc/jj8rXrXD/cast-32.jpg" title="김정희"></li>
-                                <li><img src="https://i.postimg.cc/fT0g7sKd/cast-33.jpg" title="김오서"></li>
+                                <li><img src="/images/profiles/girl.png" alt="이경봉" title="이경봉"></li>
+                                <li><img src="/images/profiles/girl1.png" alt="이경봉" title="이경봉"></li>
+                                <li><img src="/images/profiles/girl2.png" alt="이경봉" title="이경봉"></li>
+                                <li><img src="/images/profiles/girl3.png" alt="이경봉" title="이경봉"></li>
                             </ul>
                         </div>
                     </div>
                 </div>
-                <!-- 제4장 -->
+
+                <!-- 4번째 카드 -->
                 <div class="card">
-                    <div class="poster"><img src="https://i.postimg.cc/13L26Qkb/poster4-img.jpg" alt=""></div>
+                    <div class="poster"><img src="/images/posters/autumn3.png" alt="세부케 사우로"></div>
                     <div class="details">
-                        <h1>방파제 박사이드</h1>
-                        <h2>2023 • 삼청 • 방파제</h2>
+                        <h1>섬낚시 크루</h1>
+                        <h2>2025 • 제주도 • 형제섬</h2>
                         <div class="rating">
                             <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
                             <span>5.0/5</span>
                         </div>
                         <div class="tags">
-                            <span class="tag">방파제</span><span class="tag">박사이드</span>
+                            <span class="tag">섬낚시</span><span class="tag">부시리</span>
                         </div>
-                        <p class="desc">현재 가장 인기 많은 인증 리드 아이템 게시판입니다.</p>
+                        <p class="desc">섬낚시 예약하고 바로 출발해 부시리 맛보기!!</p>
                         <div class="cast">
-                            <h3>Cast</h3>
+                            <h3>romanticuk@naver.com</h3>
                             <ul>
-                                <li><img src="https://i.postimg.cc/76g0Zwzd/cast-41.jpg" title="정상인"></li>
-                                <li><img src="https://i.postimg.cc/jd8hD7D2/cast-42.jpg" title="이도영"></li>
-                                <li><img src="https://i.postimg.cc/0jTk4mPY/cast-43.jpg" title="박지석"></li>
+                                <li><img src="/images/profiles/man2.png" alt="이경봉" title="이경봉"></li>
+                                <li><img src="/images/profiles/man3.png" alt="이경봉" title="이경봉"></li>
+                                <li><img src="/images/profiles/man4.png" alt="이경봉" title="이경봉"></li>
                             </ul>
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
     </section>

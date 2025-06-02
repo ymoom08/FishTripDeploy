@@ -2,7 +2,7 @@ body {
     font-family: 'Noto Sans KR', sans-serif;
     margin: 0;
     padding: 0;
-    background: linear-gradient(to bottom, #d8f3f9, #ffffff);
+    background: linear-gradient(to bottom, #eeeeee, #ffffff);
     min-height: 100vh;
     display: flex;
     flex-direction: column;

@@ -156,10 +156,16 @@
 
   <div class="content" th:text="${post.content}">내용</div>
 
-  <!-- 첨부 미디어 -->
-  <div>
-    <img th:if="${post.imagePath != null}" th:src="@{${post.imagePath}}" alt="첨부 이미지">
-    <video th:if="${post.videoPath != null}" th:src="@{${post.videoPath}}" controls></video>
+  <!-- 첨부 이미지: 여러 개 있을 경우 반복 출력 -->
+  <div th:if="${post.imagePath != null}">
+    <div th:each="imgPath : ${post.imagePath.split(',')}">
+      <img th:src="@{${imgPath}}" alt="첨부 이미지" />
+    </div>
+  </div>
+
+  <!-- 첨부 영상 -->
+  <div th:if="${post.videoPath != null}">
+    <video th:src="@{${post.videoPath}}" controls></video>
   </div>
 
   <div class="button-group">
