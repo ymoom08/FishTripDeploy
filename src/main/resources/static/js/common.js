@@ -144,7 +144,6 @@ document.addEventListener('DOMContentLoaded', () => {
         fullMenuBox.style.display = 'none';
     }
 
-
     document.addEventListener('click', (event) => {
         const fullMenuBox = document.querySelector('.fullMenuBox');
         const menuIcon = document.querySelector('.menuIcon');
@@ -161,7 +160,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (menuIcon) menuIcon.textContent = '☰';
         }
     });
-
 
     const videos = document.querySelectorAll('.videoSlider .video');
     let current = 0;
@@ -184,23 +182,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-
 function selectRegion(regionName) {
     alert(`선택된 해역: ${regionName}`);
 }
 
-function showSubMenu() {
-  const submenu = event.currentTarget.querySelector(".submenu");
-  if (submenu) submenu.style.display = "block";
-}
-
-function hideSubMenu() {
-  const submenu = event.currentTarget.querySelector(".submenu");
-  if (submenu) submenu.style.display = "none";
-}
-
-// ✅ 전역 바인딩해서 inline 이벤트에서 인식되도록
+// ✅ 전역 바인딩
 window.toggleMenu = toggleMenu;
 window.navigatePage = navigatePage;
 window.showSubMenu = showSubMenu;
 window.hideSubMenu = hideSubMenu;
+window.selectRegion = selectRegion;
