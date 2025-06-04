@@ -8,6 +8,7 @@ import com.fishtripplanner.repository.PostRepository;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
@@ -44,13 +45,13 @@ public class CommentController {
         return "redirect:/posts/" + postId;
     }
 
+    @Transactional // 중요: 좋아요 증가가 DB에 반영되도록 보장
     @PostMapping("/like/{commentId}")
     @ResponseBody
     public String likeComment(@PathVariable Long commentId) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 댓글이 없습니다."));
         comment.increaseLikeCount();
-        commentRepository.save(comment);
         return String.valueOf(comment.getLikeCount());
     }
 }
