@@ -129,3 +129,11 @@
 .back-link:hover {
   text-decoration: underline;
 }
+
+.flatpickr-day.sunday {
+  color: #e74c3c;
+}
+
+.flatpickr-day.saturday {
+  color: #3498db;
+}
