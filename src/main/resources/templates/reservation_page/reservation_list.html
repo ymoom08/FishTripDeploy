@@ -60,10 +60,9 @@
         </div>
         <div class="ad-desc" th:text="${card.title}">제목</div>
         <div class="ad-detail">
-          <p th:text="${card.region ?: '없음'}">지역</p>
-          <p th:text="'회사명: ' + ${card.companyName}">회사명</p>
-          <p th:text="'어종: ' + ${#strings.arrayJoin(card.fishTypes.toArray(), ', ')}">어종</p>
-          <p th:text="${card.content}">내용</p>
+          <p th:text="${card.companyName}">회사명</p>
+          <p th:text="${card.region}">지역</p>
+          <p th:text="${#strings.arrayJoin(card.fishTypes.toArray(), ', ')}">어종</p>
         </div>
       </a>
     </div>

@@ -17,7 +17,6 @@ public interface ReservationPostRepository extends JpaRepository<ReservationPost
     List<ReservationPost> findByType(ReservationType type);
     Page<ReservationPost> findByType(ReservationType type, Pageable pageable);
 
-    // ✅ 수정됨: 다대다 region 연관관계 기준으로 변경
     @Query("""
         SELECT DISTINCT r
         FROM ReservationPost r
@@ -127,9 +126,9 @@ public interface ReservationPostRepository extends JpaRepository<ReservationPost
     @Query("""
         SELECT DISTINCT r
         FROM ReservationPost r
+        JOIN r.regions region
         LEFT JOIN r.availableDates d
         LEFT JOIN r.fishTypes f
-        LEFT JOIN r.regions region
         WHERE r.type = :type
           AND (:regionIds IS NULL OR region.id IN :regionIds)
           AND (:dates IS NULL OR d.availableDate IN :dates)

@@ -1,13 +1,13 @@
 package com.fishtripplanner.dto.reservation;
 
 import com.fishtripplanner.domain.reservation.ReservationPost;
-import com.fishtripplanner.domain.reservation.ReservationType;
 import com.fishtripplanner.entity.FishTypeEntity;
+import com.fishtripplanner.entity.RegionEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Data
@@ -20,21 +20,64 @@ public class ReservationCardDto {
     private String content;
     private String companyName;
     private String imageUrl;
-    private String region;  // (부모) 자식 형식
+    private String region;  // 여러 지역 문자열로 표시
     private List<String> fishTypes;
 
     public static ReservationCardDto from(ReservationPost post) {
-        String regionText = null;
+        String regionText = "미지정";
 
-        if (post.getRegions() != null && !post.getRegions().isEmpty()) {
-            // 일단 리스트 중 첫 번째 지역 기준으로 표시
-            var region = post.getRegions().get(0);
-            String child = region.getName();
-            String parent = region.getParent() != null ? region.getParent().getName() : null;
-            regionText = parent != null ? "(" + parent + ") " + child : child;
+        List<RegionEntity> regions = post.getRegions();
+        if (regions != null && !regions.isEmpty()) {
+            // 부모 이름 -> 자식 목록 매핑
+            Map<String, List<RegionEntity>> groupedByParent = new LinkedHashMap<>();
+
+            for (RegionEntity region : regions) {
+                String parentName;
+                RegionEntity parent;
+
+                if (region.getParent() != null) {
+                    parent = region.getParent();
+                    parentName = parent.getName();
+                } else {
+                    parent = region;
+                    parentName = region.getName();
+                }
+
+                groupedByParent.computeIfAbsent(parentName, k -> new ArrayList<>()).add(region);
+            }
+
+            List<String> displayStrings = new ArrayList<>();
+
+            for (Map.Entry<String, List<RegionEntity>> entry : groupedByParent.entrySet()) {
+                String parentName = entry.getKey();
+                List<RegionEntity> selected = entry.getValue();
+
+                RegionEntity sampleRegion = selected.get(0).getParent() != null
+                        ? selected.get(0).getParent()
+                        : selected.get(0);
+
+                List<RegionEntity> allChildren = sampleRegion.getChildren();
+                Set<Long> selectedIds = selected.stream().map(RegionEntity::getId).collect(Collectors.toSet());
+
+                boolean isAllChildrenSelected = allChildren != null && !allChildren.isEmpty() &&
+                        allChildren.stream().map(RegionEntity::getId).allMatch(selectedIds::contains);
+
+                if (isAllChildrenSelected) {
+                    displayStrings.add("(" + parentName + ") 전체");
+                } else {
+                    displayStrings.addAll(
+                            selected.stream()
+                                    .filter(r -> r.getParent() != null) // 자식만
+                                    .map(r -> "(" + parentName + ") " + r.getName())
+                                    .toList()
+                    );
+                }
+            }
+
+            regionText = String.join(", ", displayStrings);
         }
 
-        // 이미지 처리 로직은 그대로 유지
+        // 이미지 처리
         String imageUrl = post.getImageUrl();
         if (imageUrl == null || imageUrl.isBlank()) {
             switch (post.getType()) {
@@ -55,11 +98,10 @@ public class ReservationCardDto {
                 post.getContent(),
                 post.getCompanyName(),
                 imageUrl,
-                regionText,
+                regionText, // 🔁 지역 문자열 먼저
                 post.getFishTypes().stream()
                         .map(FishTypeEntity::getName)
                         .collect(Collectors.toList())
         );
     }
-
 }

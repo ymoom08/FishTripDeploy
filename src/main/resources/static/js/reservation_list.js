@@ -75,16 +75,16 @@ function updateCards(cards) {
               </div>
               <div class="ad-desc">${card.title}</div>
               <div class="ad-detail">
-                <p>지역: ${card.region || "없음"}</p>
-                <p>회사명: ${card.companyName || "알 수 없음"}</p>
-                <p>어종: ${(card.fishTypes && card.fishTypes.join(", ")) || "정보 없음"}</p>
-                <p>${card.content}</p>
+                <p>${card.companyName || "알 수 없음"}</p>
+                <p>${card.region || "지역 없음"}</p>
+                <p>${(card.fishTypes && card.fishTypes.join(", ")) || "어종 없음"}</p>
               </div>
             </a>
           </div>
         `;
       }).join('');
 }
+
 
 // ✅ 선택된 지역 텍스트 포맷 생성
 function getCompactRegionText() {
