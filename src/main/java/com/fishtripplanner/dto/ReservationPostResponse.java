@@ -28,7 +28,7 @@ public class ReservationPostResponse {
         // 여러 지역을 처리하는 코드로 수정
         String regionText = post.getRegions().stream()
                 .map(region -> {
-                    String parent = region.getParent() != null ? "(" + region.getParent().getName() + ") " : "";
+                    String parent = region.getParent() != null ? "(" + region.getParent().getName() + ")" : "";
                     return parent + region.getName();  // 지역 이름에 부모 지역 이름을 추가
                 })
                 .collect(Collectors.joining(", "));  // 지역들을 콤마로 구분하여 연결

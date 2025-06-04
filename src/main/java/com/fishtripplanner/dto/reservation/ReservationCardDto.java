@@ -68,7 +68,7 @@ public class ReservationCardDto {
                     displayStrings.addAll(
                             selected.stream()
                                     .filter(r -> r.getParent() != null) // 자식만
-                                    .map(r -> "(" + parentName + ") " + r.getName())
+                                    .map(r -> "(" + parentName + ")" + r.getName())  // 여기 공백 제거
                                     .toList()
                     );
                 }
