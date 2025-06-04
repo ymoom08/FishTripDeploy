@@ -20,6 +20,7 @@ import java.nio.file.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,32 +33,53 @@ public class ReservationPostService {
     private final UserRepository userRepository;
     private final ReservationOrderRepository reservationOrderRepository;
 
+    /**
+     * 예약글을 생성하고, 여러 지역을 하나의 예약글에 연결합니다.
+     * @param request 예약글에 대한 요청 정보
+     * @param user 예약글 작성자
+     * @return 생성된 예약글 응답 리스트
+     */
     public List<ReservationPostResponse> createReservationPosts(ReservationPostRequest request, User user) {
+        // 지역 목록을 다중으로 받아옵니다
         List<RegionEntity> regions = regionRepository.findAllById(request.getRegionIds());
 
-        return regions.stream().map(region -> {
-            ReservationPost post = request.toEntity(region);
-            post.setOwner(user);
+        // 예약글을 생성하고 여러 지역을 설정합니다
+        ReservationPost post = request.toEntity(regions);  // 여러 지역을 전달하여 예약글 생성
+        post.setOwner(user);  // 예약글 작성자 설정
 
-            // ✅ 어종 ID 기반으로 처리
-            List<FishTypeEntity> fishTypes = fishTypeRepository.findAllById(request.getFishTypeIds());
-            post.setFishTypes(fishTypes);
+        // 어종 설정
+        List<FishTypeEntity> fishTypes = fishTypeRepository.findAllById(request.getFishTypeIds());
+        post.setFishTypes(fishTypes);
 
-            reservationPostRepository.save(post);
+        // 예약글 저장
+        reservationPostRepository.save(post);
 
-            List<ReservationPostAvailableDate> availableDates = request.getAvailableDates().stream()
-                    .map(date -> ReservationPostAvailableDate.builder()
-                            .reservationPost(post)
-                            .availableDate(date)
-                            .build())
-                    .toList();
+        // 예약 가능한 날짜 처리
+        List<ReservationPostAvailableDate> availableDates = request.getAvailableDates().stream()
+                .map(date -> ReservationPostAvailableDate.builder()
+                        .reservationPost(post)
+                        .availableDate(date)
+                        .build())
+                .toList();
 
-            availableDateRepository.saveAll(availableDates);
+        // 예약 가능한 날짜를 저장
+        availableDateRepository.saveAll(availableDates);
 
-            return ReservationPostResponse.from(post);
-        }).toList();
+        // 예약글 응답 생성 후 반환
+        return List.of(ReservationPostResponse.from(post));
     }
 
+    /**
+     * 예약글을 필터링하여 검색합니다.
+     * @param type 예약 유형
+     * @param regionIds 지역 ID 리스트
+     * @param dates 예약 날짜 리스트
+     * @param fishTypes 어종 리스트
+     * @param keyword 검색어
+     * @param sortKey 정렬 기준
+     * @param pageable 페이지 설정
+     * @return 예약글 페이지
+     */
     public Page<ReservationPost> filterPosts(
             ReservationType type,
             List<Long> regionIds,
@@ -71,6 +93,7 @@ public class ReservationPostService {
         List<String> safeFishTypes = (fishTypes == null || fishTypes.isEmpty()) ? null : fishTypes;
         String safeKeyword = (keyword == null || keyword.isBlank()) ? null : keyword;
 
+        // 정렬 기준 설정
         Sort sort = switch (sortKey) {
             case "priceAsc"  -> Sort.by("price").ascending();
             case "priceDesc" -> Sort.by("price").descending();
@@ -79,6 +102,7 @@ public class ReservationPostService {
         };
         Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
 
+        // 조건 키에 따라 필터링 수행
         String conditionKey = String.format("%s-%s-%s",
                 safeRegionIds != null,
                 dates != null,
@@ -102,14 +126,26 @@ public class ReservationPostService {
         };
     }
 
+    /**
+     * 등록된 어종 이름을 가져옵니다.
+     * @return 어종 이름 리스트
+     */
     public List<String> getFishTypeNames() {
         return reservationPostRepository.findAllFishTypeNames().stream().sorted().toList();
     }
 
+    /**
+     * 사용된 지역 이름을 가져옵니다.
+     * @return 사용된 지역 이름 리스트
+     */
     public List<String> getUsedRegionNames() {
         return reservationPostRepository.findAllRegionNames();
     }
 
+    /**
+     * 예약글을 저장합니다.
+     * @param dto 예약글 생성에 필요한 정보
+     */
     public void saveReservation(ReservationCreateRequestDto dto) {
         if (dto.getUserId() == null) {
             throw new IllegalArgumentException("유저 ID는 필수입니다.");
@@ -127,64 +163,75 @@ public class ReservationPostService {
             throw new IllegalArgumentException("예약 가능 날짜는 1개 이상 입력되어야 합니다.");
         }
 
+        // 유저 조회
         User user = userRepository.findById(dto.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
 
+        // 지역과 어종 리스트 조회
         List<RegionEntity> regions = regionRepository.findAllById(dto.getRegionIds());
         List<FishTypeEntity> fishTypes = fishTypeRepository.findByNameIn(dto.getFishTypeNames());
 
-        for (RegionEntity region : regions) {
-            ReservationPost post = new ReservationPost();
-            post.setTitle(dto.getTitle());
-            post.setType(ReservationType.valueOf(dto.getType()));
-            post.setRegion(region);
-            post.setContent(dto.getContent());
-            post.setPrice(dto.getPrice());
-            post.setCompanyName(dto.getCompanyName());
-            post.setOwner(user);
-            post.setFishTypes(fishTypes);
+        // 예약글 생성
+        ReservationPost post = new ReservationPost();
+        post.setTitle(dto.getTitle());
+        post.setType(ReservationType.valueOf(dto.getType()));
+        post.setRegions(regions);  // 여러 지역 설정
+        post.setContent(dto.getContent());
+        post.setPrice(dto.getPrice());
+        post.setCompanyName(dto.getCompanyName());
+        post.setOwner(user);
+        post.setFishTypes(fishTypes);
 
-            // 이미지 저장
-            if (dto.getImageFile() != null && !dto.getImageFile().isEmpty()) {
-                try {
-                    String fileName = UUID.randomUUID() + "_" + dto.getImageFile().getOriginalFilename();
-                    String uploadDir = "uploads/reservation_images/";
-                    Path savePath = Paths.get(uploadDir, fileName);
+        // 이미지 저장 처리
+        if (dto.getImageFile() != null && !dto.getImageFile().isEmpty()) {
+            try {
+                String fileName = UUID.randomUUID() + "_" + dto.getImageFile().getOriginalFilename();
+                String uploadDir = "uploads/reservation_images/";
+                Path savePath = Paths.get(uploadDir, fileName);
 
-                    Files.createDirectories(savePath.getParent());
-                    Files.write(savePath, dto.getImageFile().getBytes());
+                Files.createDirectories(savePath.getParent());
+                Files.write(savePath, dto.getImageFile().getBytes());
 
-                    post.setImageUrl("/uploads/reservation_images/" + fileName);
-                } catch (IOException e) {
-                    throw new RuntimeException("이미지 저장 실패", e);
-                }
+                post.setImageUrl("/uploads/reservation_images/" + fileName);
+            } catch (IOException e) {
+                throw new RuntimeException("이미지 저장 실패", e);
             }
-
-            reservationPostRepository.save(post);
-
-            List<ReservationPostAvailableDate> dates = dto.getAvailableDates().stream()
-                    .map(d -> {
-                        ReservationPostAvailableDate ad = new ReservationPostAvailableDate();
-                        ad.setReservationPost(post);
-                        ad.setAvailableDate(LocalDate.parse(d.getDate()));
-                        ad.setCapacity(d.getCapacity());
-                        ad.setTime(d.getTime());
-                        return ad;
-                    }).toList();
-
-            availableDateRepository.saveAll(dates);
         }
+
+        reservationPostRepository.save(post);
+
+        // 예약 가능 날짜 처리
+        List<ReservationPostAvailableDate> dates = dto.getAvailableDates().stream()
+                .map(d -> {
+                    ReservationPostAvailableDate ad = new ReservationPostAvailableDate();
+                    ad.setReservationPost(post);
+                    ad.setAvailableDate(LocalDate.parse(d.getDate()));
+                    ad.setCapacity(d.getCapacity());
+                    ad.setTime(d.getTime());
+                    return ad;
+                }).toList();
+
+        availableDateRepository.saveAll(dates);
     }
 
-
-
+    /**
+     * 예약글 상세 정보를 가져옵니다.
+     * @param postId 예약글 ID
+     * @return 예약글 상세 정보 DTO
+     */
     public ReservationDetailResponseDto getReservationDetail(Long postId) {
         ReservationPost post = reservationPostRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 예약글이 존재하지 않습니다."));
 
+        // 여러 지역을 처리하기 위해, 지역들을 반환합니다.
+        List<String> regionNames = post.getRegions().stream()
+                .map(region -> region.getName())  // 여러 지역 이름을 리스트로 반환
+                .collect(Collectors.toList());
+
+        // 예약 가능한 날짜 처리
         List<ReservationDetailResponseDto.AvailableDateDto> dateDtos =
                 post.getAvailableDates().stream().map(ad -> {
-                    int reserved = reservationOrderRepository.countByReservationPostAndAvailableDate(post, ad.getAvailableDate());  // 여기 수정됨
+                    int reserved = reservationOrderRepository.countByReservationPostAndAvailableDate(post, ad.getAvailableDate());
                     return ReservationDetailResponseDto.AvailableDateDto.builder()
                             .date(ad.getAvailableDate().toString())
                             .time(ad.getTime())
@@ -193,12 +240,11 @@ public class ReservationPostService {
                             .build();
                 }).toList();
 
-
         return ReservationDetailResponseDto.builder()
                 .id(post.getId())
                 .title(post.getTitle())
                 .imageUrl(post.getImageUrl())
-                .regionName(post.getRegion().getName())
+                .regionNames(regionNames)  // 여러 지역 이름을 반환
                 .companyName(post.getCompanyName())
                 .type(post.getType().name())
                 .typeLower(post.getType().name().toLowerCase())

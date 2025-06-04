@@ -32,37 +32,40 @@ public class ReservationService {
     private final FishTypeRepository fishTypeRepository;
 
     /**
-     * ✅ 여러 지역에 대해 각각 예약글 생성
+     * 여러 지역을 하나의 예약글에 추가하여 예약글 생성
      */
     public List<ReservationPostResponse> createReservationPosts(ReservationPostRequest request, User user) {
         List<RegionEntity> regions = regionRepository.findAllById(request.getRegionIds());
         List<FishTypeEntity> fishTypes = fishTypeRepository.findAllById(request.getFishTypeIds());
 
-        return regions.stream().map(region -> {
-            ReservationPost post = ReservationPost.builder()
-                    .owner(user)
-                    .type(ReservationType.valueOf(request.getType()))
-                    .title(request.getTitle())
-                    .content(request.getContent())
-                    .region(region)
-                    .price(request.getPrice())
-                    .imageUrl(request.getImageUrl())
-                    .createdAt(LocalDateTime.now())
-                    .build();
+        if (regions.isEmpty() || fishTypes.isEmpty()) {
+            return List.of(); // 예외 처리 없이 비어있으면 반환
+        }
 
-            post.setFishTypes(fishTypes);
+        ReservationPost post = ReservationPost.builder()
+                .owner(user)
+                .type(ReservationType.valueOf(request.getType()))
+                .title(request.getTitle())
+                .content(request.getContent())
+                .price(request.getPrice())
+                .imageUrl(request.getImageUrl())
+                .createdAt(LocalDateTime.now())
+                .regions(regions)
+                .build();
 
-            List<ReservationPostAvailableDate> availableDateList = request.getAvailableDates().stream()
-                    .map(date -> ReservationPostAvailableDate.builder()
-                            .availableDate(date)
-                            .reservationPost(post)
-                            .build())
-                    .toList();
+        post.setFishTypes(fishTypes);
 
-            post.setAvailableDates(availableDateList);
+        List<ReservationPostAvailableDate> availableDateList = request.getAvailableDates().stream()
+                .map(date -> ReservationPostAvailableDate.builder()
+                        .availableDate(date)
+                        .reservationPost(post)
+                        .build())
+                .collect(Collectors.toList());
 
-            return ReservationPostResponse.from(reservationPostRepository.save(post));
-        }).toList();
+        post.setAvailableDates(availableDateList);
+
+        ReservationPost savedPost = reservationPostRepository.save(post);
+        return List.of(ReservationPostResponse.from(savedPost));
     }
 
     public List<ReservationPostResponse> getAllPosts() {
@@ -125,33 +128,20 @@ public class ReservationService {
         ReservationPost post = reservationPostRepository.findByIdWithAvailableDatesOnly(id)
                 .orElseThrow(() -> new RuntimeException("예약글을 찾을 수 없습니다."));
 
-        return ReservationDetailResponseDto.builder()
-                .id(post.getId())
-                .title(post.getTitle())
-                .imageUrl(
-                        post.getImageUrl() != null && !post.getImageUrl().isEmpty()
-                                ? post.getImageUrl()
-                                : "/images/" + post.getType().name().toLowerCase() + ".jpg"
-                )
-                .regionName(post.getRegion().getName())
-                .companyName(post.getCompanyName())
-                .type(post.getType().name())
-                .typeLower(post.getType().name().toLowerCase())
-                .typeKorean(post.getType().getKorean())
-                .price(post.getPrice())
-                .content(post.getContent())
-                .fishTypes(post.getFishTypes().stream().map(FishTypeEntity::getName).toList())
-                .availableDates(post.getAvailableDates().stream()
-                        .map(date -> {
-                            int reserved = reservationOrderRepository.countByReservationPostAndAvailableDate(post, date.getAvailableDate());
-                            return ReservationDetailResponseDto.AvailableDateDto.builder()
-                                    .date(date.getAvailableDate().toString())
-                                    .time(date.getTime())
-                                    .capacity(date.getCapacity())
-                                    .remaining(date.getCapacity() - reserved)
-                                    .build();
-                        })
-                        .toList())
-                .build();
+        // ✅ availableDates 계산만 남기고 regionNames는 DTO에서 처리함
+        List<ReservationDetailResponseDto.AvailableDateDto> availableDates = post.getAvailableDates().stream()
+                .map(date -> {
+                    int reserved = reservationOrderRepository.countByReservationPostAndAvailableDate(post, date.getAvailableDate());
+                    return ReservationDetailResponseDto.AvailableDateDto.builder()
+                            .date(date.getAvailableDate().toString())
+                            .time(date.getTime())
+                            .capacity(date.getCapacity())
+                            .remaining(date.getCapacity() - reserved)
+                            .build();
+                })
+                .collect(Collectors.toList());
+
+        return ReservationDetailResponseDto.from(post, availableDates);
     }
+
 }
