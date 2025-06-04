@@ -17,11 +17,13 @@ public interface ReservationPostRepository extends JpaRepository<ReservationPost
     List<ReservationPost> findByType(ReservationType type);
     Page<ReservationPost> findByType(ReservationType type, Pageable pageable);
 
+    // ✅ 수정됨: 다대다 region 연관관계 기준으로 변경
     @Query("""
-        SELECT r
+        SELECT DISTINCT r
         FROM ReservationPost r
+        JOIN r.regions region
         WHERE r.type = :type
-          AND r.region.id IN :regionIds
+          AND region.id IN :regionIds
     """)
     Page<ReservationPost> findByTypeAndRegionIds(
             @Param("type") ReservationType type,
@@ -42,7 +44,6 @@ public interface ReservationPostRepository extends JpaRepository<ReservationPost
             Pageable pageable
     );
 
-    // ✅ 수정: 날짜 IN 조건 추가
     @Query("""
         SELECT DISTINCT r
         FROM ReservationPost r
@@ -59,13 +60,13 @@ public interface ReservationPostRepository extends JpaRepository<ReservationPost
             Pageable pageable
     );
 
-    // ✅ 수정: 날짜 IN 조건 추가
     @Query("""
         SELECT DISTINCT r
         FROM ReservationPost r
+        JOIN r.regions region
         JOIN r.availableDates d
         WHERE r.type = :type
-          AND r.region.id IN :regionIds
+          AND region.id IN :regionIds
           AND d.availableDate IN :dates
     """)
     Page<ReservationPost> findByTypeAndRegionIdsAndDate(
@@ -78,9 +79,10 @@ public interface ReservationPostRepository extends JpaRepository<ReservationPost
     @Query("""
         SELECT DISTINCT r
         FROM ReservationPost r
+        JOIN r.regions region
         JOIN r.fishTypes f
         WHERE r.type = :type
-          AND r.region.id IN :regionIds
+          AND region.id IN :regionIds
           AND f.name IN :fishTypes
     """)
     Page<ReservationPost> findByRegionIdsAndFishTypes(
@@ -90,14 +92,14 @@ public interface ReservationPostRepository extends JpaRepository<ReservationPost
             Pageable pageable
     );
 
-    // ✅ 수정: 날짜 IN 조건 추가
     @Query("""
         SELECT DISTINCT r
         FROM ReservationPost r
+        JOIN r.regions region
         JOIN r.availableDates d
         JOIN r.fishTypes f
         WHERE r.type = :type
-          AND r.region.id IN :regionIds
+          AND region.id IN :regionIds
           AND d.availableDate IN :dates
           AND f.name IN :fishTypes
     """)
@@ -109,7 +111,6 @@ public interface ReservationPostRepository extends JpaRepository<ReservationPost
             Pageable pageable
     );
 
-    // ✅ 수정: 날짜 IN 조건 추가
     @Query("""
         SELECT DISTINCT r
         FROM ReservationPost r
@@ -123,14 +124,14 @@ public interface ReservationPostRepository extends JpaRepository<ReservationPost
             Pageable pageable
     );
 
-    // ✅ 수정: 느슨한 조건 필터 - 날짜 IN 사용
     @Query("""
         SELECT DISTINCT r
         FROM ReservationPost r
         LEFT JOIN r.availableDates d
         LEFT JOIN r.fishTypes f
+        LEFT JOIN r.regions region
         WHERE r.type = :type
-          AND (:regionIds IS NULL OR r.region.id IN :regionIds)
+          AND (:regionIds IS NULL OR region.id IN :regionIds)
           AND (:dates IS NULL OR d.availableDate IN :dates)
           AND (:fishTypes IS NULL OR f.name IN :fishTypes)
           AND (
@@ -143,7 +144,11 @@ public interface ReservationPostRepository extends JpaRepository<ReservationPost
                    FROM r.fishTypes f2
                    WHERE LOWER(f2.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
                )
-               OR LOWER(r.region.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+               OR EXISTS (
+                   SELECT 1
+                   FROM r.regions reg
+                   WHERE LOWER(reg.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+               )
           )
     """)
     Page<ReservationPost> findByFilters(
@@ -158,7 +163,7 @@ public interface ReservationPostRepository extends JpaRepository<ReservationPost
     @Query("SELECT DISTINCT f.name FROM FishTypeEntity f")
     List<String> findAllFishTypeNames();
 
-    @Query("SELECT DISTINCT r.region.name FROM ReservationPost r")
+    @Query("SELECT DISTINCT reg.name FROM RegionEntity reg")
     List<String> findAllRegionNames();
 
     @Query("""

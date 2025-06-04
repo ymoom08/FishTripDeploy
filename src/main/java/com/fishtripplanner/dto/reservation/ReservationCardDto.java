@@ -26,15 +26,15 @@ public class ReservationCardDto {
     public static ReservationCardDto from(ReservationPost post) {
         String regionText = null;
 
-        if (post.getRegion() != null) {
-            String child = post.getRegion().getName();
-            String parent = post.getRegion().getParent() != null
-                    ? post.getRegion().getParent().getName()
-                    : null;
+        if (post.getRegions() != null && !post.getRegions().isEmpty()) {
+            // 일단 리스트 중 첫 번째 지역 기준으로 표시
+            var region = post.getRegions().get(0);
+            String child = region.getName();
+            String parent = region.getParent() != null ? region.getParent().getName() : null;
             regionText = parent != null ? "(" + parent + ") " + child : child;
         }
 
-        // ✅ 이미지 경로 처리
+        // 이미지 처리 로직은 그대로 유지
         String imageUrl = post.getImageUrl();
         if (imageUrl == null || imageUrl.isBlank()) {
             switch (post.getType()) {
@@ -46,7 +46,6 @@ public class ReservationCardDto {
                 default -> imageUrl = "/images/default.jpg";
             }
         } else if (!imageUrl.startsWith("/uploads/") && !imageUrl.startsWith("/images/")) {
-            // 예외 케이스 대비 (예: 파일명만 저장됐을 때)
             imageUrl = "/uploads/reservation_images/" + imageUrl;
         }
 
@@ -57,9 +56,10 @@ public class ReservationCardDto {
                 post.getCompanyName(),
                 imageUrl,
                 regionText,
-                post.getFishTypes().stream()  // ✅ 수정된 부분
+                post.getFishTypes().stream()
                         .map(FishTypeEntity::getName)
                         .collect(Collectors.toList())
         );
     }
+
 }
