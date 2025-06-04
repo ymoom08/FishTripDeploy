@@ -9,7 +9,7 @@ import { initRegionModal } from "./modal_region.js";
 import { initFishModal } from "./modal_fish.js";
 import { initDateModal } from "./modal_date.js";
 
-// ✅ 지역 캐시 로컬 저장
+// ✅ 지역 캐시 전역 저장
 let cachedRegions = null;
 
 export function getCachedRegions() {
@@ -23,18 +23,20 @@ export function setCachedRegions(data) {
   }
 }
 
-// ✅ 카드 목록 fetch 및 렌더링
+// ✅ 필터링 함수 - 선택된 조건 기반 API 호출
 export function applyFilters({ sortKey = "latest" } = {}) {
-  const type = location.pathname.split("/").at(-1);
+  const type = location.pathname.split("/").at(-1);  // URL에서 타입 추출
   const query = new URLSearchParams({ type, page: 0, sort: sortKey });
 
   ModalState.getRegions().forEach(r => query.append("regionId", r.id));
-  ModalState.getDates().forEach(d => query.append("date", d.date)); // ✅ d → d.date 로 수정
+  ModalState.getDates().forEach(d => query.append("date", d.date));
   ModalState.getFishTypes().forEach(f => query.append("fishType", f));
 
   const keywordEl = document.querySelector(".search-input");
   const keyword = keywordEl ? keywordEl.value.trim() : "";
   if (keyword) query.append("keyword", keyword);
+
+  console.log("FILTER QUERY =", query.toString());
 
   fetch(`/api/reservation?${query.toString()}`)
     .then(res => res.ok ? res.json() : Promise.reject("서버 오류"))
@@ -48,7 +50,7 @@ export function applyFilters({ sortKey = "latest" } = {}) {
     });
 }
 
-// ✅ 카드 DOM 구성
+// ✅ 카드 리스트 렌더링
 function updateCards(cards) {
   const container = document.getElementById("cardContainer");
   if (!container) return;
@@ -85,8 +87,7 @@ function updateCards(cards) {
       }).join('');
 }
 
-
-// ✅ 선택된 지역 텍스트 포맷 생성
+// ✅ 선택된 지역 텍스트 포맷
 function getCompactRegionText() {
   const regions = ModalState.getRegions();
   const cached = getCachedRegions();
@@ -107,7 +108,7 @@ function getCompactRegionText() {
     .join(", ");
 }
 
-// ✅ 전체 선택 정보 UI에 표시
+// ✅ 선택 정보 UI에 표시
 function updateSelectedInfo() {
   const region = ModalState.getRegions();
   const fish = ModalState.getFishTypes();
@@ -123,7 +124,7 @@ function updateSelectedInfo() {
   }
 
   if (date.length > 0) {
-    const formattedDates = date.map(d => d.date).join(", "); // ✅ 수정된 부분
+    const formattedDates = date.map(d => d.date).join(", ");
     parts.push(`선택 날짜: ${formattedDates}`);
   }
 
@@ -134,6 +135,7 @@ function updateSelectedInfo() {
   label.innerText = parts.join("\n");
 }
 
+// ✅ 정렬 이벤트
 function initSortControl() {
   const sortBtn = document.getElementById("sortBtn");
   const sortOptions = document.getElementById("sortOptions");
@@ -156,6 +158,7 @@ function initSortControl() {
   });
 }
 
+// ✅ 검색창 동작
 function initSearchControl() {
   const input = document.querySelector(".search-input");
   const btn = document.querySelector(".search-button");
@@ -165,6 +168,7 @@ function initSearchControl() {
   });
 }
 
+// ✅ 모달 외부 클릭 시 닫기
 function initModalOutsideClose() {
   ["regionModal", "dateModal", "fishModal"].forEach(id => {
     const modal = document.getElementById(id);
@@ -172,6 +176,7 @@ function initModalOutsideClose() {
   });
 }
 
+// ✅ 모든 모달 초기화
 function initAllModals() {
   initRegionModal({ onApply: handleRegionApply });
   initFishModal({ onApply: handleFishApply });
@@ -179,6 +184,7 @@ function initAllModals() {
   initModalOutsideClose();
 }
 
+// ✅ 모달 필터 적용 시 실행되는 콜백들
 function handleRegionApply() {
   updateSelectedInfo();
   if (isListPage) applyFilters();
@@ -194,21 +200,24 @@ function handleDateApply() {
   if (isListPage) applyFilters();
 }
 
-// ✅ 초기화 실행
-const isListPage = location.pathname.includes("/reservation/list");
+// ✅ 예약 목록 페이지 여부 체크
+const isListPage = location.pathname.includes("/reservation/");
 
+// ✅ 지역 계층 정보 초기 fetch
 fetch("/api/regions/hierarchy")
   .then(res => res.json())
   .then(setCachedRegions)
   .catch(err => console.error("지역 데이터 초기화 실패:", err));
 
+// ✅ DOM 로드 완료 시 초기화 실행
 document.addEventListener("DOMContentLoaded", () => {
   initSortControl();
   initSearchControl();
   initAllModals();
-  if (isListPage) applyFilters();
+  applyFilters(); // 첫 로딩 시 카드 목록 불러오기
 });
 
+// ✅ 날짜 모달 조건부 초기화 함수
 export function initDateModalIfExist({ onApply } = {}) {
   const requiredIds = [
     "dateBtn",
