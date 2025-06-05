@@ -53,20 +53,28 @@
       <div class="date-list">
         <div class="date-item-row" th:each="date : ${reservation.availableDates}">
           <div class="date-box">
-            <span class="date-text" th:text="${date.date}">2025-05-09</span>
+            <span class="date-text" th:text="${date.date}"></span>
           </div>
           <div class="info-box">
-            <p><strong>운항 시간:</strong> <span th:text="${date.time ?: '06:00 ~ 16:30'}">06:00 ~ 16:30</span></p>
-            <p><strong>포함사항:</strong> <span>장비 대여, 보험 등</span></p> <!-- 고정 텍스트로 -->
+            <p><strong>운항 시간:</strong> <span th:text="${date.time ?: '06:00 ~ 16:30'}"></span></p>
           </div>
           <div class="action-box">
-            <p class="remaining" th:text="'남은 자리: ' + ${date.remaining} + '명'">남은 자리: 10명</p>
-            <button class="reserve-button"
-                    th:data-post-id="${reservation.id}"
-                    th:data-date="${date.date}"
-                    th:data-remaining="${date.remaining}">
-              예약하기
-            </button>
+            <p class="remaining" th:text="'남은 자리: ' + ${date.remaining} + '명'"></p>
+            <div style="display: flex; align-items: center;">
+              <input type="number"
+                     class="reserve-count"
+                     min="1"
+                     th:attr="max=${date.remaining}"
+                     value="1"
+                     style="width: 60px; margin-right: 10px;" />
+
+              <button class="reserve-button"
+                      th:data-post-id="${reservation.id}"
+                      th:data-date="${date.rawDate}"
+                      th:data-remaining="${date.remaining}">
+                예약하기
+              </button>
+            </div>
           </div>
         </div>
       </div>

@@ -1,7 +1,6 @@
 package com.fishtripplanner.dto.reservation;
 
 import com.fishtripplanner.domain.reservation.ReservationPost;
-import com.fishtripplanner.domain.reservation.ReservationPostAvailableDate;
 import com.fishtripplanner.entity.FishTypeEntity;
 import lombok.Builder;
 import lombok.Getter;
@@ -38,10 +37,11 @@ public class ReservationDetailResponseDto {
     @Getter
     @Builder
     public static class AvailableDateDto {
-        private String date;       // ✅ 포맷: yyyy-MM-dd (요일)
-        private String time;       // 예약 시간대 (예: 06:00~14:00)
-        private Integer capacity;  // 최대 정원
-        private Integer remaining; // 남은 인원 수
+        private String rawDate;     // ✅ 전송용: yyyy-MM-dd (서버 전달 시 사용)
+        private String date;        // ✅ 출력용: yyyy-MM-dd(요일) (화면 표시용)
+        private String time;        // 예약 시간대 (예: 06:00~14:00)
+        private Integer capacity;   // 최대 정원
+        private Integer remaining;  // 남은 인원 수
     }
 
     /**
@@ -62,7 +62,9 @@ public class ReservationDetailResponseDto {
     }
 
     /**
-     * ReservationPost + 예약 가능 날짜 리스트 → DTO 변환
+     * ✅ ReservationPost + 예약 가능 날짜 리스트 → DTO 변환
+     * - 출력용 날짜 (`date`)에 요일 추가
+     * - 전송용 날짜 (`rawDate`)는 순수 yyyy-MM-dd 포맷 유지
      */
     public static ReservationDetailResponseDto from(ReservationPost post, List<AvailableDateDto> dateDtos) {
 
@@ -73,14 +75,18 @@ public class ReservationDetailResponseDto {
                 })
                 .collect(Collectors.toList());
 
-        // 여기서 요일 포맷만 적용 (기존 dateDtos는 날짜만 있음)
+        // 요일 가공해서 두 날짜 형태로 나눔
         List<AvailableDateDto> formattedDateDtos = dateDtos.stream()
-                .map(dto -> AvailableDateDto.builder()
-                        .date(formatDateWithDay(LocalDate.parse(dto.getDate())))
-                        .time(dto.getTime())
-                        .capacity(dto.getCapacity())
-                        .remaining(dto.getRemaining())
-                        .build())
+                .map(dto -> {
+                    LocalDate parsedDate = LocalDate.parse(dto.getDate());
+                    return AvailableDateDto.builder()
+                            .rawDate(parsedDate.toString())                       // ex: 2025-06-28
+                            .date(formatDateWithDay(parsedDate))                 // ex: 2025-06-28(토)
+                            .time(dto.getTime())
+                            .capacity(dto.getCapacity())
+                            .remaining(dto.getRemaining())
+                            .build();
+                })
                 .collect(Collectors.toList());
 
         return ReservationDetailResponseDto.builder()

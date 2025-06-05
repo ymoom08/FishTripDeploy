@@ -41,4 +41,6 @@ public class RegionEntity {
     public int hashCode() {
         return java.util.Objects.hash(id);  // ID를 기준으로 hashCode 생성
     }
+
+
 }

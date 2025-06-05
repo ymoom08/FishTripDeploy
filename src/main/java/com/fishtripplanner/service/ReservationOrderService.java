@@ -12,8 +12,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 
-@Service
+
 @RequiredArgsConstructor
+@Service
 public class ReservationOrderService {
 
     private final ReservationOrderRepository reservationOrderRepository;
@@ -29,14 +30,12 @@ public class ReservationOrderService {
 
         LocalDate date = dto.getAvailableDate();
 
-        // 🔍 정원 확인용: 해당 날짜에 대한 capacity 가져오기
         int capacity = post.getAvailableDates().stream()
                 .filter(d -> d.getAvailableDate().equals(date))
                 .findFirst()
                 .map(d -> d.getCapacity())
                 .orElseThrow(() -> new IllegalArgumentException("해당 날짜는 예약 불가"));
 
-        // ✅ 남은 자리 계산
         int reservedCount = reservationOrderRepository.countByReservationPostAndAvailableDate(post, date);
         int remaining = capacity - reservedCount;
 
@@ -44,7 +43,6 @@ public class ReservationOrderService {
             throw new IllegalStateException("남은 자리가 부족합니다. 남은 자리: " + remaining);
         }
 
-        // ✅ 정상 예약 진행
         ReservationOrderEntity order = ReservationOrderEntity.builder()
                 .reservationPost(post)
                 .user(user)
@@ -56,5 +54,4 @@ public class ReservationOrderService {
 
         return reservationOrderRepository.save(order);
     }
-
 }

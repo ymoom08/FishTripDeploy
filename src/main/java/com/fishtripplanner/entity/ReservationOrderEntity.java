@@ -8,6 +8,7 @@ import lombok.*;
 import java.time.LocalDate;
 
 @Entity
+@Table(name = "reservation_order")
 @Getter
 @Setter
 @Builder
@@ -38,4 +39,5 @@ public class ReservationOrderEntity {
 
     @Column(nullable = false)
     private boolean paid;
+
 }
