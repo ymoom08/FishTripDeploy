@@ -34,7 +34,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const postId = parseInt(button.dataset.postId);
       const availableDate = button.dataset.date;
       const userId = parseInt(window.currentUserId);
-      const count = 1;
+      const countInput = button.parentElement.querySelector(".reserve-count");
+      const count = parseInt(countInput.value);
       const paid = false;
 
       if (!postId || !availableDate || !userId || isNaN(userId)) {
